@@ -71,7 +71,6 @@ public class InputManager : MonoBehaviour
             currentAcceleration = input;
         }
         currentAcceleration = Mathf.Clamp(currentAcceleration, 0f, 1f);
-        Debug.Log("input: " + input + ", currentAcceleration: " + currentAcceleration);
     }
 
     private void UpdateBraking(float input)

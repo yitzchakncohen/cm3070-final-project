@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 1040809351288588936}
   - component: {fileID: 3819695382013388903}
   - component: {fileID: 3486038819420399294}
+  - component: {fileID: 3978891534158211180}
   m_Layer: 0
   m_Name: Vehicle
   m_TagString: Untagged
@@ -124,10 +125,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35d26fbcb4f154b4396e3465915bf338, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InputManager
-  vehicleController: {fileID: 0}
+  vehicleController: {fileID: 3978891534158211180}
   accelerationRate: 0.1
   brakingRate: 0.1
   steeringRate: 0.1
+--- !u!114 &3978891534158211180
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 803433713257916642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41381c64fde21564fbb8afc02370dd60, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VehicleController
 --- !u!1 &1701272198427087013
 GameObject:
   m_ObjectHideFlags: 0
