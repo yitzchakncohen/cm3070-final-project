@@ -52,6 +52,21 @@ public class InputManager : MonoBehaviour
         steeringInput = context.ReadValue<float>();
     }
 
+    public void OnGear(InputAction.CallbackContext context)
+    {
+        if(!context.performed) return; 
+        
+        float input = context.ReadValue<float>();
+        if(input < 0)
+        {
+            vehicleController.ShiftGearPrevious();
+        }
+        else if(input > 0)
+        {
+            vehicleController.ShiftGearNext();
+        }
+    }
+
     private void UpdateAcceleration(float input)
     {
         if (playerInput.currentControlScheme == KEYBOARD_SCHEME)

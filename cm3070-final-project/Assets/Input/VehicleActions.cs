@@ -118,6 +118,15 @@ public partial class @VehicleActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Gear"",
+                    ""type"": ""Button"",
+                    ""id"": ""1c6a2e67-b39c-41a9-9459-f3e4faa91d47"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -274,6 +283,72 @@ public partial class @VehicleActions: IInputActionCollection2, IDisposable
                     ""action"": ""Turn"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""1D Axis"",
+                    ""id"": ""174df50d-eced-49dd-91b6-6265e5761eaf"",
+                    ""path"": ""1DAxis"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Gear"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""negative"",
+                    ""id"": ""af2621dc-457b-4610-9e32-b2484c8545ee"",
+                    ""path"": ""<Keyboard>/downArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Gear"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""positive"",
+                    ""id"": ""e0927cc7-eb9f-41d1-ae37-5af69bd2d100"",
+                    ""path"": ""<Keyboard>/upArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Gear"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""1D Axis"",
+                    ""id"": ""2addcda1-6fd1-49dc-bd5a-b71f350a8915"",
+                    ""path"": ""1DAxis"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Gear"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""negative"",
+                    ""id"": ""5c79f370-0055-4a6e-a774-dd9f02582368"",
+                    ""path"": ""<Gamepad>/dpad/down"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Gear"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""positive"",
+                    ""id"": ""bad7e951-0fb4-4f23-b811-9ed989d268f1"",
+                    ""path"": ""<Gamepad>/dpad/up"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Gear"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
                 }
             ]
         }
@@ -308,6 +383,7 @@ public partial class @VehicleActions: IInputActionCollection2, IDisposable
         m_Driving_Accelerate = m_Driving.FindAction("Accelerate", throwIfNotFound: true);
         m_Driving_Brake = m_Driving.FindAction("Brake", throwIfNotFound: true);
         m_Driving_Turn = m_Driving.FindAction("Turn", throwIfNotFound: true);
+        m_Driving_Gear = m_Driving.FindAction("Gear", throwIfNotFound: true);
     }
 
     ~@VehicleActions()
@@ -391,6 +467,7 @@ public partial class @VehicleActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Driving_Accelerate;
     private readonly InputAction m_Driving_Brake;
     private readonly InputAction m_Driving_Turn;
+    private readonly InputAction m_Driving_Gear;
     /// <summary>
     /// Provides access to input actions defined in input action map "Driving".
     /// </summary>
@@ -414,6 +491,10 @@ public partial class @VehicleActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Driving/Turn".
         /// </summary>
         public InputAction @Turn => m_Wrapper.m_Driving_Turn;
+        /// <summary>
+        /// Provides access to the underlying input action "Driving/Gear".
+        /// </summary>
+        public InputAction @Gear => m_Wrapper.m_Driving_Gear;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -449,6 +530,9 @@ public partial class @VehicleActions: IInputActionCollection2, IDisposable
             @Turn.started += instance.OnTurn;
             @Turn.performed += instance.OnTurn;
             @Turn.canceled += instance.OnTurn;
+            @Gear.started += instance.OnGear;
+            @Gear.performed += instance.OnGear;
+            @Gear.canceled += instance.OnGear;
         }
 
         /// <summary>
@@ -469,6 +553,9 @@ public partial class @VehicleActions: IInputActionCollection2, IDisposable
             @Turn.started -= instance.OnTurn;
             @Turn.performed -= instance.OnTurn;
             @Turn.canceled -= instance.OnTurn;
+            @Gear.started -= instance.OnGear;
+            @Gear.performed -= instance.OnGear;
+            @Gear.canceled -= instance.OnGear;
         }
 
         /// <summary>
@@ -556,5 +643,12 @@ public partial class @VehicleActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnTurn(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Gear" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnGear(InputAction.CallbackContext context);
     }
 }

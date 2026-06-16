@@ -1,8 +1,12 @@
+using System;
 using UnityEngine;
 
 public class VehicleController : MonoBehaviour
 {
+    public Gear Gear => (Gear)currentGear;
+    public event Action OnGearChanged;
     private Wheel[] wheels;
+    private int currentGear = 0;
 
     private void Start()
     {
@@ -26,7 +30,8 @@ public class VehicleController : MonoBehaviour
         {
             if(wheel.IsMotorized)
             {
-                wheel.Accelerate(accelerationInput);
+                float input = GetAccelerationInputWithGear(accelerationInput);
+                wheel.Accelerate(input);
             }
         }
     }
@@ -37,5 +42,37 @@ public class VehicleController : MonoBehaviour
         {
             wheel.Brake(brakeInput);
         }
+    }
+
+    public void ShiftGearNext()
+    {
+        currentGear = Mathf.Clamp(currentGear + 1, 0, GetMaxGear());
+        Debug.Log("Gear: " + Gear.ToString());
+        OnGearChanged?.Invoke();
+    }
+
+    public void ShiftGearPrevious()
+    {
+        currentGear = Mathf.Clamp(currentGear - 1, 0, GetMaxGear());
+        OnGearChanged?.Invoke();
+    }
+
+    private float GetAccelerationInputWithGear(float input)
+    {
+        switch (Gear)
+        {
+            case Gear.Park:
+                return 0;
+            case Gear.Reverse:
+                return - input;
+            case Gear.Drive:
+            default:
+                return input;
+        }
+    }
+
+    private static int GetMaxGear()
+    {
+        return Enum.GetValues(typeof(Gear)).Length -1;
     }
 }
