@@ -10,6 +10,7 @@ public class InputManager : MonoBehaviour
     private const string KEYBOARD_SCHEME = "Keyboard";
     private const string CONTROLLER_SCHEME = "Controller";
     private PlayerInput playerInput;
+    [SerializeField] private VehicleController vehicleController;
     [SerializeField] private float accelerationRate = 0.01f;
     [SerializeField] private float brakingRate = 0.01f;
     [SerializeField] private float steeringRate = 0.01f;
@@ -30,6 +31,10 @@ public class InputManager : MonoBehaviour
         UpdateAcceleration(accelerationInput);       
         UpdateBraking(brakingInput);
         UpdateSteering(steeringInput);
+
+        vehicleController.Steer(currentSteering);
+        vehicleController.Brake(currentBraking);
+        vehicleController.Accelerate(currentAcceleration);
     }
 
     public void OnAccelerate(InputAction.CallbackContext context)

@@ -2,15 +2,40 @@ using UnityEngine;
 
 public class VehicleController : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private Wheel[] wheels;
+
+    private void Start()
     {
-        
+        wheels = GetComponentsInChildren<Wheel>();
     }
 
-    // Update is called once per frame
-    void Update()
+    public void Steer(float steeringInput)
     {
-        
+        foreach (Wheel wheel in wheels)
+        {
+            if(wheel.IsSteerable)
+            {
+                wheel.Steer(steeringInput);
+            }
+        }
+    }
+
+    public void Accelerate(float accelerationInput)
+    {
+        foreach (Wheel wheel in wheels)
+        {
+            if(wheel.IsMotorized)
+            {
+                wheel.Accelerate(accelerationInput);
+            }
+        }
+    }
+
+    public void Brake(float brakeInput)
+    {
+        foreach (Wheel wheel in wheels)
+        {
+            wheel.Brake(brakeInput);
+        }
     }
 }

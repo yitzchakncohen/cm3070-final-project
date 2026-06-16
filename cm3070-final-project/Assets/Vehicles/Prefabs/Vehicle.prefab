@@ -124,6 +124,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35d26fbcb4f154b4396e3465915bf338, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InputManager
+  vehicleController: {fileID: 0}
   accelerationRate: 0.1
   brakingRate: 0.1
   steeringRate: 0.1
@@ -239,6 +240,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Wheel
       objectReference: {fileID: 0}
+    - target: {fileID: 1569975896506205935, guid: cd3a079fd369a244b97f6806d2883f0f, type: 3}
+      propertyPath: isSteerable
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3756571875575366192, guid: cd3a079fd369a244b97f6806d2883f0f, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.65
@@ -316,6 +321,10 @@ PrefabInstance:
     - target: {fileID: 616870792062191823, guid: cd3a079fd369a244b97f6806d2883f0f, type: 3}
       propertyPath: m_Name
       value: Wheel (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1569975896506205935, guid: cd3a079fd369a244b97f6806d2883f0f, type: 3}
+      propertyPath: isSteerable
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3756571875575366192, guid: cd3a079fd369a244b97f6806d2883f0f, type: 3}
       propertyPath: m_LocalPosition.x
@@ -445,6 +454,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Wheel (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 1569975896506205935, guid: cd3a079fd369a244b97f6806d2883f0f, type: 3}
+      propertyPath: isMotorized
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3756571875575366192, guid: cd3a079fd369a244b97f6806d2883f0f, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.65
@@ -510,6 +523,10 @@ PrefabInstance:
     - target: {fileID: 616870792062191823, guid: cd3a079fd369a244b97f6806d2883f0f, type: 3}
       propertyPath: m_Name
       value: Wheel (3)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1569975896506205935, guid: cd3a079fd369a244b97f6806d2883f0f, type: 3}
+      propertyPath: isMotorized
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3756571875575366192, guid: cd3a079fd369a244b97f6806d2883f0f, type: 3}
       propertyPath: m_LocalPosition.x
