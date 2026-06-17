@@ -1,78 +1,81 @@
 using System;
 using UnityEngine;
 
-public class VehicleController : MonoBehaviour
+namespace ModularVehicleSimulator.Vehicle
 {
-    public Gear Gear => (Gear)currentGear;
-    public event Action OnGearChanged;
-    private Wheel[] wheels;
-    private int currentGear = 0;
-
-    private void Start()
+    public class VehicleController : MonoBehaviour
     {
-        wheels = GetComponentsInChildren<Wheel>();
-    }
+        public Gear Gear => (Gear)currentGear;
+        public event Action OnGearChanged;
+        private Wheel[] wheels;
+        private int currentGear = 0;
 
-    public void Steer(float steeringInput)
-    {
-        foreach (Wheel wheel in wheels)
+        private void Start()
         {
-            if(wheel.IsSteerable)
+            wheels = GetComponentsInChildren<Wheel>();
+        }
+
+        public void Steer(float steeringInput)
+        {
+            foreach (Wheel wheel in wheels)
             {
-                wheel.Steer(steeringInput);
+                if(wheel.IsSteerable)
+                {
+                    wheel.Steer(steeringInput);
+                }
             }
         }
-    }
 
-    public void Accelerate(float accelerationInput)
-    {
-        foreach (Wheel wheel in wheels)
+        public void Accelerate(float accelerationInput)
         {
-            if(wheel.IsMotorized)
+            foreach (Wheel wheel in wheels)
             {
-                float input = GetAccelerationInputWithGear(accelerationInput);
-                wheel.Accelerate(input);
+                if(wheel.IsMotorized)
+                {
+                    float input = GetAccelerationInputWithGear(accelerationInput);
+                    wheel.Accelerate(input);
+                }
             }
         }
-    }
 
-    public void Brake(float brakeInput)
-    {
-        foreach (Wheel wheel in wheels)
+        public void Brake(float brakeInput)
         {
-            wheel.Brake(brakeInput);
+            foreach (Wheel wheel in wheels)
+            {
+                wheel.Brake(brakeInput);
+            }
         }
-    }
 
-    public void ShiftGearNext()
-    {
-        currentGear = Mathf.Clamp(currentGear + 1, 0, GetMaxGear());
-        Debug.Log("Gear: " + Gear.ToString());
-        OnGearChanged?.Invoke();
-    }
-
-    public void ShiftGearPrevious()
-    {
-        currentGear = Mathf.Clamp(currentGear - 1, 0, GetMaxGear());
-        OnGearChanged?.Invoke();
-    }
-
-    private float GetAccelerationInputWithGear(float input)
-    {
-        switch (Gear)
+        public void ShiftGearNext()
         {
-            case Gear.Park:
-                return 0;
-            case Gear.Reverse:
-                return - input;
-            case Gear.Drive:
-            default:
-                return input;
+            currentGear = Mathf.Clamp(currentGear + 1, 0, GetMaxGear());
+            Debug.Log("Gear: " + Gear.ToString());
+            OnGearChanged?.Invoke();
         }
-    }
 
-    private static int GetMaxGear()
-    {
-        return Enum.GetValues(typeof(Gear)).Length -1;
+        public void ShiftGearPrevious()
+        {
+            currentGear = Mathf.Clamp(currentGear - 1, 0, GetMaxGear());
+            OnGearChanged?.Invoke();
+        }
+
+        private float GetAccelerationInputWithGear(float input)
+        {
+            switch (Gear)
+            {
+                case Gear.Park:
+                    return 0;
+                case Gear.Reverse:
+                    return - input;
+                case Gear.Drive:
+                default:
+                    return input;
+            }
+        }
+
+        private static int GetMaxGear()
+        {
+            return Enum.GetValues(typeof(Gear)).Length -1;
+        }
     }
 }

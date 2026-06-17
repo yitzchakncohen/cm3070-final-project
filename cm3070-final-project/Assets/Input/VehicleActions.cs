@@ -127,6 +127,15 @@ public partial class @VehicleActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ToggleCamera"",
+                    ""type"": ""Button"",
+                    ""id"": ""4740346e-637b-47e9-94d9-221fd50f501e"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -147,7 +156,7 @@ public partial class @VehicleActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/e"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": "";Keyboard"",
                     ""action"": ""Accelerate"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
@@ -158,7 +167,7 @@ public partial class @VehicleActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/d"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": "";Keyboard"",
                     ""action"": ""Accelerate"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
@@ -169,7 +178,7 @@ public partial class @VehicleActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Gamepad>/rightTrigger"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": "";Controller"",
                     ""action"": ""Accelerate"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -191,7 +200,7 @@ public partial class @VehicleActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/w"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": "";Keyboard"",
                     ""action"": ""Brake"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
@@ -202,7 +211,7 @@ public partial class @VehicleActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/s"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": "";Keyboard"",
                     ""action"": ""Brake"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
@@ -213,7 +222,7 @@ public partial class @VehicleActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Gamepad>/leftTrigger"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": "";Controller"",
                     ""action"": ""Brake"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -235,7 +244,7 @@ public partial class @VehicleActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/leftArrow"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": "";Keyboard"",
                     ""action"": ""Turn"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
@@ -246,7 +255,7 @@ public partial class @VehicleActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/rightArrow"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": "";Keyboard"",
                     ""action"": ""Turn"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
@@ -268,7 +277,7 @@ public partial class @VehicleActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Gamepad>/rightStick/left"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": "";Controller"",
                     ""action"": ""Turn"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
@@ -279,7 +288,7 @@ public partial class @VehicleActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Gamepad>/rightStick/right"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": "";Controller"",
                     ""action"": ""Turn"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
@@ -301,7 +310,7 @@ public partial class @VehicleActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/downArrow"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": "";Keyboard"",
                     ""action"": ""Gear"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
@@ -312,7 +321,7 @@ public partial class @VehicleActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/upArrow"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": "";Keyboard"",
                     ""action"": ""Gear"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
@@ -334,7 +343,7 @@ public partial class @VehicleActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Gamepad>/dpad/down"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": "";Controller"",
                     ""action"": ""Gear"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
@@ -345,10 +354,32 @@ public partial class @VehicleActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Gamepad>/dpad/up"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": "";Controller"",
                     ""action"": ""Gear"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c125294c-4afa-49e3-aa8e-7469d41b2f7e"",
+                    ""path"": ""<Gamepad>/select"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Controller"",
+                    ""action"": ""ToggleCamera"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""02c2bb3a-f829-4220-8d45-5b71feb73c50"",
+                    ""path"": ""<Keyboard>/c"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard"",
+                    ""action"": ""ToggleCamera"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -384,6 +415,7 @@ public partial class @VehicleActions: IInputActionCollection2, IDisposable
         m_Driving_Brake = m_Driving.FindAction("Brake", throwIfNotFound: true);
         m_Driving_Turn = m_Driving.FindAction("Turn", throwIfNotFound: true);
         m_Driving_Gear = m_Driving.FindAction("Gear", throwIfNotFound: true);
+        m_Driving_ToggleCamera = m_Driving.FindAction("ToggleCamera", throwIfNotFound: true);
     }
 
     ~@VehicleActions()
@@ -468,6 +500,7 @@ public partial class @VehicleActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Driving_Brake;
     private readonly InputAction m_Driving_Turn;
     private readonly InputAction m_Driving_Gear;
+    private readonly InputAction m_Driving_ToggleCamera;
     /// <summary>
     /// Provides access to input actions defined in input action map "Driving".
     /// </summary>
@@ -495,6 +528,10 @@ public partial class @VehicleActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Driving/Gear".
         /// </summary>
         public InputAction @Gear => m_Wrapper.m_Driving_Gear;
+        /// <summary>
+        /// Provides access to the underlying input action "Driving/ToggleCamera".
+        /// </summary>
+        public InputAction @ToggleCamera => m_Wrapper.m_Driving_ToggleCamera;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -533,6 +570,9 @@ public partial class @VehicleActions: IInputActionCollection2, IDisposable
             @Gear.started += instance.OnGear;
             @Gear.performed += instance.OnGear;
             @Gear.canceled += instance.OnGear;
+            @ToggleCamera.started += instance.OnToggleCamera;
+            @ToggleCamera.performed += instance.OnToggleCamera;
+            @ToggleCamera.canceled += instance.OnToggleCamera;
         }
 
         /// <summary>
@@ -556,6 +596,9 @@ public partial class @VehicleActions: IInputActionCollection2, IDisposable
             @Gear.started -= instance.OnGear;
             @Gear.performed -= instance.OnGear;
             @Gear.canceled -= instance.OnGear;
+            @ToggleCamera.started -= instance.OnToggleCamera;
+            @ToggleCamera.performed -= instance.OnToggleCamera;
+            @ToggleCamera.canceled -= instance.OnToggleCamera;
         }
 
         /// <summary>
@@ -650,5 +693,12 @@ public partial class @VehicleActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnGear(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "ToggleCamera" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnToggleCamera(InputAction.CallbackContext context);
     }
 }
