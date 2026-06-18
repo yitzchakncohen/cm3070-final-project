@@ -38,7 +38,7 @@ namespace ModularVehicleSimulator.Vehicle
             foreach (WheelCollider wheelCollider in wheelColliders)
             {
                 wheelCollider.brakeTorque = 0f;
-                wheelCollider.motorTorque = torque / wheelColliders.Length;            
+                wheelCollider.motorTorque = torque / wheelColliders.Length;             
             }
         }
 
