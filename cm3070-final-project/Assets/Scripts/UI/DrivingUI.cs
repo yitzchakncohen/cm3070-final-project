@@ -41,7 +41,7 @@ namespace ModularVehicleSimulator.UI
 
         private void VehicleController_OnGearChanged()
         {
-            gearText.text = vehicleController.Gear.ToString()[0].ToString();
+            gearText.text = vehicleController.Gear.ToLetter();
         }
     }
 }

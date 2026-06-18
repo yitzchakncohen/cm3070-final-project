@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f12d2afce5ee9da40981e1e855060f43, type: 3}
+  m_Name: HondaAccord2010
+  m_EditorClassIdentifier: Assembly-CSharp::ModularVehicleSimulator.Vehicle.Data.VehicleConfiguration
+  vehicleName: Honda Accord 2010 EX-L
+  engineType: 0
+  driveTrain: {fileID: 11400000, guid: 6967533a9b293c24a87575cc2e12916b, type: 2}

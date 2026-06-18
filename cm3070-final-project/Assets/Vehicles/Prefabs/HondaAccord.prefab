@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 3486038819420399294}
   - component: {fileID: 3978891534158211180}
   - component: {fileID: 6812107340984863835}
+  - component: {fileID: 184680343560197519}
   m_Layer: 0
   m_Name: HondaAccord
   m_TagString: Untagged
@@ -177,6 +178,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41381c64fde21564fbb8afc02370dd60, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VehicleController
+  vehicleConfiguration: {fileID: 11400000, guid: f0366b6265389a942ac05ceb3812e70d, type: 2}
 --- !u!114 &6812107340984863835
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -193,6 +195,18 @@ MonoBehaviour:
   - {fileID: 6021629200817835328}
   - {fileID: 2940403901965675115}
   - {fileID: 6623194646163291070}
+--- !u!114 &184680343560197519
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 803433713257916642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: afd92e54a95121c46bc8cb8852caa605, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ModularVehicleSimulator.Vehicle.Engine
 --- !u!1 &1033523876854779012
 GameObject:
   m_ObjectHideFlags: 0
@@ -675,8 +689,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8638235276748275244}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.000013043171, y: -0.020449543, z: 0.00000026830818, w: 0.9997909}
-  m_LocalPosition: {x: -47.34648, y: 1.2567774, z: 45.70332}
+  m_LocalRotation: {x: 0.38268343, y: 0, z: 0, w: 0.92387956}
+  m_LocalPosition: {x: 0, y: 10, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -715,7 +729,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 75
+  field of view: 60
   orthographic: 0
   orthographic size: 5
   m_Depth: -1

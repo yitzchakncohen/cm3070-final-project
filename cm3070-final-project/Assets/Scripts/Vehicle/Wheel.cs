@@ -12,10 +12,6 @@ namespace ModularVehicleSimulator.Vehicle
         [SerializeField] private Transform wheelModel;
         private WheelCollider[] wheelColliders;
         private float steeringRange = 45f;
-        private float motorTorque = 220f;
-        private float driveTrainLoss = 0.85f;
-        //Final ratio times 1st gear ratio.
-        private float driveTrainRatio = 4.31f * 2.697f;
         private float brakeTorque = 1000f;
 
         private void Awake()
@@ -37,12 +33,12 @@ namespace ModularVehicleSimulator.Vehicle
             wheelModel.rotation = rotation;
         }
 
-        public void Accelerate(float accelerationInput)
+        public void Accelerate(float torque)
         {
             foreach (WheelCollider wheelCollider in wheelColliders)
             {
                 wheelCollider.brakeTorque = 0f;
-                wheelCollider.motorTorque = accelerationInput * motorTorque * driveTrainLoss * driveTrainRatio /2f;            
+                wheelCollider.motorTorque = torque / wheelColliders.Length;            
             }
         }
 

@@ -1,4 +1,5 @@
 using System;
+using ModularVehicleSimulator.Vehicle.Data;
 using UnityEngine;
 
 namespace ModularVehicleSimulator.Vehicle
@@ -7,12 +8,16 @@ namespace ModularVehicleSimulator.Vehicle
     {
         public Gear Gear => (Gear)currentGear;
         public event Action OnGearChanged;
+        [SerializeField] private VehicleConfiguration vehicleConfiguration;
         private Wheel[] wheels;
+        private Engine engine;
         private int currentGear = 0;
 
         private void Start()
         {
             wheels = GetComponentsInChildren<Wheel>();
+            engine = GetComponent<Engine>();
+            engine.Init(vehicleConfiguration.EngineType, vehicleConfiguration.DriveTrain, wheels);
         }
 
         public void Steer(float steeringInput)
@@ -28,14 +33,7 @@ namespace ModularVehicleSimulator.Vehicle
 
         public void Accelerate(float accelerationInput)
         {
-            foreach (Wheel wheel in wheels)
-            {
-                if(wheel.IsMotorized)
-                {
-                    float input = GetAccelerationInputWithGear(accelerationInput);
-                    wheel.Accelerate(input);
-                }
-            }
+            engine.Accelerate(Gear, accelerationInput);
         }
 
         public void Brake(float brakeInput)
@@ -48,14 +46,14 @@ namespace ModularVehicleSimulator.Vehicle
 
         public void ShiftGearNext()
         {
-            currentGear = Mathf.Clamp(currentGear + 1, 0, GetMaxGear());
+            currentGear = Mathf.Clamp(currentGear + 1, -1, GetMaxGear());
             Debug.Log("Gear: " + Gear.ToString());
             OnGearChanged?.Invoke();
         }
 
         public void ShiftGearPrevious()
         {
-            currentGear = Mathf.Clamp(currentGear - 1, 0, GetMaxGear());
+            currentGear = Mathf.Clamp(currentGear - 1, -1, GetMaxGear());
             OnGearChanged?.Invoke();
         }
 
