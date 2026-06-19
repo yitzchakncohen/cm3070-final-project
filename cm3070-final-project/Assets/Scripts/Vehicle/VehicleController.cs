@@ -21,7 +21,8 @@ namespace ModularVehicleSimulator.Vehicle
                 wheel.Init(vehicleConfiguration.Wheels, 
                         vehicleConfiguration.Brakes, 
                         vehicleConfiguration.Steering, 
-                        vehicleConfiguration.Suspension
+                        vehicleConfiguration.Suspension,
+                        vehicleConfiguration.DriveTrain
                     );
             }
             engine = GetComponent<Engine>();

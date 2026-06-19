@@ -15,24 +15,29 @@ namespace ModularVehicleSimulator.Vehicle
         [SerializeField] private bool isFront = true;
         [SerializeField] private Transform wheelModel;
         private WheelCollider[] wheelColliders;
-        private float steeringRange = 38f;
-        private float brakeTorque = 1000f;
         private WheelConfiguration wheelConfiguration;
         private BrakesConfiguration brakesConfiguration;
         private SteeringConfiguration steeringConfiguration;
         private SuspensionConfiguration suspensionConfiguration;
+        private DriveTrain driveTrain;
 
         private void Awake()
         {
             wheelColliders = GetComponentsInChildren<WheelCollider>();
         }
 
-        public void Init(WheelConfiguration wheels, BrakesConfiguration brakes, SteeringConfiguration steering, SuspensionConfiguration suspension)
+        public void Init(WheelConfiguration wheels, 
+                        BrakesConfiguration brakes, 
+                        SteeringConfiguration steering, 
+                        SuspensionConfiguration suspension,
+                        DriveTrain driveTrain)
         {
             wheelConfiguration = wheels;
             brakesConfiguration = brakes;
             steeringConfiguration = steering;
             suspensionConfiguration = suspension;
+            this.driveTrain = driveTrain;
+            ApplyWheelPhysicsParamters();
         }
 
         public void Steer(float steeringInput)
@@ -41,7 +46,7 @@ namespace ModularVehicleSimulator.Vehicle
             Quaternion rotation = Quaternion.identity;
             foreach (WheelCollider wheelCollider in wheelColliders)
             {
-                wheelCollider.steerAngle = steeringInput * steeringRange;
+                wheelCollider.steerAngle = steeringInput * steeringConfiguration.MaxAngleAtRest;
                 wheelCollider.GetWorldPose(out Vector3 wheelPosition, out rotation);  
                 position = position + wheelPosition;
             }
@@ -60,10 +65,64 @@ namespace ModularVehicleSimulator.Vehicle
 
         public void Brake(float brakingInput)
         {
+            float brakeTorque = brakesConfiguration.Torque * brakesConfiguration.FrontBias;
+            if(!IsFront)
+            {
+                brakeTorque = brakesConfiguration.Torque * (1-brakesConfiguration.FrontBias);
+            }
             foreach (WheelCollider wheelCollider in wheelColliders)
             {
                 wheelCollider.motorTorque = 0f;
                 wheelCollider.brakeTorque = brakingInput * brakeTorque / wheelColliders.Count();            
+            }
+        }
+
+        private void ApplyWheelPhysicsParamters()
+        {
+            foreach (WheelCollider wheelCollider in wheelColliders)
+            {
+                wheelCollider.brakeTorque = brakesConfiguration.Torque;
+                wheelCollider.radius = wheelConfiguration.Radius;
+                // TODO apply width
+                wheelCollider.mass = wheelConfiguration.Weight;
+                WheelFrictionCurve forwardFriction = new WheelFrictionCurve
+                {
+                    extremumSlip = wheelConfiguration.ForwardExtremeSlip,
+                    extremumValue = wheelConfiguration.ForwardExtremeValue,
+                    asymptoteSlip = wheelConfiguration.ForwardAsymptoteSlip,
+                    asymptoteValue = wheelConfiguration.ForwardAsymptoteValue,
+                    stiffness = wheelConfiguration.ForwardStiffness
+                };
+                wheelCollider.forwardFriction = forwardFriction;
+                WheelFrictionCurve sidewaysFriction = new WheelFrictionCurve
+                {
+                    extremumSlip = wheelConfiguration.SideWaysExtremeSlip,
+                    extremumValue = wheelConfiguration.SideWaysExtremeValue,
+                    asymptoteSlip = wheelConfiguration.SideWaysAsymptoteSlip,
+                    asymptoteValue = wheelConfiguration.SideWaysAsymptoteValue,
+                    stiffness = wheelConfiguration.SideWaysStiffness
+                };
+                wheelCollider.sidewaysFriction = sidewaysFriction;
+                wheelCollider.suspensionDistance = suspensionConfiguration.Distance;
+                wheelCollider.wheelDampingRate = driveTrain.Damping;
+                if(IsFront)
+                {
+                    wheelCollider.suspensionSpring = new JointSpring
+                    {
+                        spring = suspensionConfiguration.FrontSpring,
+                        damper = suspensionConfiguration.Damper,
+                        targetPosition = wheelCollider.suspensionSpring.targetPosition
+                    };
+                }
+                else
+                {
+                    wheelCollider.suspensionSpring = new JointSpring
+                    {
+                        spring = suspensionConfiguration.BackSpring,
+                        damper = suspensionConfiguration.Damper,
+                        targetPosition = wheelCollider.suspensionSpring.targetPosition
+                    };
+                }
             }
         }
 

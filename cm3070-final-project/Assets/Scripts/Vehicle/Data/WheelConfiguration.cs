@@ -5,19 +5,19 @@ namespace ModularVehicleSimulator.Vehicle.Data
     [CreateAssetMenu(fileName = "WheelConfiguration", menuName = "Vehicle Simulator/WheelConfiguration")]
     public class WheelConfiguration : ScriptableObject
     {
-        private float Radius => radiusInMeters;
-        private float Width => widthInMeters;
-        private float Weight => weightInKG;
-        private float ForwardExtremeSlip => forwardExtremeSlip = 0.125f;
-        private float ForwardExtremeValue => forwardExtremeValue = 0.875f;
-        private float ForwardAsymptoteSlip => forwardAsymptoteSlip = 0.7f;
-        private float ForwardAsymptoteValue => forwardAsymptoteValue = 0.725f;
-        private float ForwardStiffness => forwardStiffness = 1.0f;
-        private float SideWaysExtremeSlip => sideWaysExtremeSlip = 0.175f;
-        private float SideWaysExtremeValue => sideWaysExtremeValue = 0.875f;
-        private float SideWaysAsymptoteSlip => sideWaysAsymptoteSlip = 0.7f;
-        private float SideWaysAsymptoteValue => sideWaysAsymptoteValue = 0.725f;
-        private float SideWaysStiffness => sideWaysStiffness = 1.0f;
+        public float Radius => radiusInMeters;
+        public float Width => widthInMeters;
+        public float Weight => weightInKG;
+        public float ForwardExtremeSlip => forwardExtremeSlip = 0.125f;
+        public float ForwardExtremeValue => forwardExtremeValue = 0.875f;
+        public float ForwardAsymptoteSlip => forwardAsymptoteSlip = 0.7f;
+        public float ForwardAsymptoteValue => forwardAsymptoteValue = 0.725f;
+        public float ForwardStiffness => forwardStiffness = 1.0f;
+        public float SideWaysExtremeSlip => sideWaysExtremeSlip = 0.175f;
+        public float SideWaysExtremeValue => sideWaysExtremeValue = 0.875f;
+        public float SideWaysAsymptoteSlip => sideWaysAsymptoteSlip = 0.7f;
+        public float SideWaysAsymptoteValue => sideWaysAsymptoteValue = 0.725f;
+        public float SideWaysStiffness => sideWaysStiffness = 1.0f;
         [Header("Dimensions")]
         private float radiusInMeters = 0.3284f;
         private float widthInMeters = 0.225f;
