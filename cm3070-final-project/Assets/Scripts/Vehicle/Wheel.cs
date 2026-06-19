@@ -1,4 +1,6 @@
+using System;
 using System.Linq;
+using ModularVehicleSimulator.Vehicle.Data;
 using UnityEngine;
 
 namespace ModularVehicleSimulator.Vehicle
@@ -15,10 +17,22 @@ namespace ModularVehicleSimulator.Vehicle
         private WheelCollider[] wheelColliders;
         private float steeringRange = 38f;
         private float brakeTorque = 1000f;
+        private WheelConfiguration wheelConfiguration;
+        private BrakesConfiguration brakesConfiguration;
+        private SteeringConfiguration steeringConfiguration;
+        private SuspensionConfiguration suspensionConfiguration;
 
         private void Awake()
         {
             wheelColliders = GetComponentsInChildren<WheelCollider>();
+        }
+
+        public void Init(WheelConfiguration wheels, BrakesConfiguration brakes, SteeringConfiguration steering, SuspensionConfiguration suspension)
+        {
+            wheelConfiguration = wheels;
+            brakesConfiguration = brakes;
+            steeringConfiguration = steering;
+            suspensionConfiguration = suspension;
         }
 
         public void Steer(float steeringInput)
@@ -52,5 +66,6 @@ namespace ModularVehicleSimulator.Vehicle
                 wheelCollider.brakeTorque = brakingInput * brakeTorque / wheelColliders.Count();            
             }
         }
+
     }
 }

@@ -16,6 +16,14 @@ namespace ModularVehicleSimulator.Vehicle
         private void Start()
         {
             wheels = GetComponentsInChildren<Wheel>();
+            foreach (Wheel wheel in wheels)
+            {
+                wheel.Init(vehicleConfiguration.Wheels, 
+                        vehicleConfiguration.Brakes, 
+                        vehicleConfiguration.Steering, 
+                        vehicleConfiguration.Suspension
+                    );
+            }
             engine = GetComponent<Engine>();
             engine.Init(vehicleConfiguration.Engine, vehicleConfiguration.DriveTrain, wheels);
         }
