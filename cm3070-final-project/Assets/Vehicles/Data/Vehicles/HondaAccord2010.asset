@@ -17,4 +17,6 @@ MonoBehaviour:
   driveTrain: {fileID: 11400000, guid: 6967533a9b293c24a87575cc2e12916b, type: 2}
   wheelConfiguration: {fileID: 11400000, guid: aeeb886f4bab5344a8e8a3b1a5135da0, type: 2}
   suspensionConfiguration: {fileID: 11400000, guid: aa57690acb149b14ca01d26fbc86020a, type: 2}
+  brakesConfiguration: {fileID: 11400000, guid: b111f873510bd374591b5c4f105e583d, type: 2}
   chassisConfiguration: {fileID: 11400000, guid: e20a9ff7369f81645955127ad1cee6f6, type: 2}
+  steeringConfiguration: {fileID: 11400000, guid: 1fd75c3ce865b5547aa21b4315f8d7d1, type: 2}

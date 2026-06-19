@@ -17,7 +17,7 @@ namespace ModularVehicleSimulator.Vehicle
         {
             wheels = GetComponentsInChildren<Wheel>();
             engine = GetComponent<Engine>();
-            engine.Init(vehicleConfiguration.EngineType, vehicleConfiguration.DriveTrain, wheels);
+            engine.Init(vehicleConfiguration.Engine, vehicleConfiguration.DriveTrain, wheels);
         }
 
         public void Steer(float steeringInput)

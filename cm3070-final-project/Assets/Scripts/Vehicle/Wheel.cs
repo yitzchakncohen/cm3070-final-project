@@ -7,11 +7,13 @@ namespace ModularVehicleSimulator.Vehicle
     {
         public bool IsMotorized => isMotorized;
         public bool IsSteerable => isSteerable;
+        public bool IsFront => isFront;
         [SerializeField] private bool isMotorized = true;
         [SerializeField] private bool isSteerable = true;
+        [SerializeField] private bool isFront = true;
         [SerializeField] private Transform wheelModel;
         private WheelCollider[] wheelColliders;
-        private float steeringRange = 45f;
+        private float steeringRange = 38f;
         private float brakeTorque = 1000f;
 
         private void Awake()

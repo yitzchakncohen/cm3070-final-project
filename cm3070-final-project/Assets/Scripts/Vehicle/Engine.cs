@@ -5,14 +5,13 @@ namespace ModularVehicleSimulator.Vehicle
 {
     public class Engine : MonoBehaviour
     {
-        private float engineTorque = 220f;
+        EngineConfiguration engineConfiguration;
         private DriveTrain driveTrain;
         private Wheel[] wheels;
-        private EngineType engineType = EngineType.Gas;
 
-        public void Init(EngineType engineType, DriveTrain driveTrain, Wheel[] wheels)
+        public void Init(EngineConfiguration engineConfiguration, DriveTrain driveTrain, Wheel[] wheels)
         {
-            this.engineType = engineType;
+            this.engineConfiguration = engineConfiguration;
             this.driveTrain = driveTrain;
             this.wheels = wheels;
         }
@@ -31,7 +30,7 @@ namespace ModularVehicleSimulator.Vehicle
 
         private float GetWheelTorque(Gear gear, float input)
         {
-            return GetAccelerationInputWithGear(engineTorque * input, gear, engineType);
+            return GetAccelerationInputWithGear(engineConfiguration.Power * input, gear, engineConfiguration.Type);
         }
         
         private float GetAccelerationInputWithGear(float input, Gear gear, EngineType engineType)
