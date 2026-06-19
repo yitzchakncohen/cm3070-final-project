@@ -9,6 +9,7 @@ namespace ModularVehicleSimulator.Vehicle
         public Gear Gear => (Gear)currentGear;
         public event Action OnGearChanged;
         [SerializeField] private VehicleConfiguration vehicleConfiguration;
+        [SerializeField] private Rigidbody chassisRigidBody;
         private Wheel[] wheels;
         private Engine engine;
         private int currentGear = 0;
@@ -35,7 +36,8 @@ namespace ModularVehicleSimulator.Vehicle
             {
                 if(wheel.IsSteerable)
                 {
-                    wheel.Steer(steeringInput);
+                    float speed = chassisRigidBody.linearVelocity.magnitude;
+                    wheel.Steer(steeringInput, speed);
                 }
             }
         }

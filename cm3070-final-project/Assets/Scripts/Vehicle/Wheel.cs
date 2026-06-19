@@ -40,14 +40,18 @@ namespace ModularVehicleSimulator.Vehicle
             ApplyWheelPhysicsParamters();
         }
 
-        public void Steer(float steeringInput)
+        public void Steer(float steeringInput, float currentSpeed)
         {
             Vector3 position = Vector3.zero;
             Quaternion rotation = Quaternion.identity;
+
+            // Power Steering
+            float targetSteeringAngle = GetTargetSteeringAngle(steeringInput, currentSpeed);
+
             foreach (WheelCollider wheelCollider in wheelColliders)
             {
-                wheelCollider.steerAngle = steeringInput * steeringConfiguration.MaxAngleAtRest;
-                wheelCollider.GetWorldPose(out Vector3 wheelPosition, out rotation);  
+                wheelCollider.steerAngle = Mathf.MoveTowards(wheelCollider.steerAngle, targetSteeringAngle, steeringConfiguration.SteeringSpeed * Time.fixedDeltaTime);
+                wheelCollider.GetWorldPose(out Vector3 wheelPosition, out rotation);
                 position = position + wheelPosition;
             }
             wheelModel.position = position / wheelColliders.Count();
@@ -124,6 +128,14 @@ namespace ModularVehicleSimulator.Vehicle
                     };
                 }
             }
+        }
+
+        private float GetTargetSteeringAngle(float steeringInput, float currentSpeed)
+        {
+            float speedFactor = Mathf.InverseLerp(0f, steeringConfiguration.HighSpeedThreshold, currentSpeed);
+            float allowableMaxSteer = Mathf.Lerp(steeringConfiguration.MaxSteeringAngleAtRest, steeringConfiguration.MaxSteeringAngleAtHighSpeed, speedFactor);
+            float targetSteeringAngle = steeringInput * allowableMaxSteer;
+            return targetSteeringAngle;
         }
 
     }

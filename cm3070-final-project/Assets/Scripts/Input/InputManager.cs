@@ -34,10 +34,13 @@ namespace ModularVehicleSimulator.Input
             UpdateAcceleration(accelerationInput);       
             UpdateBraking(brakingInput);
             UpdateSteering(steeringInput);
+        }
 
+        void FixedUpdate()
+        {
             vehicleController.Steer(currentSteering);
             vehicleController.Brake(currentBraking);
-            vehicleController.Accelerate(currentAcceleration);
+            vehicleController.Accelerate(currentAcceleration);            
         }
 
         public void OnAccelerate(InputAction.CallbackContext context)

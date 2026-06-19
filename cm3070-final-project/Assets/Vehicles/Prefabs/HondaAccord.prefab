@@ -179,6 +179,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VehicleController
   vehicleConfiguration: {fileID: 11400000, guid: f0366b6265389a942ac05ceb3812e70d, type: 2}
+  chassisRigidBody: {fileID: 1611960791474144282}
 --- !u!114 &6812107340984863835
 MonoBehaviour:
   m_ObjectHideFlags: 0
