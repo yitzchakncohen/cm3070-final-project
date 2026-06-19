@@ -10,6 +10,8 @@ namespace ModularVehicleSimulator.Vehicle
         public bool IsMotorized => isMotorized;
         public bool IsSteerable => isSteerable;
         public bool IsFront => isFront;
+        public bool IsLeft => transform.localPosition.x < 0f;
+        public bool IsRight => transform.localPosition.x > 0f;
         [SerializeField] private bool isMotorized = true;
         [SerializeField] private bool isSteerable = true;
         [SerializeField] private bool isFront = true;
@@ -19,6 +21,7 @@ namespace ModularVehicleSimulator.Vehicle
         private BrakesConfiguration brakesConfiguration;
         private SteeringConfiguration steeringConfiguration;
         private SuspensionConfiguration suspensionConfiguration;
+        private ChassisConfiguration chassisConfiguration;
         private DriveTrain driveTrain;
 
         private void Awake()
@@ -30,12 +33,14 @@ namespace ModularVehicleSimulator.Vehicle
                         BrakesConfiguration brakes, 
                         SteeringConfiguration steering, 
                         SuspensionConfiguration suspension,
+                        ChassisConfiguration chassis,
                         DriveTrain driveTrain)
         {
             wheelConfiguration = wheels;
             brakesConfiguration = brakes;
             steeringConfiguration = steering;
             suspensionConfiguration = suspension;
+            chassisConfiguration = chassis;
             this.driveTrain = driveTrain;
             ApplyWheelPhysicsParamters();
         }
@@ -47,10 +52,18 @@ namespace ModularVehicleSimulator.Vehicle
 
             // Power Steering
             float targetSteeringAngle = GetTargetSteeringAngle(steeringInput, currentSpeed);
+            GetSteeringAngles(chassisConfiguration.WheelBase, chassisConfiguration.Track, targetSteeringAngle, out float rightSteeringAngle, out float leftSteeringAngle);
 
             foreach (WheelCollider wheelCollider in wheelColliders)
             {
-                wheelCollider.steerAngle = Mathf.MoveTowards(wheelCollider.steerAngle, targetSteeringAngle, steeringConfiguration.SteeringSpeed * Time.fixedDeltaTime);
+                if(IsLeft)
+                {
+                    wheelCollider.steerAngle = Mathf.MoveTowards(wheelCollider.steerAngle, rightSteeringAngle, steeringConfiguration.SteeringSpeed * Time.fixedDeltaTime);                    
+                }
+                else
+                {
+                    wheelCollider.steerAngle = Mathf.MoveTowards(wheelCollider.steerAngle, leftSteeringAngle, steeringConfiguration.SteeringSpeed * Time.fixedDeltaTime);                    
+                }
                 wheelCollider.GetWorldPose(out Vector3 wheelPosition, out rotation);
                 position = position + wheelPosition;
             }
@@ -138,5 +151,27 @@ namespace ModularVehicleSimulator.Vehicle
             return targetSteeringAngle;
         }
 
+        // Ackerman's Geometric Model
+        private static void GetSteeringAngles(float wheelBase, float track, float targetAngle, out float rightSteeringAngle, out float leftSteeringAngle)
+        {
+            // Handle small values
+            if(Mathf.Abs(targetAngle) < 0.1f)
+            {
+                rightSteeringAngle = leftSteeringAngle = targetAngle;
+                return;
+            }
+
+            float tanOfTargetAngle = Mathf.Tan(Mathf.Abs(targetAngle) * Mathf.Deg2Rad);
+            if(targetAngle > 0)
+            {
+                rightSteeringAngle = Mathf.Rad2Deg * Mathf.Atan(wheelBase / ((wheelBase / tanOfTargetAngle) + (track/2))) * Mathf.Sign(targetAngle);
+                leftSteeringAngle = Mathf.Rad2Deg * Mathf.Atan(wheelBase / ((wheelBase / tanOfTargetAngle) - (track/2))) * Mathf.Sign(targetAngle);
+            }
+            else
+            {
+                rightSteeringAngle = Mathf.Rad2Deg * Mathf.Atan(wheelBase / ((wheelBase / tanOfTargetAngle) - (track/2))) * Mathf.Sign(targetAngle);
+                leftSteeringAngle = Mathf.Rad2Deg * Mathf.Atan(wheelBase / ((wheelBase / tanOfTargetAngle) + (track/2))) * Mathf.Sign(targetAngle);
+            }
+        }
     }
 }

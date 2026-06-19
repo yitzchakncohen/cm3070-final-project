@@ -23,6 +23,7 @@ namespace ModularVehicleSimulator.Vehicle
                         vehicleConfiguration.Brakes, 
                         vehicleConfiguration.Steering, 
                         vehicleConfiguration.Suspension,
+                        vehicleConfiguration.Chassis,
                         vehicleConfiguration.DriveTrain
                     );
             }
