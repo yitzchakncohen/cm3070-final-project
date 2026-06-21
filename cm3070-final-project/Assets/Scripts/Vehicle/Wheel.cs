@@ -12,6 +12,9 @@ namespace ModularVehicleSimulator.Vehicle
         public bool IsFront => isFront;
         public bool IsLeft => transform.localPosition.x < 0f;
         public bool IsRight => transform.localPosition.x > 0f;
+        public float SteeringAngle => currentTargetSteeringAngle;
+        public float RightSteeringAngle => rightSteeringAngle;
+        public float LeftSteeringAngle => leftSteeringAngle;
         [SerializeField] private bool isMotorized = true;
         [SerializeField] private bool isSteerable = true;
         [SerializeField] private bool isFront = true;
@@ -23,6 +26,9 @@ namespace ModularVehicleSimulator.Vehicle
         private SuspensionConfiguration suspensionConfiguration;
         private ChassisConfiguration chassisConfiguration;
         private DriveTrain driveTrain;
+        private float currentTargetSteeringAngle = 0f;
+        private float rightSteeringAngle = 0f;
+        private float leftSteeringAngle = 0f;
 
         private void Awake()
         {
@@ -50,9 +56,10 @@ namespace ModularVehicleSimulator.Vehicle
             Vector3 position = Vector3.zero;
             Quaternion rotation = Quaternion.identity;
 
-            // Power Steering
-            float targetSteeringAngle = GetTargetSteeringAngle(steeringInput, currentSpeed);
-            GetSteeringAngles(chassisConfiguration.WheelBase, chassisConfiguration.Track, targetSteeringAngle, out float rightSteeringAngle, out float leftSteeringAngle);
+            // Power Steering, cache for debugging
+            // TODO move to steering class.
+            currentTargetSteeringAngle = GetTargetSteeringAngle(steeringInput, currentSpeed);
+            GetSteeringAngles(chassisConfiguration.WheelBase, chassisConfiguration.Track, currentTargetSteeringAngle);
 
             foreach (WheelCollider wheelCollider in wheelColliders)
             {
@@ -152,7 +159,7 @@ namespace ModularVehicleSimulator.Vehicle
         }
 
         // Ackerman's Geometric Model
-        private static void GetSteeringAngles(float wheelBase, float track, float targetAngle, out float rightSteeringAngle, out float leftSteeringAngle)
+        private void GetSteeringAngles(float wheelBase, float track, float targetAngle)
         {
             // Handle small values
             if(Mathf.Abs(targetAngle) < 0.1f)

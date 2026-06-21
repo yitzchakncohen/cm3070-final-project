@@ -343,6 +343,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9122147248508245894}
   - component: {fileID: 1611960791474144282}
+  - component: {fileID: 1272208942798105835}
   m_Layer: 0
   m_Name: Chassis
   m_TagString: Untagged
@@ -394,6 +395,18 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &1272208942798105835
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1701272198427087013}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e08f12fe8f68f9745b108fc30c52b59d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ModularVehicleSimulator.Debugging.TurningRadiusGizmo
 --- !u!1 &4127906604676985921
 GameObject:
   m_ObjectHideFlags: 0
@@ -884,6 +897,10 @@ PrefabInstance:
       value: WheelBackLeft
       objectReference: {fileID: 0}
     - target: {fileID: 1569975896506205935, guid: cd3a079fd369a244b97f6806d2883f0f, type: 3}
+      propertyPath: isFront
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1569975896506205935, guid: cd3a079fd369a244b97f6806d2883f0f, type: 3}
       propertyPath: isSteerable
       value: 0
       objectReference: {fileID: 0}
@@ -964,6 +981,10 @@ PrefabInstance:
     - target: {fileID: 616870792062191823, guid: cd3a079fd369a244b97f6806d2883f0f, type: 3}
       propertyPath: m_Name
       value: WheelBackRight
+      objectReference: {fileID: 0}
+    - target: {fileID: 1569975896506205935, guid: cd3a079fd369a244b97f6806d2883f0f, type: 3}
+      propertyPath: isFront
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1569975896506205935, guid: cd3a079fd369a244b97f6806d2883f0f, type: 3}
       propertyPath: isSteerable
