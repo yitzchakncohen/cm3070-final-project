@@ -24,8 +24,8 @@ namespace ModularVehicleSimulator.Debugging
         {
             if(wheels == null) return;
 
-            Gizmos.color = debugColor;
             Handles.color = debugColor;
+            Gizmos.color = debugColor;
 
             if (frontRight != null && frontLeft != null && backRight != null && backLeft != null)
             {
@@ -35,36 +35,39 @@ namespace ModularVehicleSimulator.Debugging
                 Gizmos.DrawLine(frontRight.transform.position, frontLeft.transform.position);
                 // Wheel Base
                 Gizmos.DrawLine(front, back);
-                if(Mathf.Abs(frontRight.SteeringAngle) > 0f)
+                DrawTurningRadius(back);
+            }
+        }
+
+        private void DrawTurningRadius(Vector3 back)
+        {
+            if (Mathf.Abs(frontRight.SteeringAngle) > 0f)
+            {
+                float wheelBase = Vector3.Distance(frontRight.transform.position, backRight.transform.position);
+                float turningRadius = wheelBase / Mathf.Tan(frontRight.SteeringAngle * Mathf.Deg2Rad);
+                Vector3 turningRadiusCenter = back + transform.right * turningRadius;
+
+                // Draw Turning Center
+                Gizmos.DrawLine(backLeft.transform.position, turningRadiusCenter);
+                Gizmos.DrawLine(frontRight.transform.position, turningRadiusCenter);
+                Gizmos.DrawLine(frontLeft.transform.position, turningRadiusCenter);
+                Gizmos.DrawWireSphere(turningRadiusCenter, WIRE_SPHERE_RADIUS);
+
+                // Draw turning arcs
+                foreach (Wheel wheel in wheels)
                 {
-                    float wheelBase = Vector3.Distance(frontRight.transform.position, backRight.transform.position);
-                    float turningRadius = wheelBase / Mathf.Tan(frontRight.SteeringAngle * Mathf.Deg2Rad);
-                    Vector3 turningRadiusCenter = back + transform.right * turningRadius;
+                    float wheelTurningRadius = Vector3.Distance(wheel.transform.position, turningRadiusCenter);
+                    Vector3 direction = (wheel.transform.position - turningRadiusCenter).normalized;
 
-                    // Draw Turning Center
-                    Gizmos.DrawLine(backLeft.transform.position, turningRadiusCenter);                
-                    Gizmos.DrawLine(frontRight.transform.position, turningRadiusCenter);                
-                    Gizmos.DrawLine(frontLeft.transform.position, turningRadiusCenter);                
-                    Gizmos.DrawWireSphere(turningRadiusCenter, WIRE_SPHERE_RADIUS);
-
-                    // Draw turning arcs
-                    foreach (Wheel wheel in wheels)
+                    if (frontRight.SteeringAngle < 0f)
                     {
-                        float wheelTurningRadius = Vector3.Distance(wheel.transform.position, turningRadiusCenter);
-                        Vector3 direction = (wheel.transform.position - turningRadiusCenter).normalized;
-
-                        if(frontRight.SteeringAngle < 0f)
-                        {
-                            Handles.DrawWireArc(turningRadiusCenter, -transform.up, direction, ARC_ANGLE, wheelTurningRadius);                                                        
-                        }
-                        else
-                        {
-                            Handles.DrawWireArc(turningRadiusCenter, -transform.up, direction, -ARC_ANGLE, wheelTurningRadius);                            
-                        }
+                        Handles.DrawWireArc(turningRadiusCenter, -transform.up, direction, ARC_ANGLE, wheelTurningRadius);
+                    }
+                    else
+                    {
+                        Handles.DrawWireArc(turningRadiusCenter, -transform.up, direction, -ARC_ANGLE, wheelTurningRadius);
                     }
                 }
-
-
             }
         }
 

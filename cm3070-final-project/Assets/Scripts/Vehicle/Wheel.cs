@@ -7,6 +7,9 @@ namespace ModularVehicleSimulator.Vehicle
 {
     public class Wheel : MonoBehaviour
     {
+        public Vector3 WheelFriction => GetWheelFrictionVector();
+        public Vector3 WheelContactPoint => GetWheelContactPoint();
+
         public bool IsMotorized => isMotorized;
         public bool IsSteerable => isSteerable;
         public bool IsFront => isFront;
@@ -178,6 +181,58 @@ namespace ModularVehicleSimulator.Vehicle
             {
                 rightSteeringAngle = Mathf.Rad2Deg * Mathf.Atan(wheelBase / ((wheelBase / tanOfTargetAngle) - (track/2))) * Mathf.Sign(targetAngle);
                 leftSteeringAngle = Mathf.Rad2Deg * Mathf.Atan(wheelBase / ((wheelBase / tanOfTargetAngle) + (track/2))) * Mathf.Sign(targetAngle);
+            }
+        }
+
+        private Vector3 GetWheelFrictionVector()
+        {
+            Vector3 frictionVector = Vector3.zero;
+            foreach (WheelCollider wheelCollider in wheelColliders)
+            {
+                wheelCollider.GetGroundHit(out WheelHit hit);
+                float forwardFrictionCoefficient = EvaluateFrictionCurve(wheelCollider.forwardFriction, hit.forwardSlip);
+                float sidewaysFrictionCoefficient = EvaluateFrictionCurve(wheelCollider.sidewaysFriction, hit.sidewaysSlip);
+                float forwardFriction = forwardFrictionCoefficient * hit.force * Mathf.Sign(hit.forwardSlip);
+                float sidewaysFriction = sidewaysFrictionCoefficient * hit.force * Mathf.Sign(hit.sidewaysSlip);
+                frictionVector += (hit.forwardDir * forwardFriction) + (hit.sidewaysDir * sidewaysFriction);
+            }
+            return frictionVector;
+        }
+
+        private Vector3 GetWheelContactPoint()
+        {
+            Vector3 contactPoint = Vector3.zero;
+            foreach (WheelCollider wheelCollider in wheelColliders)
+            {
+                wheelCollider.GetGroundHit(out WheelHit hit);
+                contactPoint += hit.point;
+            }
+            return contactPoint / wheelColliders.Length;
+        }
+
+        private static float EvaluateFrictionCurve(WheelFrictionCurve curve, float slip)
+        {
+            float absSlip = Mathf.Abs(slip);
+
+            // 1. First spline section: from 0 to Extremum
+            if (absSlip < curve.extremumSlip)
+            {
+                float t = absSlip / curve.extremumSlip;
+                // Cubic spline interpolation with zero tangent at origin and extremum
+                return Mathf.SmoothStep(0f, curve.extremumValue, t);
+            }
+            // 2. Second spline section: from Extremum to Asymptote
+            else if (absSlip < curve.asymptoteSlip)
+            {
+                float range = curve.asymptoteSlip - curve.extremumSlip;
+                float t = (absSlip - curve.extremumSlip) / range;
+                // Cubic spline interpolation between Extremum Value and Asymptote Value
+                return Mathf.SmoothStep(curve.extremumValue, curve.asymptoteValue, t);
+            }
+            // 3. Beyond Asymptote: returns the constant Asymptote Value
+            else
+            {
+                return curve.asymptoteValue;
             }
         }
     }
