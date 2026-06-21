@@ -37,7 +37,7 @@ namespace ModularVehicleSimulator.Debugging
                 Gizmos.DrawLine(front, back);
                 if(Mathf.Abs(frontRight.SteeringAngle) > 0f)
                 {
-                    float wheelBase = Vector3.Distance(frontRight.transform.position, frontLeft.transform.position);
+                    float wheelBase = Vector3.Distance(frontRight.transform.position, backRight.transform.position);
                     float turningRadius = wheelBase / Mathf.Tan(frontRight.SteeringAngle * Mathf.Deg2Rad);
                     Vector3 turningRadiusCenter = back + transform.right * turningRadius;
 
@@ -50,25 +50,16 @@ namespace ModularVehicleSimulator.Debugging
                     // Draw turning arcs
                     foreach (Wheel wheel in wheels)
                     {
-                        Vector3 direction = wheel.transform.forward;
-                        float steeringAngle = frontRight.SteeringAngle;
-                        if(wheel.IsRight)
-                        {
-                            steeringAngle = wheel.LeftSteeringAngle;
-                        }
-                        else if(wheel.IsLeft)
-                        {
-                            steeringAngle = wheel.RightSteeringAngle;
-                        }
-                        turningRadius = wheelBase / Mathf.Tan(steeringAngle * Mathf.Deg2Rad);
+                        float wheelTurningRadius = Vector3.Distance(wheel.transform.position, turningRadiusCenter);
+                        Vector3 direction = (wheel.transform.position - turningRadiusCenter).normalized;
 
                         if(frontRight.SteeringAngle < 0f)
                         {
-                            Handles.DrawWireArc(wheel.transform.position + transform.right * turningRadius, -wheel.transform.up, -direction, -ARC_ANGLE, turningRadius);                                                        
+                            Handles.DrawWireArc(turningRadiusCenter, -transform.up, direction, ARC_ANGLE, wheelTurningRadius);                                                        
                         }
                         else
                         {
-                            Handles.DrawWireArc(wheel.transform.position + transform.right * turningRadius, wheel.transform.up, direction, -ARC_ANGLE, turningRadius);                            
+                            Handles.DrawWireArc(turningRadiusCenter, -transform.up, direction, -ARC_ANGLE, wheelTurningRadius);                            
                         }
                     }
                 }
