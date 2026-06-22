@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 3978891534158211180}
   - component: {fileID: 6812107340984863835}
   - component: {fileID: 184680343560197519}
+  - component: {fileID: 1870346533073608262}
   m_Layer: 0
   m_Name: HondaAccord
   m_TagString: Untagged
@@ -208,6 +209,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: afd92e54a95121c46bc8cb8852caa605, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ModularVehicleSimulator.Vehicle.Engine
+--- !u!114 &1870346533073608262
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 803433713257916642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82acfa60dd9e19346b8fe3f2dca1ccb0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ModularVehicleSimulator.Debugging.CenterOfMassGizmo
+  debugColor: {r: 0, g: 1, b: 0, a: 1}
 --- !u!1 &1033523876854779012
 GameObject:
   m_ObjectHideFlags: 0
@@ -365,6 +379,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 6010587700128718622}
   - {fileID: 163573672587749733}
   - {fileID: 158735945353639280}
   m_Father: {fileID: 1040809351288588936}
@@ -690,6 +705,37 @@ MonoBehaviour:
     Time: 0
     Smoothing: 0
     IgnoreY: 0
+--- !u!1 &7973175748985185762
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6010587700128718622}
+  m_Layer: 0
+  m_Name: CenterOfMass_Check
+  m_TagString: Untagged
+  m_Icon: {fileID: -5487077368411116049, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6010587700128718622
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7973175748985185762}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.2625, z: 0.243049}
+  m_LocalScale: {x: 1.846, y: 0.75, z: 4.93}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 9122147248508245894}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8638235276748275244
 GameObject:
   m_ObjectHideFlags: 0

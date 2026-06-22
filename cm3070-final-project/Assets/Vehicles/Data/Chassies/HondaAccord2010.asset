@@ -13,3 +13,6 @@ MonoBehaviour:
   m_Name: HondaAccord2010
   m_EditorClassIdentifier: Assembly-CSharp::ChassisConfiguration
   weightInKG: 1510
+  wheelBaseInMeters: 2.8
+  trackInMeters: 1.58
+  centerOfMassOffsetInMeters: {x: 0, y: 0.2625, z: 0.243049}

@@ -7,6 +7,7 @@ namespace ModularVehicleSimulator.Vehicle
     public class VehicleController : MonoBehaviour
     {
         public Gear Gear => (Gear)currentGear;
+        public Rigidbody ChassisRigidBody => chassisRigidBody;
         public event Action OnGearChanged;
         [SerializeField] private VehicleConfiguration vehicleConfiguration;
         [SerializeField] private Rigidbody chassisRigidBody;
@@ -29,6 +30,7 @@ namespace ModularVehicleSimulator.Vehicle
             }
             engine = GetComponent<Engine>();
             engine.Init(vehicleConfiguration.Engine, vehicleConfiguration.DriveTrain, wheels);
+            chassisRigidBody.centerOfMass = vehicleConfiguration.Chassis.CenterOfMass;
         }
 
         public void Steer(float steeringInput)
