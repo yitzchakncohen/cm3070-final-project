@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace ModularVehicleSimulator.Debugging
 {
-    public class TireFrictionGizmo : MonoBehaviour
+    public class TireFrictionGizmo : DebuggingTool
     {
         [SerializeField] private Color debugColor = Color.orange;
         private const float TIRE_FRICTION_LINE_MAX = 1f;
@@ -23,6 +23,7 @@ namespace ModularVehicleSimulator.Debugging
 
         private void OnDrawGizmos()
         {
+            if(!isDebuggingEnabled) return;
             if(wheels == null) return;
 
             Gizmos.color = debugColor;      

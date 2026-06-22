@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace ModularVehicleSimulator.Debugging
 {
-    public class CenterOfMassGizmo : MonoBehaviour
+    public class CenterOfMassGizmo : DebuggingTool
     {
         private const float CENTER_OF_MASS_RADIUS = 0.5f;
         private const float VELOCITY_SCALING = 3.6f;
@@ -17,8 +17,9 @@ namespace ModularVehicleSimulator.Debugging
 
         private void OnDrawGizmos()
         {
+            if(!isDebuggingEnabled) return;
             if (vehicleController == null) return;
-            
+
             Vector3 centerOfMass = vehicleController.ChassisRigidBody.transform.position + vehicleController.ChassisRigidBody.centerOfMass;
             Gizmos.color = debugColor;      
             Gizmos.DrawWireSphere(centerOfMass, CENTER_OF_MASS_RADIUS);

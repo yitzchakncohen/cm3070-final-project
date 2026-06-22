@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace ModularVehicleSimulator.Debugging
 {
-    public class TurningRadiusGizmo : MonoBehaviour
+    public class TurningRadiusGizmo : DebuggingTool
     {
         [SerializeField] private Color debugColor = Color.yellow;
         private const float WIRE_SPHERE_RADIUS = 0.3f;
@@ -22,6 +22,7 @@ namespace ModularVehicleSimulator.Debugging
 
         private void OnDrawGizmos()
         {
+            if(!isDebuggingEnabled) return;
             if(wheels == null) return;
 
             Handles.color = debugColor;
