@@ -9,6 +9,8 @@ public class ChassisConfiguration : ScriptableObject
     public Vector3 CenterOfMass => centerOfMassOffsetInMeters;
     [SerializeField] private float weightInKG = 1510f;
     // TODO give option to be determine by model.
+    // TODO apply ride height
+    // TODO apply wheel front back offset
     [SerializeField] private float wheelBaseInMeters = 2.8f;
     [SerializeField] private float trackInMeters = 1.58f;
     [SerializeField] private Vector3 centerOfMassOffsetInMeters;

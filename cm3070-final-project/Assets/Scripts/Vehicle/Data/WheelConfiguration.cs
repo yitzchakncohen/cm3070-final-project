@@ -8,16 +8,18 @@ namespace ModularVehicleSimulator.Vehicle.Data
         public float Radius => radiusInMeters;
         public float Width => widthInMeters;
         public float Weight => weightInKG;
-        public float ForwardExtremeSlip => forwardExtremeSlip = 0.125f;
-        public float ForwardExtremeValue => forwardExtremeValue = 0.875f;
-        public float ForwardAsymptoteSlip => forwardAsymptoteSlip = 0.7f;
-        public float ForwardAsymptoteValue => forwardAsymptoteValue = 0.725f;
-        public float ForwardStiffness => forwardStiffness = 1.0f;
-        public float SideWaysExtremeSlip => sideWaysExtremeSlip = 0.175f;
-        public float SideWaysExtremeValue => sideWaysExtremeValue = 0.875f;
-        public float SideWaysAsymptoteSlip => sideWaysAsymptoteSlip = 0.7f;
-        public float SideWaysAsymptoteValue => sideWaysAsymptoteValue = 0.725f;
-        public float SideWaysStiffness => sideWaysStiffness = 1.0f;
+        public float ForwardExtremeSlip => forwardExtremeSlip;
+        public float ForwardExtremeValue => forwardExtremeValue;
+        public float ForwardAsymptoteSlip => forwardAsymptoteSlip;
+        public float ForwardAsymptoteValue => forwardAsymptoteValue;
+        public float ForwardStiffness => forwardStiffness;
+        public float SideWaysExtremeSlip => sideWaysExtremeSlip;
+        public float SideWaysExtremeValue => sideWaysExtremeValue;
+        public float SideWaysAsymptoteSlip => sideWaysAsymptoteSlip;
+        public float SideWaysAsymptoteValue => sideWaysAsymptoteValue;
+        public float SideWaysStiffness => sideWaysStiffness;
+        public float RadialTireStiffness => (pressureMultiplier * tirePressureInPSI) + carcassBaseStiffness;
+        public float LateralTireStiffness => RadialTireStiffness * lateralStiffnessRatio;
         [Header("Dimensions")]
         private float radiusInMeters = 0.3284f;
         private float widthInMeters = 0.225f;
@@ -35,6 +37,12 @@ namespace ModularVehicleSimulator.Vehicle.Data
         [SerializeField] private float sideWaysAsymptoteSlip = 0.7f;
         [SerializeField] private float sideWaysAsymptoteValue = 0.725f;
         [SerializeField] private float sideWaysStiffness = 1.0f;
+        [Header("Tire Deformation")]
+        [SerializeField] private float pressureMultiplier = 2500f;
+        [SerializeField] private float carcassBaseStiffness = 145000;
+        [SerializeField] private float tirePressureInPSI = 35f;
+        [SerializeField] private float lateralStiffnessRatio = 0.6f;
+
 
     }
 }

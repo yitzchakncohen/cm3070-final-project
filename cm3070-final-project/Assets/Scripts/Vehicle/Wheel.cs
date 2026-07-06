@@ -52,6 +52,27 @@ namespace ModularVehicleSimulator.Vehicle
             chassisConfiguration = chassis;
             this.driveTrain = driveTrain;
             ApplyWheelPhysicsParamters();
+            UpdateWheelPositions();
+        }
+
+        public void FixedUpdate()
+        {
+            ApplyDeflection();
+        }
+
+        private void ApplyDeflection()
+        {
+            float verticalForce = 0f;
+            foreach (WheelCollider wheelCollider in wheelColliders)
+            {
+                wheelCollider.GetGroundHit(out WheelHit hit);
+                verticalForce += hit.force;
+            }
+            // Linear approximation of tire deformation
+            float deflection = verticalForce / wheelConfiguration.RadialTireStiffness;
+            float bulge = verticalForce / wheelConfiguration.LateralTireStiffness;
+            float currentRadius = wheelConfiguration.Radius - deflection;
+            float currentWidth = wheelConfiguration.Width + bulge;
         }
 
         public void Steer(float steeringInput, float currentSpeed)
@@ -110,7 +131,6 @@ namespace ModularVehicleSimulator.Vehicle
             {
                 wheelCollider.brakeTorque = brakesConfiguration.Torque;
                 wheelCollider.radius = wheelConfiguration.Radius;
-                // TODO apply width
                 wheelCollider.mass = wheelConfiguration.Weight;
                 WheelFrictionCurve forwardFriction = new WheelFrictionCurve
                 {
@@ -150,6 +170,40 @@ namespace ModularVehicleSimulator.Vehicle
                         targetPosition = wheelCollider.suspensionSpring.targetPosition
                     };
                 }
+            }
+            UpdateWheelWidth(wheelConfiguration.Width);
+        }
+
+        private void UpdateWheelPositions()
+        {
+            float wheelXPosition = chassisConfiguration.Track/2f;
+            float wheelZPosition = chassisConfiguration.WheelBase/2f;
+            float wheelYPosition = 0f;
+            if(IsFront && IsLeft)
+            {
+                transform.localPosition = new Vector3(-wheelXPosition, wheelYPosition, wheelZPosition);
+            }
+            else if(IsFront && IsRight)
+            {
+                transform.localPosition = new Vector3(wheelXPosition, wheelYPosition, wheelZPosition);
+            }
+            else if(!IsFront && IsLeft)
+            {
+                transform.localPosition = new Vector3(-wheelXPosition, wheelYPosition, -wheelZPosition);
+            }
+            else if(!IsFront && IsRight)
+            {
+                transform.localPosition = new Vector3(wheelXPosition, wheelYPosition, -wheelZPosition);
+            }
+        }
+
+        private void UpdateWheelWidth(float currentWidth)
+        {
+            float offset = -currentWidth/2;
+            float increment = (wheelColliders.Length - 1) * currentWidth;
+            for (int i = 0; i < wheelColliders.Length; i++)
+            {
+                wheelColliders[i].center = new Vector3(offset + i * increment, 0f, 0f);
             }
         }
 
