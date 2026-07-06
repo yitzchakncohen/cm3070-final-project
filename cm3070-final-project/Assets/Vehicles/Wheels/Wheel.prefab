@@ -49,7 +49,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Wheel
   isMotorized: 1
   isSteerable: 1
+  isFront: 1
   wheelModel: {fileID: 833683357528647871}
+  tireModel: {fileID: 1655589781523843829}
 --- !u!1 &1068143748749641568
 GameObject:
   m_ObjectHideFlags: 0

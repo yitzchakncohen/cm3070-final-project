@@ -22,6 +22,7 @@ namespace ModularVehicleSimulator.Vehicle
         [SerializeField] private bool isSteerable = true;
         [SerializeField] private bool isFront = true;
         [SerializeField] private Transform wheelModel;
+        [SerializeField] private Transform tireModel;
         private WheelCollider[] wheelColliders;
         private WheelConfiguration wheelConfiguration;
         private BrakesConfiguration brakesConfiguration;
@@ -53,6 +54,7 @@ namespace ModularVehicleSimulator.Vehicle
             this.driveTrain = driveTrain;
             ApplyWheelPhysicsParamters();
             UpdateWheelPositions();
+            UpdateTireVisuals(wheelConfiguration.Radius, wheelConfiguration.Width);
         }
 
         public void FixedUpdate()
@@ -72,7 +74,19 @@ namespace ModularVehicleSimulator.Vehicle
             float deflection = verticalForce / wheelConfiguration.RadialTireStiffness;
             float bulge = verticalForce / wheelConfiguration.LateralTireStiffness;
             float currentRadius = wheelConfiguration.Radius - deflection;
+            foreach (WheelCollider wheelCollider in wheelColliders)
+            {
+                wheelCollider.radius = currentRadius;
+            }
             float currentWidth = wheelConfiguration.Width + bulge;
+            UpdateWheelWidth(currentWidth);
+            UpdateTireVisuals(currentRadius, currentWidth);
+            // TODO Update friction
+        }
+
+        private void UpdateTireVisuals(float currentRadius, float currentWidth)
+        {
+            tireModel.localScale = new Vector3(currentRadius * 2f, currentWidth / 2f, wheelConfiguration.Radius * 2f);
         }
 
         public void Steer(float steeringInput, float currentSpeed)
