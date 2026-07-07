@@ -1,3 +1,4 @@
+using ModularVehicleSimulator.Physics;
 using ModularVehicleSimulator.Vehicle;
 using UnityEditor;
 using UnityEngine;
@@ -45,7 +46,7 @@ namespace ModularVehicleSimulator.Debugging
             if (Mathf.Abs(frontRight.SteeringAngle) > 0f)
             {
                 float wheelBase = Vector3.Distance(frontRight.transform.position, backRight.transform.position);
-                float turningRadius = wheelBase / Mathf.Tan(frontRight.SteeringAngle * Mathf.Deg2Rad);
+                float turningRadius = VehiclePhysics.GetTurningRadius(wheelBase, frontRight.SteeringAngle);
                 Vector3 turningRadiusCenter = back + transform.right * turningRadius;
 
                 // Draw Turning Center

@@ -87,6 +87,11 @@ namespace ModularVehicleSimulator.Physics
                 leftSteeringAngle = Mathf.Rad2Deg * Mathf.Atan(wheelBase / ((wheelBase / tanOfTargetAngle) + (track/2))) * Mathf.Sign(targetAngle);
             }
         }
+
+        public static float GetTurningRadius(float wheelBase, float steeringAngle)
+        {
+            return wheelBase / Mathf.Tan(steeringAngle * Mathf.Deg2Rad);
+        }
         #endregion
     }
 }
