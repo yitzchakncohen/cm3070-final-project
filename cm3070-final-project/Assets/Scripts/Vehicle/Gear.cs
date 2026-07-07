@@ -4,7 +4,8 @@ namespace ModularVehicleSimulator.Vehicle
     {
         Reverse = -1,
         Park = 0,
-        Drive = 1,
+        Neutral = 1,
+        Drive = 2,
         Second = 3,
         Third = 4,
         Fourth = 5,
@@ -21,6 +22,8 @@ namespace ModularVehicleSimulator.Vehicle
                     return "R";
                 case Gear.Park: 
                     return "P";
+                case Gear.Neutral: 
+                    return "N";
                 case Gear.Drive: 
                     return "D";
                 case Gear.Second: 

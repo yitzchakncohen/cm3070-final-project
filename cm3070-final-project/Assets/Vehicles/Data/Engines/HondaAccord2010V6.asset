@@ -13,4 +13,42 @@ MonoBehaviour:
   m_Name: HondaAccord2010V6
   m_EditorClassIdentifier: Assembly-CSharp::ModularVehicleSimulator.Vehicle.Data.EngineConfiguration
   engineType: 0
-  enginePowerInNewtonMeters: 220
+  idleRPM: 800
+  peakTorqueRPM: 5000
+  maxRPM: 6800
+  peakTorqueInNewtownsMeters: 344
+  idleTorqueMultiplier: 0.7
+  maxTorqueMultiplier: 0.82
+  torqueCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 800
+      value: 240.8
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 5000
+      value: 344
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 6800
+      value: 282.08
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4

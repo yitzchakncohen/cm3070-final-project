@@ -18,6 +18,7 @@ namespace ModularVehicleSimulator.Vehicle
         public bool IsLeft => transform.localPosition.x < 0f;
         public bool IsRight => transform.localPosition.x > 0f;
         public float SteeringAngle => currentTargetSteeringAngle;
+        public float RPM => wheelColliders.Average(wheelCollider => wheelCollider.rpm);
         [SerializeField] private bool isMotorized = true;
         [SerializeField] private bool isSteerable = true;
         [SerializeField] private bool isFront = true;
