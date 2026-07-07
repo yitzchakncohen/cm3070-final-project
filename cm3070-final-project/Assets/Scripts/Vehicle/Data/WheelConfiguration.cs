@@ -8,18 +8,11 @@ namespace ModularVehicleSimulator.Vehicle.Data
         public float Radius => radiusInMeters;
         public float Width => widthInMeters;
         public float Weight => weightInKG;
-        public float ForwardExtremeSlip => forwardExtremeSlip;
-        public float ForwardExtremeValue => forwardExtremeValue;
-        public float ForwardAsymptoteSlip => forwardAsymptoteSlip;
-        public float ForwardAsymptoteValue => forwardAsymptoteValue;
         public float ForwardStiffness => forwardStiffness;
-        public float SideWaysExtremeSlip => sideWaysExtremeSlip;
-        public float SideWaysExtremeValue => sideWaysExtremeValue;
-        public float SideWaysAsymptoteSlip => sideWaysAsymptoteSlip;
-        public float SideWaysAsymptoteValue => sideWaysAsymptoteValue;
         public float SideWaysStiffness => sideWaysStiffness;
         public float RadialTireStiffness => (pressureMultiplier * tirePressureInPSI) + carcassBaseStiffness;
         public float LateralTireStiffness => RadialTireStiffness * lateralStiffnessRatio;
+        public float DeflectionGrip => gripGainedPerMeterOfDeflection;
         [Header("Dimensions")]
         private float radiusInMeters = 0.3284f;
         private float widthInMeters = 0.225f;
@@ -42,7 +35,30 @@ namespace ModularVehicleSimulator.Vehicle.Data
         [SerializeField] private float carcassBaseStiffness = 145000;
         [SerializeField] private float tirePressureInPSI = 35f;
         [SerializeField] private float lateralStiffnessRatio = 0.6f;
+        [SerializeField] private float gripGainedPerMeterOfDeflection = 0.15f;
 
+        public WheelFrictionCurve GetForwardFrictionCurve()
+        {
+            return new WheelFrictionCurve
+            {
+                extremumSlip = forwardExtremeSlip,
+                extremumValue = forwardExtremeValue,
+                asymptoteSlip = forwardAsymptoteSlip,
+                asymptoteValue = forwardAsymptoteValue,
+                stiffness = ForwardStiffness
+            };
+        }
 
+        public WheelFrictionCurve GetSidewaysFrictionCurve()
+        {
+            return new WheelFrictionCurve
+            {
+                extremumSlip = sideWaysExtremeSlip,
+                extremumValue = sideWaysExtremeValue,
+                asymptoteSlip = sideWaysAsymptoteSlip,
+                asymptoteValue = sideWaysAsymptoteValue,
+                stiffness = sideWaysStiffness
+            };
+        }
     }
 }
