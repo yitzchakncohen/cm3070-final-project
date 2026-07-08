@@ -7,6 +7,8 @@ namespace ModularVehicleSimulator.Vehicle.Data
     public class DriveTrain : ScriptableObject
     {
         public float Damping => damping;
+        public float Loss => loss;
+        public float Rigidity => damping * 100f * loss;
         [SerializeField] private List<GearRatio> gearRatios;
         [SerializeField] private float loss = 0.85f;
         [SerializeField] private float finalDriveRatio = 4.31f;
@@ -17,11 +19,11 @@ namespace ModularVehicleSimulator.Vehicle.Data
             GearRatio gearRatio = gearRatios.Find(ratio => ratio.Gear == gear);
             if (gearRatio != null)
             {
-                return gearRatio.Ratio * finalDriveRatio * loss;                
+                return gearRatio.Ratio * finalDriveRatio;                
             }
             else
             {
-                return finalDriveRatio * loss;
+                return finalDriveRatio;
             }
         }
     }

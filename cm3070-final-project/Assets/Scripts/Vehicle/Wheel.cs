@@ -90,11 +90,11 @@ namespace ModularVehicleSimulator.Vehicle
             UpdateWheelAngles();
         }
 
-        public void Accelerate(float torque)
+        public void Accelerate(float torque, float brakeTorque)
         {
             foreach (WheelCollider wheelCollider in wheelColliders)
             {
-                wheelCollider.brakeTorque = 0f;
+                wheelCollider.brakeTorque = brakeTorque;
                 wheelCollider.motorTorque = torque / wheelColliders.Length;             
             }
         }

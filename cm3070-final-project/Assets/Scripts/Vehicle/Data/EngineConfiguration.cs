@@ -7,7 +7,12 @@ namespace ModularVehicleSimulator.Vehicle.Data
     public class EngineConfiguration : ScriptableObject
     {
         public EngineType Type => engineType;
+        public float Inertia => inertiaInKgSquareMeters;
+        public float IdleRPM => idleRPM;
+        public float MaxRPM => maxRPM;
         [SerializeField] private EngineType engineType;
+        [SerializeField] private float inertiaInKgSquareMeters = 0.2f;
+        [Header("Torque Curve")]
         [SerializeField] private float idleRPM = 800f;
         [SerializeField] private float peakTorqueRPM = 5000f;
         [SerializeField] private float maxRPM = 6800f;
@@ -15,6 +20,11 @@ namespace ModularVehicleSimulator.Vehicle.Data
         [SerializeField] private float idleTorqueMultiplier = 0.70f;
         [SerializeField] private float maxTorqueMultiplier = 0.82f;
         [SerializeField] private AnimationCurve torqueCurve;
+        [Header("Friction Curve")]
+        [SerializeField] private float minFrictionInNewtonMeters = 15f;
+        [SerializeField] private float peakTorqueFrictionInNewtonMeters = 30f;
+        [SerializeField] private float maxRPMFrictionInNewtonMeters = 42f;
+        [SerializeField] private AnimationCurve frictionCurve;
 
         public float GetTorque(float currentRPM)
         {
@@ -23,6 +33,15 @@ namespace ModularVehicleSimulator.Vehicle.Data
             if(currentRPM > maxRPM) return 0f;
 
             return torqueCurve.Evaluate(currentRPM);
+        }
+
+        public float GetFriction(float currentRPM)
+        {
+            if(engineType == EngineType.Electric) return maxRPMFrictionInNewtonMeters;
+            if(currentRPM < idleRPM) return minFrictionInNewtonMeters;
+            if(currentRPM > maxRPM) return maxRPMFrictionInNewtonMeters;
+
+            return frictionCurve.Evaluate(currentRPM);
         }
 
         private void OnEnable()
@@ -36,6 +55,7 @@ namespace ModularVehicleSimulator.Vehicle.Data
         private void OnValidate()
         {
             GenerateTorqueCurve();
+            GenerateFrictionCurve();
         }
 
         private void GenerateTorqueCurve()
@@ -48,6 +68,16 @@ namespace ModularVehicleSimulator.Vehicle.Data
             torqueCurve.AddKey(peak);
             torqueCurve.AddKey(max);
         }
-        
+
+        private void GenerateFrictionCurve()
+        {
+            frictionCurve = new AnimationCurve();
+            Keyframe idle = new Keyframe(idleRPM, minFrictionInNewtonMeters);
+            Keyframe peak = new Keyframe(peakTorqueRPM, peakTorqueFrictionInNewtonMeters);
+            Keyframe max = new Keyframe(maxRPM, maxTorqueMultiplier * maxRPMFrictionInNewtonMeters);
+            frictionCurve.AddKey(idle);
+            frictionCurve.AddKey(peak);
+            frictionCurve.AddKey(max);
+        }        
     }
 }

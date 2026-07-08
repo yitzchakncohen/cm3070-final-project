@@ -18,6 +18,8 @@ MonoBehaviour:
   - Gear: 0
     Ratio: 0
   - Gear: 1
+    Ratio: 0
+  - Gear: 2
     Ratio: 2.697
   - Gear: 3
     Ratio: 1.606
@@ -25,7 +27,8 @@ MonoBehaviour:
     Ratio: 1.071
   - Gear: 5
     Ratio: 0.766
-  - Gear: 5
+  - Gear: 6
     Ratio: 0.612
   loss: 0.85
   finalDriveRatio: 4.31
+  damping: 0.25
