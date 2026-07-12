@@ -8,7 +8,8 @@ namespace ModularVehicleSimulator.Vehicle
 {
     public class Wheel : MonoBehaviour
     {
-        public const float RADIUS_SMOOTH_STEP = 5f;
+        public const float DEFLECTION_SMOOTH_STEP = 1f;
+        public const float SLIP_THRESHHOLD = 0.98f;
         public Vector3 WheelFriction => GetWheelFrictionVector();
         public Vector3 WheelContactPoint => GetWheelContactPoint();
 
@@ -19,6 +20,7 @@ namespace ModularVehicleSimulator.Vehicle
         public bool IsRight => transform.localPosition.x > 0f;
         public float SteeringAngle => currentTargetSteeringAngle;
         public float RPM => wheelColliders.Average(wheelCollider => wheelCollider.rpm);
+        private int numberOfColliders => wheelColliders.Length;
         [SerializeField] private bool isMotorized = true;
         [SerializeField] private bool isSteerable = true;
         [SerializeField] private bool isFront = true;
@@ -34,12 +36,50 @@ namespace ModularVehicleSimulator.Vehicle
         private float currentTargetSteeringAngle = 0f;
         private float rightSteeringAngle = 0f;
         private float leftSteeringAngle = 0f;
-        private float currentWheelRadius;
+        private float currentDeflection = 0f;
         private float nominalDeflection = 0.02f;
 
         private void Awake()
         {
             wheelColliders = GetComponentsInChildren<WheelCollider>();
+        }
+
+        private void Update()
+        {
+            if(IsMotorized)
+            {
+                foreach (WheelCollider wheelCollider in wheelColliders)
+                {
+                    WheelHit hit;
+                    if (wheelCollider.GetGroundHit(out hit))
+                    {
+                        // 1. Get the world position of the wheel collider's center origin
+                        Vector3 wheelOrigin = wheelCollider.transform.position;
+
+                        // 2. Project the contact point along the collider's local downward suspension axis
+                        Vector3 suspensionAxis = -wheelCollider.transform.up;
+                        float currentDistanceToGround = Vector3.Dot(hit.point - wheelOrigin, suspensionAxis);
+
+                        // 3. Unity measures suspension from the center radius position.
+                        // Subtract the tire radius to get the actual compressed spring length.
+                        float currentSuspensionLength = currentDistanceToGround - wheelCollider.radius;
+
+                        // 4. Calculate compression (Max Distance minus current extension length)
+                        float maxDistance = wheelCollider.suspensionDistance;
+                        float currentCompression = Mathf.Max(0f, maxDistance - currentSuspensionLength);
+                        float compressionPercentage = (currentCompression / maxDistance) * 100f;
+
+                        Debug.Log($"{gameObject.name} | " +
+                                $"Load: {hit.force:F0} N | " +
+                                $"Suspension Compression: {currentCompression:F3}m / {maxDistance}m ({compressionPercentage:F1}%) | " +
+                                $"Slip: {hit.forwardSlip:F3}");
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"{wheelCollider.gameObject.name} is completely off the ground!");
+                    }
+                }
+            }
         }
 
         public void Init(WheelConfiguration wheels, 
@@ -94,8 +134,8 @@ namespace ModularVehicleSimulator.Vehicle
         {
             foreach (WheelCollider wheelCollider in wheelColliders)
             {
-                wheelCollider.brakeTorque = brakeTorque;
-                wheelCollider.motorTorque = torque / wheelColliders.Length;             
+                wheelCollider.brakeTorque = brakeTorque / numberOfColliders;
+                wheelCollider.motorTorque = torque / numberOfColliders;             
             }
         }
 
@@ -104,13 +144,36 @@ namespace ModularVehicleSimulator.Vehicle
             float brakeTorque = brakesConfiguration.Torque * brakesConfiguration.FrontBias;
             if(!IsFront)
             {
-                brakeTorque = brakesConfiguration.Torque * (1-brakesConfiguration.FrontBias);
+                brakeTorque = brakesConfiguration.Torque * (1 - brakesConfiguration.FrontBias);
             }
+            float brakeTorquePerCollider = brakeTorque / numberOfColliders;
             foreach (WheelCollider wheelCollider in wheelColliders)
             {
                 wheelCollider.motorTorque = 0f;
-                wheelCollider.brakeTorque = brakingInput * brakeTorque / wheelColliders.Count();            
+                wheelCollider.brakeTorque = brakingInput * brakeTorquePerCollider;            
             }
+        }
+
+        public float GetEffectiveRPM()
+        {
+            float rpm = 0f;
+            int effectiveColliders = 0;
+            foreach (WheelCollider wheelCollider in wheelColliders)
+            {
+                if(wheelCollider.GetGroundHit(out WheelHit hit))
+                {
+                    if(Mathf.Abs(hit.forwardSlip) < SLIP_THRESHHOLD)
+                    {
+                        rpm += wheelCollider.rpm;
+                        effectiveColliders++;
+                    }
+                }                
+            }
+            if(effectiveColliders > 0)
+            {
+                return rpm / effectiveColliders;
+            }
+            return 0f;
         }
 
         private void UpdateWheelAngles()
@@ -136,25 +199,23 @@ namespace ModularVehicleSimulator.Vehicle
 
         private void ApplyWheelPhysicsParamters()
         {
-            float numberOfColliders = wheelColliders.Length;
             foreach (WheelCollider wheelCollider in wheelColliders)
             {
-                wheelCollider.brakeTorque = brakesConfiguration.Torque / numberOfColliders;
                 wheelCollider.radius = wheelConfiguration.Radius;
                 wheelCollider.mass = wheelConfiguration.Weight / numberOfColliders;
-                WheelFrictionCurve forwardFriction = wheelConfiguration.GetForwardFrictionCurve();
+                WheelFrictionCurve forwardFriction = wheelConfiguration.GetForwardFrictionCurve(numberOfColliders);
                 wheelCollider.forwardFriction = forwardFriction;
-                WheelFrictionCurve sidewaysFriction = wheelConfiguration.GetSidewaysFrictionCurve(); 
+                WheelFrictionCurve sidewaysFriction = wheelConfiguration.GetSidewaysFrictionCurve(numberOfColliders); 
                 wheelCollider.sidewaysFriction = sidewaysFriction;
                 wheelCollider.suspensionDistance = suspensionConfiguration.Distance;
-                wheelCollider.wheelDampingRate = driveTrain.Damping / numberOfColliders;
+                wheelCollider.wheelDampingRate = driveTrain.Damping;
                 if(IsFront)
                 {
-                    wheelCollider.suspensionSpring = suspensionConfiguration.GetFrontSuspectionSpring(wheelCollider.suspensionSpring.targetPosition, numberOfColliders);
+                    wheelCollider.suspensionSpring = suspensionConfiguration.GetFrontSuspectionSpring(wheelCollider.suspensionSpring.targetPosition);
                 }
                 else
                 {
-                    wheelCollider.suspensionSpring = suspensionConfiguration.GetBackSuspectionSpring(wheelCollider.suspensionSpring.targetPosition, numberOfColliders);
+                    wheelCollider.suspensionSpring = suspensionConfiguration.GetBackSuspectionSpring(wheelCollider.suspensionSpring.targetPosition);
                 }
             }
             UpdateWheelWidth(wheelConfiguration.Width);
@@ -162,17 +223,16 @@ namespace ModularVehicleSimulator.Vehicle
 
         private void ApplyDeflection()
         {
-            // TODO factor in weight distribution
             float verticalForce = 0f;
             foreach (WheelCollider wheelCollider in wheelColliders)
             {
                 wheelCollider.GetGroundHit(out WheelHit hit);
                 verticalForce += hit.force;
             }
-            float deflection = VehiclePhysics.GetTireDeflection(verticalForce, wheelConfiguration.RadialTireStiffness);
+            float targetDeflection = VehiclePhysics.GetTireDeflection(verticalForce, wheelConfiguration.RadialTireStiffness);
             float bulge = VehiclePhysics.GetTireDeflection(verticalForce, wheelConfiguration.LateralTireStiffness);
-            float targetRadius = wheelConfiguration.Radius - deflection;
-            currentWheelRadius = Mathf.MoveTowards(currentWheelRadius, targetRadius, RADIUS_SMOOTH_STEP * Time.fixedDeltaTime);
+            currentDeflection = Mathf.MoveTowards(currentDeflection, targetDeflection, DEFLECTION_SMOOTH_STEP * Time.fixedDeltaTime);
+            float currentWheelRadius = wheelConfiguration.Radius - currentDeflection;
             foreach (WheelCollider wheelCollider in wheelColliders)
             {
                 wheelCollider.radius = currentWheelRadius;
@@ -180,7 +240,7 @@ namespace ModularVehicleSimulator.Vehicle
             float currentWidth = wheelConfiguration.Width + bulge;
             UpdateWheelWidth(currentWidth);
             UpdateTireVisuals(currentWheelRadius, currentWidth);
-            UpdateTireFriction(deflection);
+            UpdateTireFriction(currentDeflection);
         }
 
         private void UpdateTireVisuals(float currentRadius, float currentWidth)
@@ -194,11 +254,11 @@ namespace ModularVehicleSimulator.Vehicle
             foreach (WheelCollider wheelCollider in wheelColliders)
             {
                 WheelFrictionCurve forwardFriction = wheelCollider.forwardFriction;
-                forwardFriction.stiffness = wheelConfiguration.ForwardStiffness * frictionMultiplier;
+                forwardFriction.stiffness = (wheelConfiguration.ForwardStiffness / numberOfColliders) * frictionMultiplier;
                 wheelCollider.forwardFriction = forwardFriction;
 
                 WheelFrictionCurve sidewaysFriction = wheelCollider.sidewaysFriction;
-                sidewaysFriction.stiffness = wheelConfiguration.SideWaysStiffness * frictionMultiplier;
+                sidewaysFriction.stiffness = (wheelConfiguration.SideWaysStiffness / numberOfColliders) * frictionMultiplier;
                 wheelCollider.sidewaysFriction = sidewaysFriction;
             }
         }
@@ -229,8 +289,8 @@ namespace ModularVehicleSimulator.Vehicle
         private void UpdateWheelWidth(float currentWidth)
         {
             float offset = -currentWidth/2;
-            float increment = (wheelColliders.Length - 1) * currentWidth;
-            for (int i = 0; i < wheelColliders.Length; i++)
+            float increment = (numberOfColliders - 1) * currentWidth;
+            for (int i = 0; i < numberOfColliders; i++)
             {
                 wheelColliders[i].center = new Vector3(offset + i * increment, 0f, 0f);
             }
@@ -257,7 +317,7 @@ namespace ModularVehicleSimulator.Vehicle
                 wheelCollider.GetGroundHit(out WheelHit hit);
                 contactPoint += hit.point;
             }
-            return contactPoint / wheelColliders.Length;
+            return contactPoint / numberOfColliders;
         }
     }
 }

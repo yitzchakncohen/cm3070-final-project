@@ -11,22 +11,22 @@ namespace ModularVehicleSimulator.Vehicle.Data
         [SerializeField] private float backSpringConstant = 20000f;
         [SerializeField] private float damper = 3000f;
         
-        public JointSpring GetFrontSuspectionSpring(float targetPosition, float numberOfColliders)
+        public JointSpring GetFrontSuspectionSpring(float targetPosition)
         {
             return new JointSpring
             {
-                spring = frontSpringConstant / numberOfColliders,
-                damper = damper / numberOfColliders,
+                spring = frontSpringConstant,
+                damper = damper,
                 targetPosition = targetPosition
             };
         }
 
-        public JointSpring GetBackSuspectionSpring(float targetPosition, float numberOfColliders)
+        public JointSpring GetBackSuspectionSpring(float targetPosition)
         {
             return new JointSpring
             {
-                spring = backSpringConstant / numberOfColliders,
-                damper = damper / numberOfColliders,
+                spring = backSpringConstant,
+                damper = damper,
                 targetPosition = targetPosition
             };
         }

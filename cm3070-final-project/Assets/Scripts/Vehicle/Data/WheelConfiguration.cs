@@ -37,7 +37,7 @@ namespace ModularVehicleSimulator.Vehicle.Data
         [SerializeField] private float lateralStiffnessRatio = 0.6f;
         [SerializeField] private float gripGainedPerMeterOfDeflection = 0.15f;
 
-        public WheelFrictionCurve GetForwardFrictionCurve()
+        public WheelFrictionCurve GetForwardFrictionCurve(float numberOfColliders)
         {
             return new WheelFrictionCurve
             {
@@ -45,11 +45,11 @@ namespace ModularVehicleSimulator.Vehicle.Data
                 extremumValue = forwardExtremeValue,
                 asymptoteSlip = forwardAsymptoteSlip,
                 asymptoteValue = forwardAsymptoteValue,
-                stiffness = ForwardStiffness
+                stiffness = forwardStiffness / numberOfColliders,
             };
         }
 
-        public WheelFrictionCurve GetSidewaysFrictionCurve()
+        public WheelFrictionCurve GetSidewaysFrictionCurve(float numberOfColliders)
         {
             return new WheelFrictionCurve
             {
@@ -57,7 +57,7 @@ namespace ModularVehicleSimulator.Vehicle.Data
                 extremumValue = sideWaysExtremeValue,
                 asymptoteSlip = sideWaysAsymptoteSlip,
                 asymptoteValue = sideWaysAsymptoteValue,
-                stiffness = sideWaysStiffness
+                stiffness = sideWaysStiffness  / numberOfColliders
             };
         }
     }

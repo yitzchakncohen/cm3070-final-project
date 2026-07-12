@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using ModularVehicleSimulator.Vehicle.Data;
 using UnityEngine;
 
@@ -6,6 +7,8 @@ namespace ModularVehicleSimulator.Vehicle
 {
     public class VehicleController : MonoBehaviour
     {
+        private const float RPM_TO_METERS_PER_SECOND = (2f * Mathf.PI) / 60f;
+        public float Speed => speed;
         public Gear Gear => (Gear)currentGear;
         public Rigidbody ChassisRigidBody => chassisRigidBody;
         public event Action OnGearChanged;
@@ -14,6 +17,7 @@ namespace ModularVehicleSimulator.Vehicle
         private Wheel[] wheels;
         private Engine engine;
         private int currentGear = 0;
+        private float speed = 0f;
 
         private void Start()
         {
@@ -33,13 +37,19 @@ namespace ModularVehicleSimulator.Vehicle
             chassisRigidBody.centerOfMass = vehicleConfiguration.Chassis.CenterOfMass;
         }
 
+        private void Update()
+        {
+            float rpm = Mathf.Abs(wheels.Where(wheel => wheel.IsMotorized).Average(wheel => wheel.GetEffectiveRPM()));
+            speed = rpm * vehicleConfiguration.Wheels.Radius * RPM_TO_METERS_PER_SECOND; 
+            Debug.Log($"Speed[m/s]: {speed} [km/h] {speed * 3.6f}");
+        }
+
         public void Steer(float steeringInput)
         {
             foreach (Wheel wheel in wheels)
             {
                 if(wheel.IsSteerable)
                 {
-                    float speed = chassisRigidBody.linearVelocity.magnitude;
                     wheel.Steer(steeringInput, speed);
                 }
             }
