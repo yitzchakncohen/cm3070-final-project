@@ -9,7 +9,8 @@ namespace ModularVehicleSimulator.Vehicle
     public class Wheel : MonoBehaviour
     {
         public const float DEFLECTION_SMOOTH_STEP = 1f;
-        public const float SLIP_THRESHHOLD = 0.15f;
+        public const float EFFECTIVE_SLIP_THRESHHOLD = 0.15f;
+        public const float SPEEDOMETER_SLIP_THRESHHOLD = 0.75f;
         public Vector3 WheelFriction => GetWheelFrictionVector();
         public Vector3 WheelContactPoint => GetWheelContactPoint();
 
@@ -156,24 +157,34 @@ namespace ModularVehicleSimulator.Vehicle
 
         public float GetEffectiveRPM()
         {
+            return GetRPM(EFFECTIVE_SLIP_THRESHHOLD);
+        }
+
+        public float GetSpeedometerRPM()
+        {
+            return GetRPM(SPEEDOMETER_SLIP_THRESHHOLD);
+        }
+
+        private float GetRPM(float slipThreshhold)
+        {
             float rpm = 0f;
             int effectiveColliders = 0;
             foreach (WheelCollider wheelCollider in wheelColliders)
             {
-                if(wheelCollider.GetGroundHit(out WheelHit hit))
+                if (wheelCollider.GetGroundHit(out WheelHit hit))
                 {
                     // Calculate total slip magnitude accounting for steering angle
                     float steerAngleRad = wheelCollider.steerAngle * Mathf.Deg2Rad;
                     float vehicleForwardSlip = hit.forwardSlip * Mathf.Cos(steerAngleRad) - hit.sidewaysSlip * Mathf.Sin(steerAngleRad);
 
-                    if(Mathf.Abs(vehicleForwardSlip) < SLIP_THRESHHOLD)
+                    if (Mathf.Abs(vehicleForwardSlip) < slipThreshhold)
                     {
                         rpm += wheelCollider.rpm;
                         effectiveColliders++;
                     }
-                }                
+                }
             }
-            if(effectiveColliders > 0)
+            if (effectiveColliders > 0)
             {
                 return rpm / effectiveColliders;
             }

@@ -39,9 +39,9 @@ namespace ModularVehicleSimulator.Vehicle
 
         private void Update()
         {
-            float rpm = Mathf.Abs(wheels.Where(wheel => wheel.IsMotorized).Average(wheel => wheel.GetEffectiveRPM()));
+            float rpm = Mathf.Abs(wheels.Where(wheel => wheel.IsMotorized).Average(wheel => wheel.GetSpeedometerRPM()));
             speed = rpm * vehicleConfiguration.Wheels.Radius * RPM_TO_METERS_PER_SECOND; 
-            Debug.Log($"Speed[m/s]: {speed} [km/h] {speed * 3.6f}");
+            Debug.Log($"Speed[m/s]: {speed} [km/h] {speed * 3.6f} velocity {chassisRigidBody.linearVelocity.magnitude * 3.6f}");
         }
 
         public void Steer(float steeringInput)
@@ -50,6 +50,8 @@ namespace ModularVehicleSimulator.Vehicle
             {
                 if(wheel.IsSteerable)
                 {
+                    float rpm = Mathf.Abs(wheels.Where(wheel => wheel.IsMotorized).Average(wheel => wheel.GetEffectiveRPM()));
+                    float speed = rpm * vehicleConfiguration.Wheels.Radius * RPM_TO_METERS_PER_SECOND;
                     wheel.Steer(steeringInput, speed);
                 }
             }
