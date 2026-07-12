@@ -9,6 +9,7 @@ namespace ModularVehicleSimulator.Vehicle
     {
         private const float RPM_TO_METERS_PER_SECOND = (2f * Mathf.PI) / 60f;
         public float Speed => speed;
+        public float RPM => engineRPM;
         public Gear Gear => (Gear)currentGear;
         public Rigidbody ChassisRigidBody => chassisRigidBody;
         public event Action OnGearChanged;
@@ -16,8 +17,9 @@ namespace ModularVehicleSimulator.Vehicle
         [SerializeField] private Rigidbody chassisRigidBody;
         private Wheel[] wheels;
         private Engine engine;
-        private int currentGear = 0;
+        private int currentGear = -1;
         private float speed = 0f;
+        private float engineRPM = 0f;
 
         private void Start()
         {
@@ -39,9 +41,14 @@ namespace ModularVehicleSimulator.Vehicle
 
         private void Update()
         {
-            float rpm = Mathf.Abs(wheels.Where(wheel => wheel.IsMotorized).Average(wheel => wheel.GetSpeedometerRPM()));
-            speed = rpm * vehicleConfiguration.Wheels.Radius * RPM_TO_METERS_PER_SECOND; 
+            float wheelRPM = Mathf.Abs(wheels.Where(wheel => wheel.IsMotorized).Average(wheel => wheel.GetSpeedometerRPM()));
+            speed = wheelRPM * vehicleConfiguration.Wheels.Radius * RPM_TO_METERS_PER_SECOND; 
+            if(speed == 0f)
+            {
+                speed = chassisRigidBody.linearVelocity.magnitude;
+            }
             Debug.Log($"Speed[m/s]: {speed} [km/h] {speed * 3.6f} velocity {chassisRigidBody.linearVelocity.magnitude * 3.6f}");
+            engineRPM = engine.RPM;
         }
 
         public void Steer(float steeringInput)

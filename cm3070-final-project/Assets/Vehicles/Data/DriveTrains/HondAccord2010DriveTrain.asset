@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ModularVehicleSimulator.Vehicle.Data.DriveTrain
   gearRatios:
   - Gear: -1
-    Ratio: -1.889
-  - Gear: 0
     Ratio: 0
+  - Gear: 0
+    Ratio: -1.889
   - Gear: 1
     Ratio: 0
   - Gear: 2

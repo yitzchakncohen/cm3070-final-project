@@ -2,8 +2,8 @@ namespace ModularVehicleSimulator.Vehicle
 {
     public enum Gear
     {
-        Reverse = -1,
-        Park = 0,
+        Park = -1,
+        Reverse = 0,
         Neutral = 1,
         Drive = 2,
         Second = 3,

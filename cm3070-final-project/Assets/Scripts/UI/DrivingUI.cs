@@ -15,11 +15,15 @@ namespace ModularVehicleSimulator.UI
         [SerializeField] private Image brake;
         [SerializeField] private RectTransform steeringWheel;
         [SerializeField] private TMP_Text gearText;
+        [SerializeField] private Odemeter speedomdeter;
+        [SerializeField] private Odemeter odemeter;
         private float wheelRotationRate = 180f;
 
         private void Start()
         {
-            VehicleController_OnGearChanged();   
+            VehicleController_OnGearChanged();
+            speedomdeter.Init("km/h", 20f) ;
+            odemeter.Init("x1000r/min", 0.5f) ;
         }
 
         private void OnEnable()
@@ -36,7 +40,9 @@ namespace ModularVehicleSimulator.UI
         {
             accelerator.fillAmount = inputManager.CurrentAcceleration;
             brake.fillAmount = inputManager.CurrentBraking;
-            steeringWheel.rotation = Quaternion.Euler(0, 0, -inputManager.CurrentSteering * wheelRotationRate);
+            steeringWheel.rotation = Quaternion.Euler(0, 0, -inputManager.CurrentSteering * wheelRotationRate);   
+            speedomdeter.UpdateNeedle(vehicleController.Speed * 3.6f);
+            odemeter.UpdateNeedle(vehicleController.RPM / 1000f);
         }
 
         private void VehicleController_OnGearChanged()
