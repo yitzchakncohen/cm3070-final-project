@@ -9,7 +9,7 @@ namespace ModularVehicleSimulator.Vehicle
     public class Wheel : MonoBehaviour
     {
         public const float DEFLECTION_SMOOTH_STEP = 1f;
-        public const float SLIP_THRESHHOLD = 0.98f;
+        public const float SLIP_THRESHHOLD = 0.15f;
         public Vector3 WheelFriction => GetWheelFrictionVector();
         public Vector3 WheelContactPoint => GetWheelContactPoint();
 
@@ -162,7 +162,11 @@ namespace ModularVehicleSimulator.Vehicle
             {
                 if(wheelCollider.GetGroundHit(out WheelHit hit))
                 {
-                    if(Mathf.Abs(hit.forwardSlip) < SLIP_THRESHHOLD)
+                    // Calculate total slip magnitude accounting for steering angle
+                    float steerAngleRad = wheelCollider.steerAngle * Mathf.Deg2Rad;
+                    float vehicleForwardSlip = hit.forwardSlip * Mathf.Cos(steerAngleRad) - hit.sidewaysSlip * Mathf.Sin(steerAngleRad);
+
+                    if(Mathf.Abs(vehicleForwardSlip) < SLIP_THRESHHOLD)
                     {
                         rpm += wheelCollider.rpm;
                         effectiveColliders++;

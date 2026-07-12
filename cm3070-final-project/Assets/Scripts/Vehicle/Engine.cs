@@ -27,7 +27,7 @@ namespace ModularVehicleSimulator.Vehicle
 
         public void Accelerate(Gear gear, float accelerationInput)
         {
-            float engineInputRPM = motorizedWheels.Average(wheel => wheel.RPM) * driveTrain.GetRatioForGear(gear);
+            float engineInputRPM = motorizedWheels.Average(wheel => wheel.GetEffectiveRPM()) * driveTrain.GetRatioForGear(gear);
             float wheelTorque = GetWheelTorque(gear, accelerationInput, engineInputRPM) / motorizedWheels.Count();
 
             // Apply the engine torque or braking to the wheels
