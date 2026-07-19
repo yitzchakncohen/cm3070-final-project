@@ -17,6 +17,7 @@ namespace ModularVehicleSimulator.Vehicle
         [SerializeField] private Rigidbody chassisRigidBody;
         private Wheel[] wheels;
         private Engine engine;
+        private Brake brake;
         private int currentGear = -1;
         private float speed = 0f;
         private float engineRPM = 0f;
@@ -27,7 +28,6 @@ namespace ModularVehicleSimulator.Vehicle
             foreach (Wheel wheel in wheels)
             {
                 wheel.Init(vehicleConfiguration.Wheels, 
-                        vehicleConfiguration.Brakes, 
                         vehicleConfiguration.Steering, 
                         vehicleConfiguration.Suspension,
                         vehicleConfiguration.Chassis,
@@ -37,6 +37,8 @@ namespace ModularVehicleSimulator.Vehicle
             engine = GetComponent<Engine>();
             engine.Init(vehicleConfiguration.Engine, vehicleConfiguration.DriveTrain, wheels);
             chassisRigidBody.centerOfMass = vehicleConfiguration.Chassis.CenterOfMass;
+            brake = GetComponent<Brake>();
+            brake.Init(wheels, vehicleConfiguration.Brakes);
         }
 
         private void Update()
@@ -71,10 +73,7 @@ namespace ModularVehicleSimulator.Vehicle
 
         public void Brake(float brakeInput)
         {
-            foreach (Wheel wheel in wheels)
-            {
-                wheel.Brake(brakeInput);
-            }
+            brake.ApplyForce(brakeInput);
         }
 
         public void ShiftGearNext()

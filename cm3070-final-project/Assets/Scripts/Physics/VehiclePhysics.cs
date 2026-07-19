@@ -92,6 +92,12 @@ namespace ModularVehicleSimulator.Physics
         {
             return wheelBase / Mathf.Tan(steeringAngle * Mathf.Deg2Rad);
         }
+
+        public static float ABSStepFunction(float brakeTorque, float oscillationSpeed)
+        {
+            brakeTorque = Mathf.Sin(Time.deltaTime * oscillationSpeed) > 0f ? brakeTorque : 0f;
+            return brakeTorque;
+        }
         #endregion
     }
 }

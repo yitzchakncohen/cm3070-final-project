@@ -14,5 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ModularVehicleSimulator.Vehicle.Data.BrakesConfiguration
   brakeTorqueInNewtonMeters: 3000
   fontBrakeBias: 0.7
-  enableABS: 0
-  aBSSlipThreshold: 0.15
+  enableABS: 1
+  aBSSlipThreshold: 0.4
+  aBSOscillationSpeed: 20

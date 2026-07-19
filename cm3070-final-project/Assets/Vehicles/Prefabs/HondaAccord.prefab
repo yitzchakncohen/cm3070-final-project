@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 6812107340984863835}
   - component: {fileID: 184680343560197519}
   - component: {fileID: 1870346533073608262}
+  - component: {fileID: 7970761858409370905}
   m_Layer: 0
   m_Name: HondaAccord
   m_TagString: Untagged
@@ -222,6 +223,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ModularVehicleSimulator.Debugging.CenterOfMassGizmo
   debuggingMode: 1
   debugColor: {r: 0, g: 1, b: 0, a: 1}
+--- !u!114 &7970761858409370905
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 803433713257916642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 25fdbedf85a624b4e8e4cff3145fa4ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ModularVehicleSimulator.Vehicle.Brake
 --- !u!1 &914418845776699868
 GameObject:
   m_ObjectHideFlags: 0

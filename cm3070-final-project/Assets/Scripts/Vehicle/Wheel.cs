@@ -29,7 +29,6 @@ namespace ModularVehicleSimulator.Vehicle
         [SerializeField] private Transform tireModel;
         private WheelCollider[] wheelColliders;
         private WheelConfiguration wheelConfiguration;
-        private BrakesConfiguration brakesConfiguration;
         private SteeringConfiguration steeringConfiguration;
         private SuspensionConfiguration suspensionConfiguration;
         private ChassisConfiguration chassisConfiguration;
@@ -84,14 +83,12 @@ namespace ModularVehicleSimulator.Vehicle
         }
 
         public void Init(WheelConfiguration wheels, 
-                        BrakesConfiguration brakes, 
                         SteeringConfiguration steering, 
                         SuspensionConfiguration suspension,
                         ChassisConfiguration chassis,
                         DriveTrain driveTrain)
         {
             wheelConfiguration = wheels;
-            brakesConfiguration = brakes;
             steeringConfiguration = steering;
             suspensionConfiguration = suspension;
             chassisConfiguration = chassis;
@@ -140,13 +137,8 @@ namespace ModularVehicleSimulator.Vehicle
             }
         }
 
-        public void Brake(float brakingInput)
+        public void Brake(float brakingInput, float brakeTorque)
         {
-            float brakeTorque = brakesConfiguration.Torque * brakesConfiguration.FrontBias;
-            if(!IsFront)
-            {
-                brakeTorque = brakesConfiguration.Torque * (1 - brakesConfiguration.FrontBias);
-            }
             float brakeTorquePerCollider = brakeTorque / numberOfColliders;
             foreach (WheelCollider wheelCollider in wheelColliders)
             {
@@ -165,23 +157,33 @@ namespace ModularVehicleSimulator.Vehicle
             return GetRPM(SPEEDOMETER_SLIP_THRESHHOLD);
         }
 
+        public float GetAverageForwardSlip()
+        {
+            float slip = 0f;
+            int colliders = 0;
+            foreach (WheelCollider wheelCollider in wheelColliders)
+            {
+                float colliderSlip = GetSlipForCollider(wheelCollider);
+                if(colliderSlip < Mathf.Infinity)
+                {
+                    colliders++;
+                    slip += colliderSlip;
+                }
+            }
+            return slip / colliders;
+        }
+
         private float GetRPM(float slipThreshhold)
         {
             float rpm = 0f;
             int effectiveColliders = 0;
             foreach (WheelCollider wheelCollider in wheelColliders)
             {
-                if (wheelCollider.GetGroundHit(out WheelHit hit))
+                float vehicleForwardSlip = GetSlipForCollider(wheelCollider);
+                if (Mathf.Abs(vehicleForwardSlip) < slipThreshhold)
                 {
-                    // Calculate total slip magnitude accounting for steering angle
-                    float steerAngleRad = wheelCollider.steerAngle * Mathf.Deg2Rad;
-                    float vehicleForwardSlip = hit.forwardSlip * Mathf.Cos(steerAngleRad) - hit.sidewaysSlip * Mathf.Sin(steerAngleRad);
-
-                    if (Mathf.Abs(vehicleForwardSlip) < slipThreshhold)
-                    {
-                        rpm += wheelCollider.rpm;
-                        effectiveColliders++;
-                    }
+                    rpm += wheelCollider.rpm;
+                    effectiveColliders++;
                 }
             }
             if (effectiveColliders > 0)
@@ -189,6 +191,20 @@ namespace ModularVehicleSimulator.Vehicle
                 return rpm / effectiveColliders;
             }
             return 0f;
+        }
+
+        private static float GetSlipForCollider(WheelCollider wheelCollider)
+        {
+            float vehicleForwardSlip = Mathf.Infinity;
+            if (wheelCollider.GetGroundHit(out WheelHit hit))
+            {
+                // Calculate total slip magnitude accounting for steering angle
+                float steerAngleRad = wheelCollider.steerAngle * Mathf.Deg2Rad;
+                vehicleForwardSlip = hit.forwardSlip * Mathf.Cos(steerAngleRad) - hit.sidewaysSlip * Mathf.Sin(steerAngleRad);
+
+            }
+
+            return vehicleForwardSlip;
         }
 
         private void UpdateWheelAngles()
