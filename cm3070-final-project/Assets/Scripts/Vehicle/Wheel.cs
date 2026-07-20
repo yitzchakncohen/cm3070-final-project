@@ -33,6 +33,7 @@ namespace ModularVehicleSimulator.Vehicle
         private SuspensionConfiguration suspensionConfiguration;
         private ChassisConfiguration chassisConfiguration;
         private DriveTrain driveTrain;
+        private PhysicsMaterial currentSurfaceMaterial = null;
         private float currentTargetSteeringAngle = 0f;
         private float rightSteeringAngle = 0f;
         private float leftSteeringAngle = 0f;
@@ -46,40 +47,7 @@ namespace ModularVehicleSimulator.Vehicle
 
         private void Update()
         {
-            if(IsMotorized)
-            {
-                foreach (WheelCollider wheelCollider in wheelColliders)
-                {
-                    WheelHit hit;
-                    if (wheelCollider.GetGroundHit(out hit))
-                    {
-                        // 1. Get the world position of the wheel collider's center origin
-                        Vector3 wheelOrigin = wheelCollider.transform.position;
-
-                        // 2. Project the contact point along the collider's local downward suspension axis
-                        Vector3 suspensionAxis = -wheelCollider.transform.up;
-                        float currentDistanceToGround = Vector3.Dot(hit.point - wheelOrigin, suspensionAxis);
-
-                        // 3. Unity measures suspension from the center radius position.
-                        // Subtract the tire radius to get the actual compressed spring length.
-                        float currentSuspensionLength = currentDistanceToGround - wheelCollider.radius;
-
-                        // 4. Calculate compression (Max Distance minus current extension length)
-                        float maxDistance = wheelCollider.suspensionDistance;
-                        float currentCompression = Mathf.Max(0f, maxDistance - currentSuspensionLength);
-                        float compressionPercentage = (currentCompression / maxDistance) * 100f;
-
-                        Debug.Log($"{gameObject.name} | " +
-                                $"Load: {hit.force:F0} N | " +
-                                $"Suspension Compression: {currentCompression:F3}m / {maxDistance}m ({compressionPercentage:F1}%) | " +
-                                $"Slip: {hit.forwardSlip:F3}");
-                    }
-                    else
-                    {
-                        Debug.LogWarning($"{wheelCollider.gameObject.name} is completely off the ground!");
-                    }
-                }
-            }
+            UpdateSurfaceMaterial();
         }
 
         public void Init(WheelConfiguration wheels, 
@@ -103,7 +71,7 @@ namespace ModularVehicleSimulator.Vehicle
             UpdateTireVisuals(wheelConfiguration.Radius, wheelConfiguration.Width);
         }
 
-        public void FixedUpdate()
+        private void FixedUpdate()
         {
             ApplyDeflection();
         }
@@ -171,6 +139,45 @@ namespace ModularVehicleSimulator.Vehicle
                 }
             }
             return slip / colliders;
+        }
+
+        private void UpdateSurfaceMaterial()
+        {
+            foreach (WheelCollider wheelCollider in wheelColliders)
+            {
+                WheelHit hit;
+                if (wheelCollider.GetGroundHit(out hit))
+                {
+                    Debug.Log("UpdateSurfaceMaterial " + hit.collider.name);
+                    if (hit.collider.material.GetType() == typeof(PhysicsMaterial))
+                    {
+                        if (hit.collider.material != currentSurfaceMaterial)
+                        {
+                            currentSurfaceMaterial = hit.collider.material;
+                            ApplySurfaceMaterial(wheelCollider, hit.collider.material.dynamicFriction);
+                        }
+                    }
+                    else
+                    {
+                        if(currentSurfaceMaterial != null)
+                        {
+                            currentSurfaceMaterial = null;
+                            ApplySurfaceMaterial(wheelCollider);
+                        }
+                    }
+                }
+            }
+        }
+
+        private void ApplySurfaceMaterial(WheelCollider wheelCollider, float friction = 1f)
+        {
+            Debug.Log("ApplySurfaceMaterial");
+            WheelFrictionCurve forwardFriction = wheelCollider.forwardFriction;
+            forwardFriction.stiffness = forwardFriction.stiffness * friction / wheelColliders.Length;
+            wheelCollider.forwardFriction = forwardFriction;
+            WheelFrictionCurve sidewaysFriction = wheelCollider.sidewaysFriction;
+            sidewaysFriction.stiffness = sidewaysFriction.stiffness * friction / wheelColliders.Length;
+            wheelCollider.sidewaysFriction = forwardFriction;
         }
 
         private float GetRPM(float slipThreshhold)

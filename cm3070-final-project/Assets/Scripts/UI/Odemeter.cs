@@ -18,7 +18,7 @@ public class Odemeter : MonoBehaviour
         incrementValue = values;
         for(int i = 0; i < indicators.childCount; i++)
         {
-            DestroyImmediate(indicators.GetChild(i));
+            DestroyImmediate(indicators.GetChild(i).gameObject);
         }
 
         unitsText.text = units;
