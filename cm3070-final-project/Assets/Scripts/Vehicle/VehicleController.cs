@@ -48,6 +48,15 @@ namespace ModularVehicleSimulator.Vehicle
             UpdateTransmission();
         }
 
+        private void FixedUpdate()
+        {
+            // Parking Break
+            if(currentGear == (int)Gear.Park)
+            {
+                Brake(1f);
+            }
+        }
+
         public void Steer(float steeringInput)
         {
             foreach (Wheel wheel in wheels)
