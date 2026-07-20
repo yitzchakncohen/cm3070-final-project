@@ -1,6 +1,7 @@
 using ModularVehicleSimulator.Vehicle;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 namespace ModularVehicleSimulator.Input
 {
@@ -78,6 +79,13 @@ namespace ModularVehicleSimulator.Input
             if(!context.performed) return;
 
             cameraController.ToggleCamera();
+        }
+
+        public void OnRestart(InputAction.CallbackContext context)
+        {
+            if(!context.performed) return;
+
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
 
         private void UpdateAcceleration(float input)

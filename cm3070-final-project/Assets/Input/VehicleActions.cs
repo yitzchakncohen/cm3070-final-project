@@ -136,6 +136,15 @@ public partial class @VehicleActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Restart"",
+                    ""type"": ""Button"",
+                    ""id"": ""46987a07-68ed-4f3a-9354-d203a7d88960"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -380,6 +389,28 @@ public partial class @VehicleActions: IInputActionCollection2, IDisposable
                     ""action"": ""ToggleCamera"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""7e90e594-862a-4345-88c4-202baaa26a96"",
+                    ""path"": ""<Gamepad>/start"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Controller"",
+                    ""action"": ""Restart"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""af4b9706-f2bc-4dfa-b431-b7766725fdda"",
+                    ""path"": ""<Keyboard>/r"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard"",
+                    ""action"": ""Restart"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -416,6 +447,7 @@ public partial class @VehicleActions: IInputActionCollection2, IDisposable
         m_Driving_Turn = m_Driving.FindAction("Turn", throwIfNotFound: true);
         m_Driving_Gear = m_Driving.FindAction("Gear", throwIfNotFound: true);
         m_Driving_ToggleCamera = m_Driving.FindAction("ToggleCamera", throwIfNotFound: true);
+        m_Driving_Restart = m_Driving.FindAction("Restart", throwIfNotFound: true);
     }
 
     ~@VehicleActions()
@@ -501,6 +533,7 @@ public partial class @VehicleActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Driving_Turn;
     private readonly InputAction m_Driving_Gear;
     private readonly InputAction m_Driving_ToggleCamera;
+    private readonly InputAction m_Driving_Restart;
     /// <summary>
     /// Provides access to input actions defined in input action map "Driving".
     /// </summary>
@@ -532,6 +565,10 @@ public partial class @VehicleActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Driving/ToggleCamera".
         /// </summary>
         public InputAction @ToggleCamera => m_Wrapper.m_Driving_ToggleCamera;
+        /// <summary>
+        /// Provides access to the underlying input action "Driving/Restart".
+        /// </summary>
+        public InputAction @Restart => m_Wrapper.m_Driving_Restart;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -573,6 +610,9 @@ public partial class @VehicleActions: IInputActionCollection2, IDisposable
             @ToggleCamera.started += instance.OnToggleCamera;
             @ToggleCamera.performed += instance.OnToggleCamera;
             @ToggleCamera.canceled += instance.OnToggleCamera;
+            @Restart.started += instance.OnRestart;
+            @Restart.performed += instance.OnRestart;
+            @Restart.canceled += instance.OnRestart;
         }
 
         /// <summary>
@@ -599,6 +639,9 @@ public partial class @VehicleActions: IInputActionCollection2, IDisposable
             @ToggleCamera.started -= instance.OnToggleCamera;
             @ToggleCamera.performed -= instance.OnToggleCamera;
             @ToggleCamera.canceled -= instance.OnToggleCamera;
+            @Restart.started -= instance.OnRestart;
+            @Restart.performed -= instance.OnRestart;
+            @Restart.canceled -= instance.OnRestart;
         }
 
         /// <summary>
@@ -700,5 +743,12 @@ public partial class @VehicleActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnToggleCamera(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Restart" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnRestart(InputAction.CallbackContext context);
     }
 }
