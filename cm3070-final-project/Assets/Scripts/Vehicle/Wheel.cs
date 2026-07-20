@@ -148,7 +148,6 @@ namespace ModularVehicleSimulator.Vehicle
                 WheelHit hit;
                 if (wheelCollider.GetGroundHit(out hit))
                 {
-                    Debug.Log("UpdateSurfaceMaterial " + hit.collider.name);
                     if (hit.collider.material.GetType() == typeof(PhysicsMaterial))
                     {
                         if (hit.collider.material != currentSurfaceMaterial)
@@ -171,7 +170,6 @@ namespace ModularVehicleSimulator.Vehicle
 
         private void ApplySurfaceMaterial(WheelCollider wheelCollider, float friction = 1f)
         {
-            Debug.Log("ApplySurfaceMaterial");
             WheelFrictionCurve forwardFriction = wheelCollider.forwardFriction;
             forwardFriction.stiffness = forwardFriction.stiffness * friction / wheelColliders.Length;
             wheelCollider.forwardFriction = forwardFriction;
