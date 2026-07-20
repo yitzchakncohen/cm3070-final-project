@@ -21,6 +21,7 @@ namespace ModularVehicleSimulator.Vehicle
         private int currentGear = -1;
         private float speed = 0f;
         private float engineRPM = 0f;
+        private float autoShiftTimer = 0f;
 
         private void Start()
         {
@@ -43,14 +44,8 @@ namespace ModularVehicleSimulator.Vehicle
 
         private void Update()
         {
-            float wheelRPM = Mathf.Abs(wheels.Where(wheel => wheel.IsMotorized).Average(wheel => wheel.GetSpeedometerRPM()));
-            speed = wheelRPM * vehicleConfiguration.Wheels.Radius * RPM_TO_METERS_PER_SECOND; 
-            if(speed == 0f)
-            {
-                speed = chassisRigidBody.linearVelocity.magnitude;
-            }
-            Debug.Log($"Speed[m/s]: {speed} [km/h] {speed * 3.6f} velocity {chassisRigidBody.linearVelocity.magnitude * 3.6f}");
-            engineRPM = engine.RPM;
+            CalculateCurrentSpeed();
+            UpdateTransmission();
         }
 
         public void Steer(float steeringInput)
@@ -89,17 +84,35 @@ namespace ModularVehicleSimulator.Vehicle
             OnGearChanged?.Invoke();
         }
 
-        private float GetAccelerationInputWithGear(float input)
+        private void CalculateCurrentSpeed()
         {
-            switch (Gear)
+            float wheelRPM = Mathf.Abs(wheels.Where(wheel => wheel.IsMotorized).Average(wheel => wheel.GetSpeedometerRPM()));
+            speed = wheelRPM * vehicleConfiguration.Wheels.Radius * RPM_TO_METERS_PER_SECOND;
+            if (speed == 0f)
             {
-                case Gear.Park:
-                    return 0;
-                case Gear.Reverse:
-                    return - input;
-                case Gear.Drive:
-                default:
-                    return input;
+                speed = chassisRigidBody.linearVelocity.magnitude;
+            }
+            Debug.Log($"Speed[m/s]: {speed} [km/h] {speed * 3.6f} velocity {chassisRigidBody.linearVelocity.magnitude * 3.6f}");
+        }
+
+        private void UpdateTransmission()
+        {
+            engineRPM = engine.RPM;
+            autoShiftTimer += Time.deltaTime;
+
+            if(!vehicleConfiguration.Engine.IsAutomaticTransmision) return;
+            
+            if(autoShiftTimer < vehicleConfiguration.Engine.MinAutoShiftTime) return;
+ 
+            if(engineRPM >= vehicleConfiguration.Engine.MaxRPM && currentGear > 2)
+            {
+                ShiftGearNext();
+                autoShiftTimer = 0f;
+            }
+            else if(engineRPM < vehicleConfiguration.Engine.IdleRPM && currentGear > 2)
+            {
+                ShiftGearPrevious();
+                autoShiftTimer = 0f;
             }
         }
 

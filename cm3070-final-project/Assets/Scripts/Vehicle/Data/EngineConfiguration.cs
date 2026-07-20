@@ -10,7 +10,11 @@ namespace ModularVehicleSimulator.Vehicle.Data
         public float Inertia => inertiaInKgSquareMeters;
         public float IdleRPM => idleRPM;
         public float MaxRPM => maxRPM;
+        public float MinAutoShiftTime => minAutomaticTransmissionShiftTime;
+        public bool IsAutomaticTransmision => isAutomaticTransmision;
         [SerializeField] private EngineType engineType;
+        [SerializeField] private bool isAutomaticTransmision = true;
+        [SerializeField] private float minAutomaticTransmissionShiftTime = 1.0f;
         [SerializeField] private float inertiaInKgSquareMeters = 0.2f;
         [Header("Torque Curve")]
         [SerializeField] private float idleRPM = 800f;
