@@ -15,9 +15,12 @@ namespace ModularVehicleSimulator.Input
         private PlayerInput playerInput;
         [SerializeField] private VehicleController vehicleController;
         [SerializeField] private CameraController cameraController;
-        [SerializeField] private float accelerationRate = 0.01f;
-        [SerializeField] private float brakingRate = 0.01f;
-        [SerializeField] private float steeringRate = 0.01f;
+        [SerializeField] private float accelerationRampRate = 3.0f;
+        [SerializeField] private float brakingRampRate = 4.0f;
+        [SerializeField] private float steeringRampRate = 4.0f;
+        [SerializeField] private float accelerationReleaseRate = 8.0f;
+        [SerializeField] private float brakingReleaseRate = 10.0f;
+        [SerializeField] private float steeringReleaseRate = 6.0f;
         private float currentAcceleration = 0f;
         private float currentBraking = 0f;
         private float currentSteering = 0f;
@@ -90,64 +93,41 @@ namespace ModularVehicleSimulator.Input
 
         private void UpdateAcceleration(float input)
         {
-            if (playerInput.currentControlScheme == KEYBOARD_SCHEME)
+            if (input > currentAcceleration)
             {
-                if (input == 1)
-                {
-                    currentBraking = 0f;
-                    currentAcceleration += accelerationRate * Time.deltaTime;
-                }
-                else if (input == 0)
-                {
-                    currentAcceleration -= accelerationRate * Time.deltaTime;
-                }
+                currentAcceleration = Mathf.MoveTowards(currentAcceleration, input, accelerationRampRate * Time.deltaTime);
             }
             else
             {
-                currentAcceleration = input;
+                currentAcceleration = Mathf.MoveTowards(currentAcceleration, input, accelerationReleaseRate * Time.deltaTime);
             }
-            currentAcceleration = Mathf.Clamp(currentAcceleration, 0f, 1f);
         }
 
         private void UpdateBraking(float input)
         {
-            if (playerInput.currentControlScheme == KEYBOARD_SCHEME)
+            if (input > currentBraking)
             {
-                if (input == 1)
-                {
-                    currentAcceleration = 0f;
-                    currentBraking += brakingRate * Time.deltaTime;
-                }
-                else if (input == 0)
-                {
-                    currentBraking -= brakingRate * Time.deltaTime;
-                }
+                currentBraking = Mathf.MoveTowards(currentBraking, input, brakingRampRate * Time.deltaTime);
             }
             else
             {
-                currentBraking = input;
+                currentBraking = Mathf.MoveTowards(currentBraking, input, brakingReleaseRate * Time.deltaTime);
             }
-            currentBraking = Mathf.Clamp(currentBraking, 0f, 1f);
         }
 
         private void UpdateSteering(float input)
         {
-            if (playerInput.currentControlScheme == KEYBOARD_SCHEME)
+            bool isSteeringDeeper = Mathf.Abs(input) > Mathf.Abs(currentSteering) 
+                && (Mathf.Sign(input) == Mathf.Sign(currentSteering) 
+                || Mathf.Approximately(currentSteering, 0f));
+            if (isSteeringDeeper)
             {
-                if (input == 1)
-                {
-                    currentSteering += steeringRate * Time.deltaTime;
-                }
-                else if (input == -1)
-                {
-                    currentSteering -= steeringRate * Time.deltaTime;
-                }
+                currentSteering = Mathf.MoveTowards(currentSteering, input, steeringRampRate * Time.deltaTime);
             }
             else
             {
-                currentSteering = input;
+                currentSteering = Mathf.MoveTowards(currentSteering, input, steeringReleaseRate * Time.deltaTime);
             }
-            currentSteering = Mathf.Clamp(currentSteering, -1f, 1f);
         }
     }
 }
