@@ -20,7 +20,7 @@ namespace ModularVehicleSimulator.Debugging
             if(!isDebuggingEnabled) return;
             if (vehicleController == null) return;
 
-            Vector3 centerOfMass = vehicleController.ChassisRigidBody.transform.position + vehicleController.ChassisRigidBody.centerOfMass;
+            Vector3 centerOfMass = vehicleController.ChassisRigidBody.worldCenterOfMass;
             Gizmos.color = debugColor;      
             Gizmos.DrawWireSphere(centerOfMass, CENTER_OF_MASS_RADIUS);
             Gizmos.DrawLine(centerOfMass, centerOfMass + vehicleController.ChassisRigidBody.linearVelocity / VELOCITY_SCALING);

@@ -104,19 +104,23 @@ namespace ModularVehicleSimulator.Physics
         #endregion
 
         #region  Air Resistance
-        public static List<Vector2> GetCollidersCrossSectionPolygon(Collider[] colliders, Vector3 direction)
+        public static List<Vector2> GetCollidersCrossSectionPolygon(Collider[] colliders, Vector3 direction, Vector3 center)
         {
             direction = direction.normalized;
             (Vector3 u, Vector3 v) = Get2DBasisPlane(direction);
-            List<Vector2> boundingPoints = GetBoundingPoints(colliders, u, v);
+            List<Vector2> boundingPoints = GetBoundingPoints(colliders, u, v, center);
             List<Vector2> convexHull = GetConvexHull(boundingPoints);
             return convexHull;
         }
 
         public static float GetAreaOfConvexHull(List<Vector2> convexHull)
         {
+            if(convexHull.Count < 3) return 0f;
+
             float area = 0f;
             int j = convexHull.Count - 1;
+            
+            // Gauss's Area Formula
             for (int i = 0; i < convexHull.Count; i++)
             {
                 area += (convexHull[j].x + convexHull[i].x) * (convexHull[j].y - convexHull[i].y);
@@ -125,7 +129,7 @@ namespace ModularVehicleSimulator.Physics
             return Mathf.Abs(area * 0.5f);
         }
 
-        private static List<Vector2> GetBoundingPoints(Collider[] colliders, Vector3 u, Vector3 v)
+        private static List<Vector2> GetBoundingPoints(Collider[] colliders, Vector3 u, Vector3 v, Vector3 center)
         {
             List<Vector2> boundingPoints = new List<Vector2>();
 
@@ -137,19 +141,19 @@ namespace ModularVehicleSimulator.Physics
                 {
                     case BoxCollider boxCollider:
                         Vector3[] boxVertices = GetBoxVertices(boxCollider);
-                        boundingPoints.AddRange(ProjectPointsToPlane(boxVertices, u, v));
+                        boundingPoints.AddRange(ProjectPointsToPlane(boxVertices, u, v, center));
                         break;
                     case SphereCollider sphereCollider:
                         List<Vector3> sphereVertices = GetSphereVertices(sphereCollider, u, v);
-                        boundingPoints.AddRange(ProjectPointsToPlane(sphereVertices, u, v));
+                        boundingPoints.AddRange(ProjectPointsToPlane(sphereVertices, u, v, center));
                         break;
                     case CapsuleCollider capsuleCollider:
                         List<Vector3> capsuleVertices = GetCapsuleVertices(capsuleCollider, u, v);
-                        boundingPoints.AddRange(ProjectPointsToPlane(capsuleVertices, u, v));
+                        boundingPoints.AddRange(ProjectPointsToPlane(capsuleVertices, u, v, center));
                         break;
                     case MeshCollider meshCollider:
                         Vector3[] meshVertices = GetMeshVertices(meshCollider);
-                        boundingPoints.AddRange(ProjectPointsToPlane(meshVertices, u, v));
+                        boundingPoints.AddRange(ProjectPointsToPlane(meshVertices, u, v, center));
                         break;
                 }
             }
@@ -198,7 +202,7 @@ namespace ModularVehicleSimulator.Physics
             return convexHull;        
         }
 
-        private static (Vector3, Vector3) Get2DBasisPlane(Vector3 direction)
+        public static (Vector3, Vector3) Get2DBasisPlane(Vector3 direction)
         {
             Vector3 referenceVector = GetPlaneReferenceVector(direction);
             Vector3 u = Vector3.Cross(direction, referenceVector);
@@ -222,16 +226,19 @@ namespace ModularVehicleSimulator.Physics
 
         private static Vector3[] GetBoxVertices(BoxCollider boxCollider)
         {
+            float halfSizeX = boxCollider.size.x / 2f;
+            float halfSizeY = boxCollider.size.y / 2f;
+            float halfSizeZ = boxCollider.size.z / 2f;
             Vector3[] localCorners = new Vector3[8]
             {
-                boxCollider.center + new Vector3(-boxCollider.size.x, -boxCollider.size.y, -boxCollider.size.z),
-                boxCollider.center + new Vector3(-boxCollider.size.x, -boxCollider.size.y,  boxCollider.size.z),
-                boxCollider.center + new Vector3(-boxCollider.size.x,  boxCollider.size.y, -boxCollider.size.z),
-                boxCollider.center + new Vector3(-boxCollider.size.x,  boxCollider.size.y,  boxCollider.size.z),
-                boxCollider.center + new Vector3( boxCollider.size.x, -boxCollider.size.y, -boxCollider.size.z),
-                boxCollider.center + new Vector3( boxCollider.size.x, -boxCollider.size.y,  boxCollider.size.z),
-                boxCollider.center + new Vector3( boxCollider.size.x,  boxCollider.size.y, -boxCollider.size.z),
-                boxCollider.center + new Vector3( boxCollider.size.x,  boxCollider.size.y,  boxCollider.size.z)
+                boxCollider.center + new Vector3(-halfSizeX, -halfSizeY, -halfSizeZ),
+                boxCollider.center + new Vector3(-halfSizeX, -halfSizeY,  halfSizeZ),
+                boxCollider.center + new Vector3(-halfSizeX,  halfSizeY, -halfSizeZ),
+                boxCollider.center + new Vector3(-halfSizeX,  halfSizeY,  halfSizeZ),
+                boxCollider.center + new Vector3( halfSizeX, -halfSizeY, -halfSizeZ),
+                boxCollider.center + new Vector3( halfSizeX, -halfSizeY,  halfSizeZ),
+                boxCollider.center + new Vector3( halfSizeX,  halfSizeY, -halfSizeZ),
+                boxCollider.center + new Vector3( halfSizeX,  halfSizeY,  halfSizeZ)
             };
             return Array.ConvertAll(localCorners, corner => boxCollider.transform.TransformPoint(corner));
         }
@@ -293,19 +300,20 @@ namespace ModularVehicleSimulator.Physics
             return Array.ConvertAll(mesh.vertices, point => meshCollider.transform.TransformPoint(point));
         }
 
-        private static Vector2[] ProjectPointsToPlane(Vector3[] points, Vector3 u, Vector3 v)
+        private static Vector2[] ProjectPointsToPlane(Vector3[] points, Vector3 u, Vector3 v, Vector3 center)
         {
-            return Array.ConvertAll(points, point => ProjectToPlane(point, u, v));
+            return Array.ConvertAll(points, point => ProjectToPlane(point, u, v, center));
         }
 
-        private static Vector2[] ProjectPointsToPlane(List<Vector3> points, Vector3 u, Vector3 v)
+        private static Vector2[] ProjectPointsToPlane(List<Vector3> points, Vector3 u, Vector3 v, Vector3 center)
         {
-            return Array.ConvertAll(points.ToArray(), point => ProjectToPlane(point, u, v));
+            return Array.ConvertAll(points.ToArray(), point => ProjectToPlane(point, u, v, center));
         }
 
-        private static Vector2 ProjectToPlane(Vector3 point, Vector3 u, Vector3 v)
+        private static Vector2 ProjectToPlane(Vector3 point, Vector3 u, Vector3 v, Vector3 center)
         {
-            return new Vector2(Vector3.Dot(point, u), Vector3.Dot(point, v));
+            Vector3 relativePoint = point - center;
+            return new Vector2(Vector3.Dot(relativePoint, u), Vector3.Dot(relativePoint, v));
         }
 
         private static Vector3 CapsuleIntToDirection(Transform transform, int integer)

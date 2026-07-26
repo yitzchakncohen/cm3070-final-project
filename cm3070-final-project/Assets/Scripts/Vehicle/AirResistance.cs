@@ -20,7 +20,7 @@ namespace ModularVehicleSimulator.Vehicle
             vehicleController = GetComponent<VehicleController>();
             chassisConfiguration = vehicleController.Chassis;
             colliders = GetComponentsInChildren<Collider>();
-            crossSection = VehiclePhysics.GetCollidersCrossSectionPolygon(colliders, velocity.normalized);
+            crossSection = VehiclePhysics.GetCollidersCrossSectionPolygon(colliders, velocity.normalized, vehicleController.ChassisRigidBody.worldCenterOfMass);
         }
 
         private void FixedUpdate()
@@ -30,11 +30,12 @@ namespace ModularVehicleSimulator.Vehicle
 
             if (velocity.sqrMagnitude > 0.01f)
             {
-                List<Vector2> crossSection = VehiclePhysics.GetCollidersCrossSectionPolygon(colliders, velocity.normalized);
+                crossSection = VehiclePhysics.GetCollidersCrossSectionPolygon(colliders, velocity.normalized, vehicleController.ChassisRigidBody.worldCenterOfMass);
                 float area = VehiclePhysics.GetAreaOfConvexHull(crossSection);
                 // D = Cd * r * V^2/2 * A
                 float drag = chassisConfiguration.DragCoefficient * AIR_DENSITY * (velocity.sqrMagnitude / 2f) * area;
-                vehicleController.ChassisRigidBody.AddForce(-drag * velocity.normalized);                
+                vehicleController.ChassisRigidBody.AddForce(-drag * velocity.normalized);        
+                Debug.Log($"Air Resistance drag: {drag}");
             }
         }
     }    

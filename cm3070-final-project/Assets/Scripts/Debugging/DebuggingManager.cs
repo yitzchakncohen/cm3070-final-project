@@ -36,5 +36,6 @@ namespace ModularVehicleSimulator.Debugging
         CenterOfMass     = 1 << 0,   
         TireFriction    = 1 << 1,   
         TurningRadius    = 1 << 2,
+        AirResistance    = 1 << 3,
     }
 }
