@@ -13,6 +13,7 @@ namespace ModularVehicleSimulator.Vehicle
         public Gear Gear => (Gear)currentGear;
         public Rigidbody ChassisRigidBody => chassisRigidBody;
         public event Action OnGearChanged;
+        public ChassisConfiguration Chassis => vehicleConfiguration.Chassis;
         [SerializeField] private VehicleConfiguration vehicleConfiguration;
         [SerializeField] private Rigidbody chassisRigidBody;
         private Wheel[] wheels;
