@@ -126,6 +126,33 @@ namespace ModularVehicleSimulator.Vehicle
             return slip / colliders;
         }
 
+        public float GetTravel()
+        {
+            float travel = 0;
+            foreach (WheelCollider wheelCollider in wheelColliders)
+            {
+                if(wheelCollider.GetGroundHit(out WheelHit hit))
+                {
+                    float localY = wheelCollider.transform.InverseTransformPoint(hit.point).y;
+                    float compression = (-localY - wheelCollider.radius) / wheelCollider.suspensionDistance;
+                    travel += Mathf.Clamp01(compression);
+                }
+            }
+            return travel / wheelColliders.Count();
+        }
+
+        public bool IsGrounded()
+        {
+            foreach (WheelCollider wheelCollider in wheelColliders)
+            {
+                if(wheelCollider.GetGroundHit(out WheelHit hit))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         private void UpdateSurfaceMaterial()
         {
             foreach (WheelCollider wheelCollider in wheelColliders)

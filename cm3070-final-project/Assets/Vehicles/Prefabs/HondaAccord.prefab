@@ -1045,6 +1045,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 158735945353639280}
+  - component: {fileID: 6806744104126893481}
+  - component: {fileID: 9017639396333649421}
   m_Layer: 0
   m_Name: Wheels
   m_TagString: Untagged
@@ -1071,6 +1073,38 @@ Transform:
   - {fileID: 6728343212795549218}
   m_Father: {fileID: 9122147248508245894}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6806744104126893481
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8783803898054575422}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3aca035466582c74fab367fb7a7ca55c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ModularVehicleSimulator.Vehicle.AntiRollBar
+  wheels:
+  - {fileID: 8266212828191584865}
+  - {fileID: 8985889026311443197}
+  isFront: 1
+--- !u!114 &9017639396333649421
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8783803898054575422}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3aca035466582c74fab367fb7a7ca55c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ModularVehicleSimulator.Vehicle.AntiRollBar
+  wheels:
+  - {fileID: 141918056152680811}
+  - {fileID: 5909941633461217701}
+  isFront: 0
 --- !u!1001 &1455117305638571908
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1152,6 +1186,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: cd3a079fd369a244b97f6806d2883f0f, type: 3}
+--- !u!114 &141918056152680811 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1569975896506205935, guid: cd3a079fd369a244b97f6806d2883f0f, type: 3}
+  m_PrefabInstance: {fileID: 1455117305638571908}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3409f1f83bc6d5a439907b5a56a8bc2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Wheel
 --- !u!4 &2311361790496787892 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3756571875575366192, guid: cd3a079fd369a244b97f6806d2883f0f, type: 3}
@@ -1350,6 +1395,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: cd3a079fd369a244b97f6806d2883f0f, type: 3}
+--- !u!114 &5909941633461217701 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1569975896506205935, guid: cd3a079fd369a244b97f6806d2883f0f, type: 3}
+  m_PrefabInstance: {fileID: 5174064607929757514}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3409f1f83bc6d5a439907b5a56a8bc2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Wheel
 --- !u!4 &8354175587571887482 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3756571875575366192, guid: cd3a079fd369a244b97f6806d2883f0f, type: 3}
@@ -1557,6 +1613,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3756571875575366192, guid: cd3a079fd369a244b97f6806d2883f0f, type: 3}
   m_PrefabInstance: {fileID: 7457626765197800590}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &8266212828191584865 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1569975896506205935, guid: cd3a079fd369a244b97f6806d2883f0f, type: 3}
+  m_PrefabInstance: {fileID: 7457626765197800590}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3409f1f83bc6d5a439907b5a56a8bc2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Wheel
 --- !u!1001 &7601485421024007186
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1627,3 +1694,14 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3756571875575366192, guid: cd3a079fd369a244b97f6806d2883f0f, type: 3}
   m_PrefabInstance: {fileID: 7601485421024007186}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &8985889026311443197 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1569975896506205935, guid: cd3a079fd369a244b97f6806d2883f0f, type: 3}
+  m_PrefabInstance: {fileID: 7601485421024007186}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3409f1f83bc6d5a439907b5a56a8bc2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Wheel

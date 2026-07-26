@@ -45,6 +45,10 @@ namespace ModularVehicleSimulator.Vehicle
             chassisRigidBody.centerOfMass = vehicleConfiguration.Chassis.CenterOfMass;
             brake = GetComponent<Brake>();
             brake.Init(wheels, vehicleConfiguration.Brakes);
+            foreach (AntiRollBar antiRollBar in GetComponentsInChildren<AntiRollBar>())
+            {
+                antiRollBar.Init(chassisRigidBody, Steering);                
+            }
         }
 
         private void Update()
