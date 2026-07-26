@@ -1,6 +1,8 @@
 using ModularVehicleSimulator.Physics;
 using ModularVehicleSimulator.Vehicle;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using UnityEngine;
 
 namespace ModularVehicleSimulator.Debugging
@@ -19,12 +21,13 @@ namespace ModularVehicleSimulator.Debugging
 
         private void Start()
         {
-            vehicleController = GetComponent<VehicleController>();
+            vehicleController = GetComponentInParent<VehicleController>();
             GetWheelTransforms();            
         }
 
         private void OnDrawGizmos()
         {
+            if(vehicleController == null) return;
             if(!isDebuggingEnabled) return;
             if(wheels == null) return;
 
@@ -63,6 +66,7 @@ namespace ModularVehicleSimulator.Debugging
                     float wheelTurningRadius = Vector3.Distance(wheel.transform.position, turningRadiusCenter);
                     Vector3 direction = (wheel.transform.position - turningRadiusCenter).normalized;
 
+#if UNITY_EDITOR
                     if (vehicleController.CurrentSteeringAngle < 0f)
                     {
                         Handles.DrawWireArc(turningRadiusCenter, -transform.up, direction, ARC_ANGLE, wheelTurningRadius);
@@ -71,6 +75,7 @@ namespace ModularVehicleSimulator.Debugging
                     {
                         Handles.DrawWireArc(turningRadiusCenter, -transform.up, direction, -ARC_ANGLE, wheelTurningRadius);
                     }
+#endif
                 }
             }
         }
