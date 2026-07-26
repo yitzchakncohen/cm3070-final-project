@@ -15,9 +15,11 @@ namespace ModularVehicleSimulator.Debugging
         private Wheel frontRight = null;
         private Wheel backLeft = null;
         private Wheel backRight = null;
+        private VehicleController vehicleController;
 
         private void Start()
         {
+            vehicleController = GetComponent<VehicleController>();
             GetWheelTransforms();            
         }
 
@@ -43,10 +45,10 @@ namespace ModularVehicleSimulator.Debugging
 
         private void DrawTurningRadius(Vector3 back)
         {
-            if (Mathf.Abs(frontRight.SteeringAngle) > 0f)
+            if (Mathf.Abs(vehicleController.CurrentSteeringAngle) > 0f)
             {
                 float wheelBase = Vector3.Distance(frontRight.transform.position, backRight.transform.position);
-                float turningRadius = VehiclePhysics.GetTurningRadius(wheelBase, frontRight.SteeringAngle);
+                float turningRadius = VehiclePhysics.GetTurningRadius(wheelBase, vehicleController.CurrentSteeringAngle);
                 Vector3 turningRadiusCenter = back + transform.right * turningRadius;
 
                 // Draw Turning Center
@@ -61,7 +63,7 @@ namespace ModularVehicleSimulator.Debugging
                     float wheelTurningRadius = Vector3.Distance(wheel.transform.position, turningRadiusCenter);
                     Vector3 direction = (wheel.transform.position - turningRadiusCenter).normalized;
 
-                    if (frontRight.SteeringAngle < 0f)
+                    if (vehicleController.CurrentSteeringAngle < 0f)
                     {
                         Handles.DrawWireArc(turningRadiusCenter, -transform.up, direction, ARC_ANGLE, wheelTurningRadius);
                     }

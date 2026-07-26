@@ -19,7 +19,6 @@ namespace ModularVehicleSimulator.Vehicle
         public bool IsFront => isFront;
         public bool IsLeft => transform.localPosition.x < 0f;
         public bool IsRight => transform.localPosition.x > 0f;
-        public float SteeringAngle => currentTargetSteeringAngle;
         public float RPM => wheelColliders.Average(wheelCollider => wheelCollider.rpm);
         private int numberOfColliders => wheelColliders.Length;
         [SerializeField] private bool isMotorized = true;
@@ -34,7 +33,6 @@ namespace ModularVehicleSimulator.Vehicle
         private ChassisConfiguration chassisConfiguration;
         private DriveTrain driveTrain;
         private PhysicsMaterial currentSurfaceMaterial = null;
-        private float currentTargetSteeringAngle = 0f;
         private float rightSteeringAngle = 0f;
         private float leftSteeringAngle = 0f;
         private float currentDeflection = 0f;
@@ -76,23 +74,10 @@ namespace ModularVehicleSimulator.Vehicle
             ApplyDeflection();
         }
 
-        public void Steer(float steeringInput, float currentSpeed)
+        public void Steer(float leftSteeringAngle, float rightSteeringAngle)
         {
-            // Power Steering, cache for debugging
-            currentTargetSteeringAngle = VehiclePhysics.GetTargetSteeringAngle(
-                steeringInput,
-                currentSpeed,
-                steeringConfiguration.HighSpeedThreshold,
-                steeringConfiguration.MaxSteeringAngleAtRest,
-                steeringConfiguration.MaxSteeringAngleAtHighSpeed
-            );
-            VehiclePhysics.GetAckermannSteeringAngles(
-                chassisConfiguration.WheelBase,
-                chassisConfiguration.Track,
-                currentTargetSteeringAngle,
-                out rightSteeringAngle,
-                out leftSteeringAngle
-            );
+            this.rightSteeringAngle = rightSteeringAngle;
+            this.leftSteeringAngle = leftSteeringAngle;
             UpdateWheelAngles();
         }
 

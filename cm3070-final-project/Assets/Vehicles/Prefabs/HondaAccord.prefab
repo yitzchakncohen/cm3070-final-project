@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: 7970761858409370905}
   - component: {fileID: 1796651613285553039}
   - component: {fileID: 6006678978194297378}
+  - component: {fileID: 6898054437826063181}
   m_Layer: 0
   m_Name: HondaAccord
   m_TagString: Untagged
@@ -279,6 +280,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ModularVehicleSimulator.Debugging.AirResistanceGizmo
   debuggingMode: 8
   debugColor: {r: 0.5803922, g: 0, b: 0.8274511, a: 1}
+--- !u!114 &6898054437826063181
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 803433713257916642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e08f12fe8f68f9745b108fc30c52b59d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ModularVehicleSimulator.Debugging.TurningRadiusGizmo
+  debuggingMode: 4
+  debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
 --- !u!1 &914418845776699868
 GameObject:
   m_ObjectHideFlags: 0
@@ -448,7 +463,6 @@ GameObject:
   m_Component:
   - component: {fileID: 9122147248508245894}
   - component: {fileID: 1611960791474144282}
-  - component: {fileID: 1272208942798105835}
   - component: {fileID: 753877793702609993}
   m_Layer: 0
   m_Name: Chassis
@@ -503,20 +517,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &1272208942798105835
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1701272198427087013}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e08f12fe8f68f9745b108fc30c52b59d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ModularVehicleSimulator.Debugging.TurningRadiusGizmo
-  debuggingMode: 4
-  debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
 --- !u!114 &753877793702609993
 MonoBehaviour:
   m_ObjectHideFlags: 0

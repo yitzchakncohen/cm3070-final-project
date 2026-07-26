@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using ModularVehicleSimulator.Physics;
 using ModularVehicleSimulator.Vehicle.Data;
 using UnityEngine;
 
@@ -10,10 +11,12 @@ namespace ModularVehicleSimulator.Vehicle
         private const float RPM_TO_METERS_PER_SECOND = (2f * Mathf.PI) / 60f;
         public float Speed => speed;
         public float RPM => engineRPM;
+        public float CurrentSteeringAngle => currentTargetSteeringAngle;
         public Gear Gear => (Gear)currentGear;
         public Rigidbody ChassisRigidBody => chassisRigidBody;
         public event Action OnGearChanged;
         public ChassisConfiguration Chassis => vehicleConfiguration.Chassis;
+        public SteeringConfiguration Steering => vehicleConfiguration.Steering;
         [SerializeField] private VehicleConfiguration vehicleConfiguration;
         [SerializeField] private Rigidbody chassisRigidBody;
         private Wheel[] wheels;
@@ -23,6 +26,7 @@ namespace ModularVehicleSimulator.Vehicle
         private float speed = 0f;
         private float engineRPM = 0f;
         private float autoShiftTimer = 0f;
+        private float currentTargetSteeringAngle = 0f;
 
         private void Start()
         {
@@ -60,13 +64,28 @@ namespace ModularVehicleSimulator.Vehicle
 
         public void Steer(float steeringInput)
         {
+            float rpm = Mathf.Abs(wheels.Where(wheel => wheel.IsMotorized).Average(wheel => wheel.GetEffectiveRPM()));
+            float speed = rpm * vehicleConfiguration.Wheels.Radius * RPM_TO_METERS_PER_SECOND;
+
+            currentTargetSteeringAngle = VehiclePhysics.GetTargetSteeringAngle(
+                steeringInput,
+                speed,
+                vehicleConfiguration.Steering.HighSpeedThreshold,
+                vehicleConfiguration.Steering.MaxSteeringAngleAtRest,
+                vehicleConfiguration.Steering.MaxSteeringAngleAtHighSpeed
+            );
+            VehiclePhysics.GetAckermannSteeringAngles(
+                vehicleConfiguration.Chassis.WheelBase,
+                vehicleConfiguration.Chassis.Track,
+                currentTargetSteeringAngle,
+                out float rightSteeringAngle,
+                out float leftSteeringAngle
+            );
             foreach (Wheel wheel in wheels)
             {
                 if(wheel.IsSteerable)
                 {
-                    float rpm = Mathf.Abs(wheels.Where(wheel => wheel.IsMotorized).Average(wheel => wheel.GetEffectiveRPM()));
-                    float speed = rpm * vehicleConfiguration.Wheels.Radius * RPM_TO_METERS_PER_SECOND;
-                    wheel.Steer(steeringInput, speed);
+                    wheel.Steer(rightSteeringAngle, leftSteeringAngle);
                 }
             }
         }

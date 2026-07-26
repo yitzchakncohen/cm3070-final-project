@@ -1,6 +1,7 @@
 using System;
 using ModularVehicleSimulator.Input;
 using ModularVehicleSimulator.Vehicle;
+using ModularVehicleSimulator.Vehicle.Data;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,6 +10,7 @@ namespace ModularVehicleSimulator.UI
 {
     public class DrivingUI : MonoBehaviour
     {
+        private const float WHEEL_ROTATION_MAX = 540f;
         [SerializeField] private InputManager inputManager;
         [SerializeField] private VehicleController vehicleController;
         [SerializeField] private Image accelerator;
@@ -17,13 +19,14 @@ namespace ModularVehicleSimulator.UI
         [SerializeField] private TMP_Text gearText;
         [SerializeField] private Odemeter speedomdeter;
         [SerializeField] private Odemeter odemeter;
-        private float wheelRotationRate = 180f;
+        private SteeringConfiguration steeringConfiguration;
 
         private void Start()
         {
             VehicleController_OnGearChanged();
             speedomdeter.Init("km/h", 20f) ;
             odemeter.Init("x1000r/min", 0.5f) ;
+            steeringConfiguration = vehicleController.Steering;
         }
 
         private void OnEnable()
@@ -40,9 +43,15 @@ namespace ModularVehicleSimulator.UI
         {
             accelerator.fillAmount = inputManager.CurrentAcceleration;
             brake.fillAmount = inputManager.CurrentBraking;
-            steeringWheel.rotation = Quaternion.Euler(0, 0, -inputManager.CurrentSteering * wheelRotationRate);   
+            UpdateSteeringWheel();
             speedomdeter.UpdateNeedle(vehicleController.Speed * 3.6f);
             odemeter.UpdateNeedle(vehicleController.RPM / 1000f);
+        }
+
+        private void UpdateSteeringWheel()
+        {
+            float wheelAngle = -vehicleController.CurrentSteeringAngle / (steeringConfiguration.MaxSteeringAngleAtRest - 0f);
+            steeringWheel.rotation = Quaternion.Euler(0, 0, wheelAngle * WHEEL_ROTATION_MAX);
         }
 
         private void VehicleController_OnGearChanged()
