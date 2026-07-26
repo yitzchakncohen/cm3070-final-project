@@ -8,6 +8,7 @@ public class Odemeter : MonoBehaviour
     [SerializeField] private RectTransform indicatorPrefab;
     [SerializeField] private RectTransform needle;
     [SerializeField] private TMP_Text unitsText;
+    [SerializeField] private TMP_Text amountText;
     [SerializeField] private float startingAngle = 130f;
     [SerializeField] private float endingAngle = -130f;
     [SerializeField] private int increments = 17;
@@ -36,6 +37,7 @@ public class Odemeter : MonoBehaviour
 
     public void UpdateNeedle(float currentValue)
     {
+        amountText.text = currentValue.ToString("000");
         float percent = currentValue / (increments * incrementValue);
         float targetAngle = Mathf.Lerp(startingAngle, endingAngle, percent);
         float angle = Mathf.MoveTowardsAngle(needle.localEulerAngles.z, targetAngle, NEEDLE_SPEED * Time.deltaTime);
