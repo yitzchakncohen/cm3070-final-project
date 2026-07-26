@@ -63,39 +63,6 @@
             ],
             "bindings": [
                 {
-                    "name": "1D Axis",
-                    "id": "e71a93b9-9c8c-4725-9ccb-8967f9f8344b",
-                    "path": "1DAxis",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Accelerate",
-                    "isComposite": true,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "Positive",
-                    "id": "d2af5953-c22f-4256-bf56-c38156bfdc0e",
-                    "path": "<Keyboard>/e",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": ";Keyboard",
-                    "action": "Accelerate",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "Negative",
-                    "id": "3e85eacc-17f9-497e-ae47-82773c8d5aa4",
-                    "path": "<Keyboard>/d",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": ";Keyboard",
-                    "action": "Accelerate",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
                     "name": "",
                     "id": "ef37bb94-c04f-47d7-a217-af5f4be452f9",
                     "path": "<Gamepad>/rightTrigger",
@@ -107,37 +74,15 @@
                     "isPartOfComposite": false
                 },
                 {
-                    "name": "1D Axis",
-                    "id": "59f1bcd6-6631-4a23-8565-bda16a2c7921",
-                    "path": "1DAxis",
+                    "name": "",
+                    "id": "baacbb8e-b527-4997-b1c2-dccae53a7e32",
+                    "path": "<Keyboard>/upArrow",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
-                    "action": "Brake",
-                    "isComposite": true,
+                    "groups": ";Keyboard",
+                    "action": "Accelerate",
+                    "isComposite": false,
                     "isPartOfComposite": false
-                },
-                {
-                    "name": "Positive",
-                    "id": "fb4d404a-93d1-4289-bf27-3e19005fb6dc",
-                    "path": "<Keyboard>/w",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": ";Keyboard",
-                    "action": "Brake",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "Negative",
-                    "id": "ebf74b63-5322-4c4a-ba4e-86f3166439e2",
-                    "path": "<Keyboard>/s",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": ";Keyboard",
-                    "action": "Brake",
-                    "isComposite": false,
-                    "isPartOfComposite": true
                 },
                 {
                     "name": "",
@@ -146,6 +91,17 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Controller",
+                    "action": "Brake",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "62f3a95c-a410-4d76-b6fa-c5a2838875c6",
+                    "path": "<Keyboard>/downArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard",
                     "action": "Brake",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -230,7 +186,7 @@
                 {
                     "name": "negative",
                     "id": "af2621dc-457b-4610-9e32-b2484c8545ee",
-                    "path": "<Keyboard>/downArrow",
+                    "path": "<Keyboard>/s",
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard",
@@ -241,7 +197,7 @@
                 {
                     "name": "positive",
                     "id": "e0927cc7-eb9f-41d1-ae37-5af69bd2d100",
-                    "path": "<Keyboard>/upArrow",
+                    "path": "<Keyboard>/w",
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard",
