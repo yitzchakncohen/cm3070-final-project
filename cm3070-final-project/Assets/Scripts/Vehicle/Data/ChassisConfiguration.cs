@@ -9,6 +9,8 @@ public class ChassisConfiguration : ScriptableObject
     public Vector3 CenterOfMass => centerOfMassOffsetInMeters;
     public int NumberOfWheels => numberOfWheels;
     public float DragCoefficient => dragCoefficient;
+    public float LiftCoefficient => liftCoefficient;
+    public float FrontLiftRatio => frontLiftRatio;
     [SerializeField] private float massInKG = 1510f;
     // TODO give option to be determine by model.
     // TODO apply ride height
@@ -17,5 +19,8 @@ public class ChassisConfiguration : ScriptableObject
     [SerializeField] private float trackInMeters = 1.58f;
     [SerializeField] private Vector3 centerOfMassOffsetInMeters;
     [SerializeField] private int numberOfWheels = 4;
-    [SerializeField] private float dragCoefficient = 0.34f;
+    [Header("Aerodynamics")]
+    [SerializeField] private float dragCoefficient = 0.31f;
+    [SerializeField] private float liftCoefficient = -0.15f;
+    [SerializeField] private float frontLiftRatio = 0.45f;
 }
