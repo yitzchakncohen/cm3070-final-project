@@ -37,10 +37,14 @@ public class Odemeter : MonoBehaviour
 
     public void UpdateNeedle(float currentValue)
     {
-        amountText.text = currentValue.ToString("000");
         float percent = currentValue / (increments * incrementValue);
         float targetAngle = Mathf.Lerp(startingAngle, endingAngle, percent);
         float angle = Mathf.MoveTowardsAngle(needle.localEulerAngles.z, targetAngle, NEEDLE_SPEED * Time.deltaTime);
         needle.localEulerAngles = new Vector3(0, 0, angle);
+    }
+
+    public void UpdateDigital(float currentValue)
+    {
+        amountText.text = currentValue.ToString("F0");
     }
 }

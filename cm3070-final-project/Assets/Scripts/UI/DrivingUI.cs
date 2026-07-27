@@ -11,6 +11,7 @@ namespace ModularVehicleSimulator.UI
     public class DrivingUI : MonoBehaviour
     {
         private const float WHEEL_ROTATION_MAX = 540f;
+        private const float UPDATE_DIGITAL_INTERVAL = 0.5f;
         [SerializeField] private InputManager inputManager;
         [SerializeField] private VehicleController vehicleController;
         [SerializeField] private Image accelerator;
@@ -32,11 +33,13 @@ namespace ModularVehicleSimulator.UI
         private void OnEnable()
         {
             vehicleController.OnGearChanged += VehicleController_OnGearChanged;
+            InvokeRepeating(nameof(UpdateDigitalDisplays), 0f, UPDATE_DIGITAL_INTERVAL);
         }
 
         private void OnDisable()
         {
             vehicleController.OnGearChanged -= VehicleController_OnGearChanged;
+            CancelInvoke(nameof(UpdateDigitalDisplays));
         }
 
         private void Update()
@@ -57,6 +60,12 @@ namespace ModularVehicleSimulator.UI
         private void VehicleController_OnGearChanged()
         {
             gearText.text = vehicleController.Gear.ToLetter();
+        }
+
+        private void UpdateDigitalDisplays()
+        {
+            speedomdeter.UpdateDigital(vehicleController.Speed * 3.6f);
+            odemeter.UpdateDigital(vehicleController.RPM);
         }
     }
 }
