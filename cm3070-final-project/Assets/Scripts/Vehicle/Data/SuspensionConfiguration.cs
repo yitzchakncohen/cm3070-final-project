@@ -6,7 +6,9 @@ namespace ModularVehicleSimulator.Vehicle.Data
     public class SuspensionConfiguration : ScriptableObject
     {
         public float Distance => suspensionDistanceInMeters;
+        public float ForceAppPointOffset => forceAppPointOffsetInMeters;
         [SerializeField] private float suspensionDistanceInMeters = 0.3f;
+        [SerializeField] private float forceAppPointOffsetInMeters = 0.3f;
         [SerializeField] private float frontSpringConstant = 30000f;
         [SerializeField] private float backSpringConstant = 20000f;
         [SerializeField] private float damper = 3000f;

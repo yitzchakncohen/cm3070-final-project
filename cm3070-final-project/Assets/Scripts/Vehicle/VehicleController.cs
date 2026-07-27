@@ -37,7 +37,8 @@ namespace ModularVehicleSimulator.Vehicle
                         vehicleConfiguration.Steering, 
                         vehicleConfiguration.Suspension,
                         vehicleConfiguration.Chassis,
-                        vehicleConfiguration.DriveTrain
+                        vehicleConfiguration.DriveTrain,
+                        chassisRigidBody
                     );
             }
             engine = GetComponent<Engine>();

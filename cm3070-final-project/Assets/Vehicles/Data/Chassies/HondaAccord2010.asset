@@ -12,7 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7f1cdbaedb1eb74389bdcd0a39c77eb, type: 3}
   m_Name: HondaAccord2010
   m_EditorClassIdentifier: Assembly-CSharp::ChassisConfiguration
-  weightInKG: 1510
+  massInKG: 1510
   wheelBaseInMeters: 2.8
   trackInMeters: 1.58
-  centerOfMassOffsetInMeters: {x: 0, y: 0.2625, z: 0.243049}
+  centerOfMassOffsetInMeters: {x: 0, y: 0.418, z: 0.243049}
+  numberOfWheels: 4
+  dragCoefficient: 0.31
+  liftCoefficient: -0.15
+  frontLiftRatio: 0.45

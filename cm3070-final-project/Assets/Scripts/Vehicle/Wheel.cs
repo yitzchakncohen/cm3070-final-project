@@ -32,6 +32,7 @@ namespace ModularVehicleSimulator.Vehicle
         private SuspensionConfiguration suspensionConfiguration;
         private ChassisConfiguration chassisConfiguration;
         private DriveTrain driveTrain;
+        private Rigidbody chassisRigidBody;
         private PhysicsMaterial currentSurfaceMaterial = null;
         private float rightSteeringAngle = 0f;
         private float leftSteeringAngle = 0f;
@@ -52,7 +53,8 @@ namespace ModularVehicleSimulator.Vehicle
                         SteeringConfiguration steering, 
                         SuspensionConfiguration suspension,
                         ChassisConfiguration chassis,
-                        DriveTrain driveTrain)
+                        DriveTrain driveTrain,
+                        Rigidbody chassisRigidBody)
         {
             wheelConfiguration = wheels;
             steeringConfiguration = steering;
@@ -64,6 +66,7 @@ namespace ModularVehicleSimulator.Vehicle
                 chassisConfiguration.NumberOfWheels, 
                 wheelConfiguration.RadialTireStiffness
             );
+            this.chassisRigidBody = chassisRigidBody;
             ApplyWheelPhysicsParamters();
             UpdateWheelPositions();
             UpdateTireVisuals(wheelConfiguration.Radius, wheelConfiguration.Width);
@@ -265,8 +268,18 @@ namespace ModularVehicleSimulator.Vehicle
                 {
                     wheelCollider.suspensionSpring = suspensionConfiguration.GetBackSuspectionSpring(wheelCollider.suspensionSpring.targetPosition);
                 }
+                wheelCollider.forceAppPointDistance = GetForceAppPointDistance();
             }
             UpdateWheelWidth(wheelConfiguration.Width);
+        }
+
+        private float GetForceAppPointDistance()
+        {
+            Vector3 wheelLocalPosition = chassisRigidBody.transform.InverseTransformPoint(transform.position);
+            float wheelOffsetFromGround = wheelConfiguration.Radius;
+            float offsetFromGroundToCenterOfMass = chassisConfiguration.CenterOfMass.y - wheelLocalPosition.y + wheelOffsetFromGround;
+            float offsetDistance = offsetFromGroundToCenterOfMass - suspensionConfiguration.ForceAppPointOffset;
+            return Mathf.Max(0f, offsetDistance);
         }
 
         private void ApplyDeflection()
