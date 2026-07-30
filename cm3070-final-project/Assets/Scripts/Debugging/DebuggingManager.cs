@@ -4,17 +4,19 @@ namespace ModularVehicleSimulator.Debugging
 {
     public class DebuggingManager : MonoBehaviour
     {
+        public DebuggingTool[] Tools => tools;
         [SerializeField] private DebuggingMode debuggingModes;
+        private DebuggingTool[] tools;
 
         private void Start()
         {
-            UpdateTools();
+            EnableTools();
         }
 
         [ContextMenu("Update Tools")]
-        public void UpdateTools()
+        public void EnableTools()
         {
-            DebuggingTool[] tools = FindObjectsByType<DebuggingTool>(FindObjectsSortMode.None);
+            tools = FindObjectsByType<DebuggingTool>(FindObjectsSortMode.None);
             foreach (DebuggingTool tool in tools)
             {
                 if (debuggingModes.HasFlag(tool.Mode))

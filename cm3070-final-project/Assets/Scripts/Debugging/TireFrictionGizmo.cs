@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using ModularVehicleSimulator.Vehicle;
 using UnityEngine;
 
@@ -6,15 +7,8 @@ namespace ModularVehicleSimulator.Debugging
 {
     public class TireFrictionGizmo : DebuggingTool
     {
-        [SerializeField] private Color debugColor = Color.orange;
-        private const float TIRE_FRICTION_LINE_MAX = 1f;
         private const float NEWTON_TO_METER_SCALING = 1000f;
-        private const float ARC_ANGLE = 90f;
         private Wheel[] wheels = null;
-        private Wheel frontLeft = null;
-        private Wheel frontRight = null;
-        private Wheel backLeft = null;
-        private Wheel backRight = null;
 
         private void Start()
         {
@@ -40,25 +34,18 @@ namespace ModularVehicleSimulator.Debugging
             {
                 wheels = GetComponentsInChildren<Wheel>();
             }
+        }
+
+        public override Dictionary<string, string> GetDebugValues()
+        {
+            Dictionary<string, string> debugValues = new Dictionary<string, string>();
             foreach (Wheel wheel in wheels)
             {
-                if (wheel.IsFront && wheel.IsLeft)
-                {
-                    frontLeft = wheel;
-                }
-                else if (wheel.IsFront && wheel.IsRight)
-                {
-                    frontRight = wheel;
-                }
-                else if (!wheel.IsFront && wheel.IsLeft)
-                {
-                    backLeft = wheel;
-                }
-                else if (!wheel.IsFront && wheel.IsRight)
-                {
-                    backRight = wheel;
-                }
+                string forward = wheel.IsFront ? "Front" : "Rear";
+                string side = wheel.IsRight ? "Right" : "Left";
+                debugValues.Add($"{forward}, {side} Friction", $"{wheel.WheelFriction.magnitude} [N]");
             }
+            return debugValues;
         }
     }
 }

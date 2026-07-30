@@ -10,7 +10,6 @@ namespace ModularVehicleSimulator.Debugging
     {
         private const float VERTEX_RADIUS = 0.05f;
         private const float FORCE_SCALING = 1f;
-        [SerializeField] private Color debugColor = Color.green;
         private VehicleController vehicleController;
         private AirResistance airResistance;
 
@@ -48,6 +47,18 @@ namespace ModularVehicleSimulator.Debugging
                 Gizmos.DrawLine(worldP1, worldP2);
                 Gizmos.DrawSphere(worldP1, VERTEX_RADIUS);
             }
+        }
+
+        public override Dictionary<string, string> GetDebugValues()
+        {
+            Dictionary<string, string> debugValues = new Dictionary<string, string>
+            {
+                { "Drag Area", $"{airResistance.CrossSectionArea} [m^2]" },
+                { "Drag Force", $"{airResistance.Drag} [N]" },
+                { "Lift Area", $"{airResistance.TopDownArea} [N]" },
+                { "Lift Force", $"{airResistance.Lift} [N]" }
+            };
+            return debugValues;
         }
     }
 }

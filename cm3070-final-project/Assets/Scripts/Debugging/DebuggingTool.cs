@@ -1,10 +1,14 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace ModularVehicleSimulator.Debugging
 {
-    public class DebuggingTool : MonoBehaviour
+    public abstract class DebuggingTool : MonoBehaviour
     {
+        public Color DebugColor => debugColor;
+        public bool IsEnable => isDebuggingEnabled;
         public DebuggingMode Mode => debuggingMode;
+        [SerializeField] protected Color debugColor;
         protected bool isDebuggingEnabled = true;
         [SerializeField] private DebuggingMode debuggingMode = DebuggingMode.None;
 
@@ -17,5 +21,7 @@ namespace ModularVehicleSimulator.Debugging
         {
             isDebuggingEnabled = false;
         }
+
+        public abstract Dictionary<string, string> GetDebugValues();
     }
 }

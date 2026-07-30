@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using ModularVehicleSimulator.Physics;
 using ModularVehicleSimulator.Vehicle;
 #if UNITY_EDITOR
@@ -9,7 +10,6 @@ namespace ModularVehicleSimulator.Debugging
 {
     public class TurningRadiusGizmo : DebuggingTool
     {
-        [SerializeField] private Color debugColor = Color.yellow;
         private const float WIRE_SPHERE_RADIUS = 0.3f;
         private const float ARC_ANGLE = 90f;
         private Wheel[] wheels = null;
@@ -105,6 +105,17 @@ namespace ModularVehicleSimulator.Debugging
                     backRight = wheel;
                 }
             }
+        }
+
+        public override Dictionary<string, string> GetDebugValues()
+        {
+            float wheelBase = Vector3.Distance(frontRight.transform.position, backRight.transform.position);
+            float turningRadius = Mathf.Abs(VehiclePhysics.GetTurningRadius(wheelBase, vehicleController.CurrentSteeringAngle));
+            Dictionary<string, string> debugValues = new Dictionary<string, string>
+            {
+                { "Turning Radius", $"{turningRadius} [m]" },
+            };
+            return debugValues;
         }
     }    
 }
