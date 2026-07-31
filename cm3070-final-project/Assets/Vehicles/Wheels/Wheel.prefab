@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3756571875575366192}
   - component: {fileID: 1569975896506205935}
+  - component: {fileID: 5410402438453179006}
   m_Layer: 0
   m_Name: Wheel
   m_TagString: Untagged
@@ -52,6 +53,19 @@ MonoBehaviour:
   isFront: 1
   wheelModel: {fileID: 833683357528647871}
   tireModel: {fileID: 1655589781523843829}
+--- !u!114 &5410402438453179006
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 616870792062191823}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97b6e56364bfeda479477ee639d00786, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ModularVehicleSimulator.Vehicle.SkidFX
+  particleFX: {fileID: 2777619553332960856}
 --- !u!1 &1068143748749641568
 GameObject:
   m_ObjectHideFlags: 0
@@ -257,7 +271,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.658, y: 0.225, z: 0.658}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 3145842215983792747}
   m_Father: {fileID: 833683357528647871}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90}
 --- !u!33 &6654471507880217885
@@ -339,3 +354,46 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1001 &1899980182422945179
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1655589781523843829}
+    m_Modifications:
+    - target: {fileID: 3600156465915871216, guid: 2474fceb54b141a4084909212432962d, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3600156465915871216, guid: 2474fceb54b141a4084909212432962d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3600156465915871216, guid: 2474fceb54b141a4084909212432962d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3600156465915871216, guid: 2474fceb54b141a4084909212432962d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4382569427339502531, guid: 2474fceb54b141a4084909212432962d, type: 3}
+      propertyPath: m_Name
+      value: TireFX
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 2474fceb54b141a4084909212432962d, type: 3}
+--- !u!1 &2777619553332960856 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4382569427339502531, guid: 2474fceb54b141a4084909212432962d, type: 3}
+  m_PrefabInstance: {fileID: 1899980182422945179}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &3145842215983792747 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3600156465915871216, guid: 2474fceb54b141a4084909212432962d, type: 3}
+  m_PrefabInstance: {fileID: 1899980182422945179}
+  m_PrefabAsset: {fileID: 0}
