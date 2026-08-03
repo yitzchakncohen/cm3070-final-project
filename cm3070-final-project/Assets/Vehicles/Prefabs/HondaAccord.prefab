@@ -182,8 +182,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::InputManager
   vehicleController: {fileID: 3978891534158211180}
   cameraController: {fileID: 6812107340984863835}
-  accelerationRampRate: 3
-  brakingRampRate: 4
+  accelerationRampRate: 1
+  brakingRampRate: 1
   steeringRampRate: 4
   accelerationReleaseRate: 8
   brakingReleaseRate: 10
@@ -242,8 +242,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82acfa60dd9e19346b8fe3f2dca1ccb0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ModularVehicleSimulator.Debugging.CenterOfMassGizmo
-  debuggingMode: 1
   debugColor: {r: 0, g: 1, b: 0, a: 1}
+  debuggingMode: 1
 --- !u!114 &7970761858409370905
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -280,8 +280,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f7221e596a3ce140b6fbc95c31a76aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ModularVehicleSimulator.Debugging.AirResistanceGizmo
-  debuggingMode: 8
   debugColor: {r: 0.5803922, g: 0, b: 0.8274511, a: 1}
+  debuggingMode: 8
 --- !u!1 &914418845776699868
 GameObject:
   m_ObjectHideFlags: 0
@@ -518,8 +518,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74deb6159e191664493a84f17a31fddd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ModularVehicleSimulator.Debugging.TireFrictionGizmo
-  debuggingMode: 2
   debugColor: {r: 0, g: 0.19833922, b: 1, a: 1}
+  debuggingMode: 2
 --- !u!114 &2914521031008523487
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -532,8 +532,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e08f12fe8f68f9745b108fc30c52b59d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ModularVehicleSimulator.Debugging.TurningRadiusGizmo
-  debuggingMode: 4
   debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  debuggingMode: 4
 --- !u!1 &4127906604676985921
 GameObject:
   m_ObjectHideFlags: 0

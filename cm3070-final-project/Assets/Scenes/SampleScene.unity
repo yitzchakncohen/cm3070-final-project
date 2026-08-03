@@ -465,7 +465,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Weather
   roadSurfaceCondition: 0
   precipitation: 0
-  windVelocity: {x: 10, y: 0, z: 0}
+  windVelocity: {x: 2, y: 0, z: 2}
   temperature: 20
   rainFX: {fileID: 508521187}
   snowFX: {fileID: 432697585}

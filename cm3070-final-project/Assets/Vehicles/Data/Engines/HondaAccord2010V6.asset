@@ -13,6 +13,9 @@ MonoBehaviour:
   m_Name: HondaAccord2010V6
   m_EditorClassIdentifier: Assembly-CSharp::ModularVehicleSimulator.Vehicle.Data.EngineConfiguration
   engineType: 0
+  isAutomaticTransmision: 1
+  minAutomaticTransmissionShiftTime: 1
+  inertiaInKgSquareMeters: 0.2
   idleRPM: 800
   peakTorqueRPM: 5000
   maxRPM: 6800
