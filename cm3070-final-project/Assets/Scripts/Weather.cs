@@ -7,9 +7,11 @@ namespace ModularVehicleSimulator
     public class Weather : MonoBehaviour
     {
         private const float WIND_SPEED_MAX = 35f;
+        private const float TEMPERATURE_MAX = 40f;
+        private const float TEMPERATURE_MIN = 40f;
         private const float RAIN_WIND_MULTIPLIER = 0.3f;
         private const float SNOW_WIND_MULTIPLIER = 0.6f;
-        private const float FX_CAMERA_OFFSET = 4f;
+        private const float FX_CAMERA_OFFSET = 6f;
         // Singleton pattern for weather
         public static Weather Instance;
         public float Temperature => temperature;
@@ -64,7 +66,7 @@ namespace ModularVehicleSimulator
         [ContextMenu("Randomize Weather")]
         public void RandomizeWeather()
         {
-            windVelocity = new Vector3(Random.Range(0, WIND_SPEED_MAX) / Mathf.Sqrt(2), Random.Range(0, WIND_SPEED_MAX) / Mathf.Sqrt(2), 0f);
+            windVelocity = new Vector3(Random.Range(0, WIND_SPEED_MAX) / Mathf.Sqrt(2), 0f, Random.Range(0, WIND_SPEED_MAX) / Mathf.Sqrt(2));
             roadSurfaceCondition = GetRandomValue<RoadSurfaceCondition>();
             if(roadSurfaceCondition == RoadSurfaceCondition.Wet)
             {
@@ -78,6 +80,7 @@ namespace ModularVehicleSimulator
             {
                 precipitation = Precipitation.None;
             }
+            temperature = Random.Range(TEMPERATURE_MIN, TEMPERATURE_MAX);
             UpdateWeather();
         }
 
