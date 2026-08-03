@@ -35,8 +35,7 @@ namespace ModularVehicleSimulator.Vehicle
 
         private void FixedUpdate()
         {
-            // TODO Add Wind Velocity
-            velocity = vehicleController.ChassisRigidBody.linearVelocity;
+            velocity = vehicleController.ChassisRigidBody.linearVelocity - Weather.Instance.WindVelocity;
 
             if (velocity.sqrMagnitude > 0.01f)
             {

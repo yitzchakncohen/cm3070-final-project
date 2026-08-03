@@ -10,15 +10,28 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3225edcbff7de9e4e9b23ccc1cb02c8e, type: 3}
-  m_Name: AllSeasonTires
+  m_Name: WinterTires
   m_EditorClassIdentifier: Assembly-CSharp::ModularVehicleSimulator.Vehicle.Data.WheelConfiguration
   forwardExtremeSlip: 0.125
   forwardExtremeValue: 0.875
   forwardAsymptoteSlip: 0.7
   forwardAsymptoteValue: 0.725
-  forwardStiffness: 1
+  defaultForwardStiffness: 0.8
   sideWaysExtremeSlip: 0.175
   sideWaysExtremeValue: 0.875
   sideWaysAsymptoteSlip: 0.7
   sideWaysAsymptoteValue: 0.725
-  sideWaysStiffness: 1
+  defaultSidewaysStiffness: 0.8
+  pressureMultiplier: 2500
+  carcassBaseStiffness: 145000
+  tirePressureInPSI: 35
+  lateralStiffnessRatio: 0.6
+  gripGainedPerMeterOfDeflection: 0.15
+  wetForwardStiffness: 0.7
+  wetSidewaysStiffness: 0.7
+  coldForwardStiffness: 0.9
+  coldSidewaysStiffness: 0.9
+  snowyForwardStiffness: 0.8
+  snowySidewaysStiffness: 0.8
+  icyForwardStiffness: 0.4
+  icySidewaysStiffness: 0.4

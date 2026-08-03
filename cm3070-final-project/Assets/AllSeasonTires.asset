@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3225edcbff7de9e4e9b23ccc1cb02c8e, type: 3}
+  m_Name: AllSeasonTires
+  m_EditorClassIdentifier: Assembly-CSharp::ModularVehicleSimulator.Vehicle.Data.WheelConfiguration
+  forwardExtremeSlip: 0.125
+  forwardExtremeValue: 0.875
+  forwardAsymptoteSlip: 0.7
+  forwardAsymptoteValue: 0.725
+  defaultForwardStiffness: 1
+  sideWaysExtremeSlip: 0.175
+  sideWaysExtremeValue: 0.875
+  sideWaysAsymptoteSlip: 0.7
+  sideWaysAsymptoteValue: 0.725
+  defaultSidewaysStiffness: 1
+  pressureMultiplier: 2500
+  carcassBaseStiffness: 145000
+  tirePressureInPSI: 35
+  lateralStiffnessRatio: 0.6
+  gripGainedPerMeterOfDeflection: 0.15
+  wetForwardStiffness: 0.9
+  wetSidewaysStiffness: 0.9
+  coldForwardStiffness: 0.6
+  coldSidewaysStiffness: 0.6
+  snowyForwardStiffness: 0.3
+  snowySidewaysStiffness: 0.3
+  icyForwardStiffness: 0.1
+  icySidewaysStiffness: 0.1
