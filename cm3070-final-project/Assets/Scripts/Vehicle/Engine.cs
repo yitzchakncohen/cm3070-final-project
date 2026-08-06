@@ -8,6 +8,8 @@ namespace ModularVehicleSimulator.Vehicle
     public class Engine : MonoBehaviour
     {
         public float RPM => currentEngineRPM;
+        public float RPMIdle => engineConfiguration.IdleRPM;
+        public float RPMMax => engineConfiguration.MaxRPM;
         private const float RAD_SEC_TO_RPM = 60f / (2f * Mathf.PI);
         private const float IDLE_COMPENSATION_MAX = 0.3f;
         private const float IDLE_FLOOR_FACTOR = 0.8f;
