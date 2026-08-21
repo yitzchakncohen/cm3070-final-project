@@ -22,7 +22,7 @@ namespace ModularVehicleSimulator.Vehicle
 
         private void UpdateSkidFX()
         {
-            if (wheel.IsGrounded() && wheel.GetAverageForwardSlip() > Wheel.SPEEDOMETER_SLIP_THRESHHOLD)
+            if (wheel.IsGrounded() && wheel.GetAverageForwardSlip() > wheel.GetSlipThreshold(Wheel.FX_SLIP_THRESHHOLD_MULTIPLIER))
             {
                 foreach (ParticleSystem particleSystem in particleSystems)
                 {

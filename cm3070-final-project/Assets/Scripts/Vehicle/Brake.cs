@@ -35,7 +35,7 @@ namespace ModularVehicleSimulator.Vehicle
             if (brakesConfiguration.ABSEnabled)
             {
                 float vehicleForwardSlip = wheel.GetAverageForwardSlip();
-                if (Mathf.Abs(vehicleForwardSlip) > brakesConfiguration.ABSSlipThreshhold)
+                if (Mathf.Abs(vehicleForwardSlip) > wheel.GetSlipThreshold(brakesConfiguration.ABSSlipThreshholdMultiplier))
                 {
                     brakeTorque = VehiclePhysics.ABSStepFunction(brakeTorque, brakesConfiguration.ABSOscillationSpeed);
                 }

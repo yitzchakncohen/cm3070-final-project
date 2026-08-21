@@ -39,7 +39,7 @@ namespace ModularVehicleSimulator.Vehicle.Audio
         {
             foreach (Wheel wheel in wheels)
             {
-                if (wheel.IsGrounded() && wheel.GetAverageForwardSlip() > Wheel.SPEEDOMETER_SLIP_THRESHHOLD)
+                if (wheel.IsGrounded() && wheel.GetAverageForwardSlip() > wheel.GetSlipThreshold(Wheel.FX_SLIP_THRESHHOLD_MULTIPLIER))
                 {
                     if(!wheelsAudioSource.isPlaying)
                     {

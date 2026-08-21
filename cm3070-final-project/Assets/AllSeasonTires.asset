@@ -16,12 +16,12 @@ MonoBehaviour:
   forwardExtremeValue: 0.875
   forwardAsymptoteSlip: 0.7
   forwardAsymptoteValue: 0.725
-  defaultForwardStiffness: 1
+  defaultForwardStiffness: 1.5
   sideWaysExtremeSlip: 0.175
   sideWaysExtremeValue: 0.875
   sideWaysAsymptoteSlip: 0.7
   sideWaysAsymptoteValue: 0.725
-  defaultSidewaysStiffness: 1
+  defaultSidewaysStiffness: 1.5
   pressureMultiplier: 2500
   carcassBaseStiffness: 145000
   tirePressureInPSI: 35

@@ -46,7 +46,9 @@ namespace ModularVehicleSimulator.Vehicle
 
         private void ApplyDrag()
         {
-            crossSection = VehiclePhysics.GetCollidersCrossSectionPolygon(colliders, velocity.normalized, vehicleController.ChassisRigidBody.worldCenterOfMass);
+            crossSection = VehiclePhysics.GetCollidersCrossSectionPolygon(colliders, 
+                                                                            velocity.normalized, 
+                                                                            vehicleController.ChassisRigidBody.worldCenterOfMass);
             crossSectionArea = VehiclePhysics.GetAreaOfConvexHull(crossSection);
             // D = Cd * r * V^2/2 * A
             drag = chassisConfiguration.DragCoefficient * AIR_DENSITY * (velocity.sqrMagnitude / 2f) * crossSectionArea;

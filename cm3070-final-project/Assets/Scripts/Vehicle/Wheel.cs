@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using ModularVehicleSimulator.Physics;
 using ModularVehicleSimulator.Vehicle.Data;
@@ -10,7 +11,8 @@ namespace ModularVehicleSimulator.Vehicle
     {
         public const float DEFLECTION_SMOOTH_STEP = 1f;
         public const float EFFECTIVE_SLIP_THRESHHOLD = 0.15f;
-        public const float SPEEDOMETER_SLIP_THRESHHOLD = 0.75f;
+        public const float SPEEDOMETER_SLIP_THRESHHOLD_MULTIPLIER = 10f;
+        public const float FX_SLIP_THRESHHOLD_MULTIPLIER = 1.3f;
         public Vector3 WheelFriction => GetWheelFrictionVector();
         public Vector3 WheelContactPoint => GetWheelContactPoint();
 
@@ -33,7 +35,7 @@ namespace ModularVehicleSimulator.Vehicle
         private ChassisConfiguration chassisConfiguration;
         private DriveTrain driveTrain;
         private Rigidbody chassisRigidBody;
-        private PhysicsMaterial currentSurfaceMaterial = null;
+        private Dictionary<WheelCollider, PhysicsMaterial> currentSurfaceMaterials = new Dictionary<WheelCollider, PhysicsMaterial>();
         private float rightSteeringAngle = 0f;
         private float leftSteeringAngle = 0f;
         private float currentDeflection = 0f;
@@ -42,11 +44,6 @@ namespace ModularVehicleSimulator.Vehicle
         private void Awake()
         {
             wheelColliders = GetComponentsInChildren<WheelCollider>();
-        }
-
-        private void Update()
-        {
-            UpdateSurfaceMaterial();
         }
 
         public void Init(WheelConfiguration wheels, 
@@ -75,6 +72,8 @@ namespace ModularVehicleSimulator.Vehicle
         private void FixedUpdate()
         {
             ApplyDeflection();
+            UpdateSurfaceMaterial();
+            UpdateTireFriction(currentDeflection);
         }
 
         public void Steer(float leftSteeringAngle, float rightSteeringAngle)
@@ -103,6 +102,14 @@ namespace ModularVehicleSimulator.Vehicle
             }
         }
 
+        public float GetSlipThreshold(float bufferMultiplier)
+        {
+            float temperature = Weather.Instance? Weather.Instance.Temperature : 20f;
+            RoadSurfaceCondition roadSurfaceCondition = Weather.Instance? Weather.Instance.RoadSurfaceCondition : RoadSurfaceCondition.None;
+            WheelFrictionCurve forwardFriction = wheelConfiguration.GetForwardFrictionCurve(numberOfColliders, temperature, roadSurfaceCondition); 
+            return forwardFriction.extremumSlip * bufferMultiplier;
+        }
+
         public float GetEffectiveRPM()
         {
             return GetRPM(EFFECTIVE_SLIP_THRESHHOLD);
@@ -110,7 +117,8 @@ namespace ModularVehicleSimulator.Vehicle
 
         public float GetSpeedometerRPM()
         {
-            return GetRPM(SPEEDOMETER_SLIP_THRESHHOLD);
+            float slipThreshold = GetSlipThreshold(SPEEDOMETER_SLIP_THRESHHOLD_MULTIPLIER);
+            return GetRPM(slipThreshold);
         }
 
         public float GetAverageForwardSlip()
@@ -119,7 +127,23 @@ namespace ModularVehicleSimulator.Vehicle
             int colliders = 0;
             foreach (WheelCollider wheelCollider in wheelColliders)
             {
-                float colliderSlip = GetSlipForCollider(wheelCollider);
+                float colliderSlip = GetForwardSlipForCollider(wheelCollider);
+                if(colliderSlip < Mathf.Infinity)
+                {
+                    colliders++;
+                    slip += colliderSlip;
+                }
+            }
+            return slip / colliders;
+        }
+
+        public float GetAverageSidewaysSlip()
+        {
+            float slip = 0f;
+            int colliders = 0;
+            foreach (WheelCollider wheelCollider in wheelColliders)
+            {
+                float colliderSlip = GetSidewaysSlipForCollider(wheelCollider);
                 if(colliderSlip < Mathf.Infinity)
                 {
                     colliders++;
@@ -156,50 +180,13 @@ namespace ModularVehicleSimulator.Vehicle
             return false;
         }
 
-        private void UpdateSurfaceMaterial()
-        {
-            foreach (WheelCollider wheelCollider in wheelColliders)
-            {
-                WheelHit hit;
-                if (wheelCollider.GetGroundHit(out hit))
-                {
-                    if (hit.collider.material.GetType() == typeof(PhysicsMaterial))
-                    {
-                        if (hit.collider.material != currentSurfaceMaterial)
-                        {
-                            currentSurfaceMaterial = hit.collider.material;
-                            ApplySurfaceMaterial(wheelCollider, hit.collider.material.dynamicFriction);
-                        }
-                    }
-                    else
-                    {
-                        if(currentSurfaceMaterial != null)
-                        {
-                            currentSurfaceMaterial = null;
-                            ApplySurfaceMaterial(wheelCollider);
-                        }
-                    }
-                }
-            }
-        }
-
-        private void ApplySurfaceMaterial(WheelCollider wheelCollider, float friction = 1f)
-        {
-            WheelFrictionCurve forwardFriction = wheelCollider.forwardFriction;
-            forwardFriction.stiffness = forwardFriction.stiffness * friction / wheelColliders.Length;
-            wheelCollider.forwardFriction = forwardFriction;
-            WheelFrictionCurve sidewaysFriction = wheelCollider.sidewaysFriction;
-            sidewaysFriction.stiffness = sidewaysFriction.stiffness * friction / wheelColliders.Length;
-            wheelCollider.sidewaysFriction = forwardFriction;
-        }
-
         private float GetRPM(float slipThreshhold)
         {
             float rpm = 0f;
             int effectiveColliders = 0;
             foreach (WheelCollider wheelCollider in wheelColliders)
             {
-                float vehicleForwardSlip = GetSlipForCollider(wheelCollider);
+                float vehicleForwardSlip = GetForwardSlipForCollider(wheelCollider);
                 if (Mathf.Abs(vehicleForwardSlip) < slipThreshhold)
                 {
                     rpm += wheelCollider.rpm;
@@ -213,7 +200,7 @@ namespace ModularVehicleSimulator.Vehicle
             return 0f;
         }
 
-        private static float GetSlipForCollider(WheelCollider wheelCollider)
+        private static float GetForwardSlipForCollider(WheelCollider wheelCollider)
         {
             float vehicleForwardSlip = Mathf.Infinity;
             if (wheelCollider.GetGroundHit(out WheelHit hit))
@@ -225,6 +212,20 @@ namespace ModularVehicleSimulator.Vehicle
             }
 
             return vehicleForwardSlip;
+        }
+
+        private static float GetSidewaysSlipForCollider(WheelCollider wheelCollider)
+        {
+            float vehicleSidewaysSlip = Mathf.Infinity;
+            if (wheelCollider.GetGroundHit(out WheelHit hit))
+            {
+                // Calculate total slip magnitude accounting for steering angle
+                float steerAngleRad = wheelCollider.steerAngle * Mathf.Deg2Rad;
+                vehicleSidewaysSlip = hit.sidewaysSlip * Mathf.Cos(steerAngleRad) - hit.sidewaysSlip * Mathf.Sin(steerAngleRad);
+
+            }
+
+            return vehicleSidewaysSlip;
         }
 
         private void UpdateWheelAngles()
@@ -303,7 +304,37 @@ namespace ModularVehicleSimulator.Vehicle
             float currentWidth = wheelConfiguration.Width + bulge;
             UpdateWheelWidth(currentWidth);
             UpdateTireVisuals(currentWheelRadius, currentWidth);
-            UpdateTireFriction(currentDeflection);
+        }
+
+        private void UpdateSurfaceMaterial()
+        {
+            foreach (WheelCollider wheelCollider in wheelColliders)
+            {
+                // Setup dictionary. 
+                if (!currentSurfaceMaterials.ContainsKey(wheelCollider))
+                {
+                    currentSurfaceMaterials.Add(wheelCollider, null);
+                }
+
+                WheelHit hit;
+                if (wheelCollider.GetGroundHit(out hit))
+                {
+                    if (hit.collider.material.GetType() == typeof(PhysicsMaterial))
+                    {
+                        if (hit.collider.material != currentSurfaceMaterials[wheelCollider])
+                        {
+                            currentSurfaceMaterials[wheelCollider] = hit.collider.material;
+                        }
+                    }
+                    else
+                    {
+                        if(currentSurfaceMaterials[wheelCollider] != null)
+                        {
+                            currentSurfaceMaterials[wheelCollider] = null;
+                        }
+                    }
+                }
+            }
         }
 
         private void UpdateTireVisuals(float currentRadius, float currentWidth)
@@ -318,12 +349,14 @@ namespace ModularVehicleSimulator.Vehicle
             RoadSurfaceCondition roadSurfaceCondition = Weather.Instance? Weather.Instance.RoadSurfaceCondition : RoadSurfaceCondition.None;
             foreach (WheelCollider wheelCollider in wheelColliders)
             {
+                float surfaceFriction = currentSurfaceMaterials[wheelCollider] ? currentSurfaceMaterials[wheelCollider].dynamicFriction : 1f;
+
                 WheelFrictionCurve forwardFriction = wheelCollider.forwardFriction;
-                forwardFriction.stiffness = (wheelConfiguration.GetForwardStiffness(temperature, roadSurfaceCondition) / numberOfColliders) * frictionMultiplier;
+                forwardFriction.stiffness = wheelConfiguration.GetForwardStiffness(temperature, roadSurfaceCondition) * surfaceFriction / numberOfColliders * frictionMultiplier;
                 wheelCollider.forwardFriction = forwardFriction;
 
                 WheelFrictionCurve sidewaysFriction = wheelCollider.sidewaysFriction;
-                sidewaysFriction.stiffness = (wheelConfiguration.GetSidewaysStiffness(temperature, roadSurfaceCondition) / numberOfColliders) * frictionMultiplier;
+                sidewaysFriction.stiffness = wheelConfiguration.GetSidewaysStiffness(temperature, roadSurfaceCondition) * surfaceFriction / numberOfColliders * frictionMultiplier;
                 wheelCollider.sidewaysFriction = sidewaysFriction;
             }
         }
