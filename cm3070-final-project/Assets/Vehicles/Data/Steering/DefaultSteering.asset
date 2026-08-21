@@ -16,3 +16,5 @@ MonoBehaviour:
   maxSteeringAngleAtHighSpeed: 38
   highSpeedThresholdInMetersPerSecond: 30
   steeringSpeedInDegreesPerSecond: 90
+  antiRollBarStiffnessFront: 12000
+  antiRollBarStiffnessRear: 8000

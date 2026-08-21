@@ -11,7 +11,7 @@ namespace ModularVehicleSimulator.Vehicle
     {
         public const float DEFLECTION_SMOOTH_STEP = 1f;
         public const float EFFECTIVE_SLIP_THRESHHOLD = 0.15f;
-        public const float SPEEDOMETER_SLIP_THRESHHOLD_MULTIPLIER = 10f;
+        public const float SPEEDOMETER_SLIP_THRESHHOLD_MULTIPLIER = .75f;
         public const float FX_SLIP_THRESHHOLD_MULTIPLIER = 1.3f;
         public Vector3 WheelFriction => GetWheelFrictionVector();
         public Vector3 WheelContactPoint => GetWheelContactPoint();

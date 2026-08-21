@@ -184,7 +184,7 @@ MonoBehaviour:
   vehicleController: {fileID: 3978891534158211180}
   cameraController: {fileID: 6812107340984863835}
   accelerationRampRate: 1
-  brakingRampRate: 1
+  brakingRampRate: 0.5
   steeringRampRate: 4
   accelerationReleaseRate: 8
   brakingReleaseRate: 10

@@ -31,13 +31,15 @@ namespace ModularVehicleSimulator.Vehicle
         public void Accelerate(Gear gear, float accelerationInput)
         {
             float engineInputRPM = motorizedWheels.Average(wheel => wheel.GetEffectiveRPM()) * driveTrain.GetRatioForGear(gear);
-            float wheelTorque = GetWheelTorque(gear, accelerationInput, engineInputRPM) / motorizedWheels.Count();
+            float totalTorque = GetWheelTorque(gear, accelerationInput, engineInputRPM);
+            float totalRMP = motorizedWheels.Sum(wheel => wheel.GetEffectiveRPM());
 
             // Apply the engine torque or braking to the wheels
             if(accelerationInput > 0.01f || currentEngineRPM > Mathf.Abs(engineInputRPM))
             {
                 foreach (Wheel wheel in motorizedWheels)
                 {
+                    float wheelTorque = ApplyOpenDifferential(totalTorque, wheel.GetEffectiveRPM(), totalRMP);
                     wheel.Accelerate(wheelTorque, 0f);
                 }                
             }
@@ -45,9 +47,17 @@ namespace ModularVehicleSimulator.Vehicle
             {
                 foreach (Wheel wheel in motorizedWheels)
                 {
+                    float wheelTorque = ApplyOpenDifferential(totalTorque, wheel.GetEffectiveRPM(), totalRMP);
                     wheel.Accelerate(0f, Mathf.Abs(wheelTorque));
                 } 
             }
+        }
+
+        private float ApplyOpenDifferential(float inputTorque, float wheelRPM, float totalRMP)
+        {
+            totalRMP = Mathf.Max(0.001f, Mathf.Abs(totalRMP));
+            wheelRPM = Mathf.Abs(wheelRPM);
+            return inputTorque * (wheelRPM / totalRMP);
         }
 
         private float GetWheelTorque(Gear gear, float input, float engineInputRPM)

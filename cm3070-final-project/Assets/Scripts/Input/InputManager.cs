@@ -16,7 +16,7 @@ namespace ModularVehicleSimulator.Input
         [SerializeField] private VehicleController vehicleController;
         [SerializeField] private CameraController cameraController;
         [SerializeField] private float accelerationRampRate = 3.0f;
-        [SerializeField] private float brakingRampRate = 4.0f;
+        [SerializeField] private float brakingRampRate = 3.0f;
         [SerializeField] private float steeringRampRate = 4.0f;
         [SerializeField] private float accelerationReleaseRate = 8.0f;
         [SerializeField] private float brakingReleaseRate = 10.0f;
