@@ -40,6 +40,7 @@ namespace ModularVehicleSimulator.Vehicle
                 foreach (Wheel wheel in motorizedWheels)
                 {
                     float wheelTorque = ApplyOpenDifferential(totalTorque, wheel.GetEffectiveRPM(), totalRMP);
+                    Debug.Log($"wheelTorque {wheelTorque}");
                     wheel.Accelerate(wheelTorque, 0f);
                 }                
             }

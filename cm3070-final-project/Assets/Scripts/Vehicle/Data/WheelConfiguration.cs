@@ -22,13 +22,13 @@ namespace ModularVehicleSimulator.Vehicle.Data
         [SerializeField] private float forwardExtremeValue = 0.875f;
         [SerializeField] private float forwardAsymptoteSlip = 0.7f;
         [SerializeField] private float forwardAsymptoteValue = 0.725f;
-        [SerializeField] private float defaultForwardStiffness = 1.0f;
+        [SerializeField] private float forwardStiffness = 1.0f;
         [Header("Friction Sideways")]
-        [SerializeField] private float sideWaysExtremeSlip = 0.175f;
-        [SerializeField] private float sideWaysExtremeValue = 0.875f;
-        [SerializeField] private float sideWaysAsymptoteSlip = 0.7f;
-        [SerializeField] private float sideWaysAsymptoteValue = 0.725f;
-        [SerializeField] private float defaultSidewaysStiffness = 1.0f;
+        [SerializeField] private float sidewaysExtremeSlip = 0.175f;
+        [SerializeField] private float sidewaysExtremeValue = 0.875f;
+        [SerializeField] private float sidewaysAsymptoteSlip = 0.7f;
+        [SerializeField] private float sidewaysAsymptoteValue = 0.725f;
+        [SerializeField] private float sidewaysStiffness = 1.0f;
         [Header("Tire Deformation")]
         [SerializeField] private float pressureMultiplier = 2500f;
         [SerializeField] private float carcassBaseStiffness = 145000;
@@ -36,58 +36,58 @@ namespace ModularVehicleSimulator.Vehicle.Data
         [SerializeField] private float lateralStiffnessRatio = 0.6f;
         [SerializeField] private float gripGainedPerMeterOfDeflection = 0.15f;
         [Header("Weather Conditions")]
-        [SerializeField] private float wetForwardStiffness = 0.9f;
-        [SerializeField] private float wetSidewaysStiffness = 0.9f;
-        [SerializeField] private float coldForwardStiffness = 0.6f;
-        [SerializeField] private float coldSidewaysStiffness = 0.6f;
-        [SerializeField] private float snowyForwardStiffness = 0.3f;
-        [SerializeField] private float snowySidewaysStiffness = 0.3f;
-        [SerializeField] private float icyForwardStiffness = 0.1f;
-        [SerializeField] private float icySidewaysStiffness = 0.1f;
+        [SerializeField] private float wetForwardFriction = 0.9f;
+        [SerializeField] private float wetSidewaysFriction = 0.9f;
+        [SerializeField] private float coldForwardFriction = 0.6f;
+        [SerializeField] private float coldSidewaysFriction = 0.6f;
+        [SerializeField] private float snowyForwardFriction = 0.3f;
+        [SerializeField] private float snowySidewaysFriction = 0.3f;
+        [SerializeField] private float icyForwardFriction = 0.1f;
+        [SerializeField] private float icySidewaysFriction = 0.1f;
 
-        public float GetForwardStiffness(float temperature, RoadSurfaceCondition roadSurfaceCondition)
+        public float GetForwardWeatherFrictionMultiplier(float temperature, RoadSurfaceCondition roadSurfaceCondition)
         {
             if(roadSurfaceCondition == RoadSurfaceCondition.Icy)
             {
-                return icyForwardStiffness;
+                return icyForwardFriction;
             }
             else if(roadSurfaceCondition == RoadSurfaceCondition.Snowy)
             {
-                return snowyForwardStiffness;
+                return snowyForwardFriction;
             }
             else if(temperature < COLD_WEATHER_TEMPERATURE)
             {
-                return coldForwardStiffness;
+                return coldForwardFriction;
             }
             else if(roadSurfaceCondition == RoadSurfaceCondition.Wet)
             {
-                return wetForwardStiffness;
+                return wetForwardFriction;
             }
-            return defaultForwardStiffness;
+            return 1f;
         }
 
-        public float GetSidewaysStiffness(float temperature, RoadSurfaceCondition roadSurfaceCondition)
+        public float GetSidewaysWeatherFrictionMultiplier(float temperature, RoadSurfaceCondition roadSurfaceCondition)
         {
             if(roadSurfaceCondition == RoadSurfaceCondition.Icy)
             {
-                return icySidewaysStiffness;
+                return icySidewaysFriction;
             }
             else if(roadSurfaceCondition == RoadSurfaceCondition.Snowy)
             {
-                return snowySidewaysStiffness;
+                return snowySidewaysFriction;
             }
             else if(temperature < COLD_WEATHER_TEMPERATURE)
             {
-                return coldSidewaysStiffness;
+                return coldSidewaysFriction;
             }
             else if(roadSurfaceCondition == RoadSurfaceCondition.Wet)
             {
-                return wetSidewaysStiffness;
+                return wetSidewaysFriction;
             }
-            return defaultSidewaysStiffness;
+            return 1f;
         }
 
-        public WheelFrictionCurve GetDefaultForwardFrictionCurve(float numberOfColliders, float temperature, RoadSurfaceCondition roadSurfaceCondition)
+        public WheelFrictionCurve GetDefaultForwardFrictionCurve()
         {
             return new WheelFrictionCurve
             {
@@ -95,19 +95,19 @@ namespace ModularVehicleSimulator.Vehicle.Data
                 extremumValue = forwardExtremeValue,
                 asymptoteSlip = forwardAsymptoteSlip,
                 asymptoteValue = forwardAsymptoteValue,
-                stiffness = GetForwardStiffness(temperature, roadSurfaceCondition) / numberOfColliders,
+                stiffness = forwardStiffness,
             };
         }
 
-        public WheelFrictionCurve GetDefaultSidewaysFrictionCurve(float numberOfColliders, float temperature, RoadSurfaceCondition roadSurfaceCondition)
+        public WheelFrictionCurve GetDefaultSidewaysFrictionCurve()
         {
             return new WheelFrictionCurve
             {
-                extremumSlip = sideWaysExtremeSlip,
-                extremumValue = sideWaysExtremeValue,
-                asymptoteSlip = sideWaysAsymptoteSlip,
-                asymptoteValue = sideWaysAsymptoteValue,
-                stiffness = GetSidewaysStiffness(temperature, roadSurfaceCondition)  / numberOfColliders
+                extremumSlip = sidewaysExtremeSlip,
+                extremumValue = sidewaysExtremeValue,
+                asymptoteSlip = sidewaysAsymptoteSlip,
+                asymptoteValue = sidewaysAsymptoteValue,
+                stiffness = sidewaysStiffness
             };
         }
     }
