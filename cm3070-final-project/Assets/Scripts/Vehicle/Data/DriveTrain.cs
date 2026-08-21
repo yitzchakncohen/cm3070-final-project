@@ -12,7 +12,7 @@ namespace ModularVehicleSimulator.Vehicle.Data
         [SerializeField] private List<GearRatio> gearRatios;
         [SerializeField] private float loss = 0.85f;
         [SerializeField] private float finalDriveRatio = 4.31f;
-        [SerializeField] private float damping = 0.25f;
+        [SerializeField] private float damping = 2.5f;
 
         public float GetRatioForGear(Gear gear)
         {
