@@ -50,6 +50,10 @@ namespace ModularVehicleSimulator.Vehicle
             {
                 antiRollBar.Init(chassisRigidBody, Steering);                
             }
+            foreach (Collider collider in GetComponentsInChildren<Collider>())
+            {
+                collider.material = Chassis.Material;
+            }
         }
 
         private void Update()
