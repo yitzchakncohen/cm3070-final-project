@@ -52,6 +52,7 @@ namespace ModularVehicleSimulator.Vehicle
             }
             foreach (Collider collider in GetComponentsInChildren<Collider>())
             {
+                if(collider as WheelCollider) continue;
                 collider.material = Chassis.Material;
             }
         }

@@ -87,7 +87,7 @@ namespace ModularVehicleSimulator.Vehicle.Data
             return defaultSidewaysStiffness;
         }
 
-        public WheelFrictionCurve GetForwardFrictionCurve(float numberOfColliders, float temperature, RoadSurfaceCondition roadSurfaceCondition)
+        public WheelFrictionCurve GetDefaultForwardFrictionCurve(float numberOfColliders, float temperature, RoadSurfaceCondition roadSurfaceCondition)
         {
             return new WheelFrictionCurve
             {
@@ -99,7 +99,7 @@ namespace ModularVehicleSimulator.Vehicle.Data
             };
         }
 
-        public WheelFrictionCurve GetSidewaysFrictionCurve(float numberOfColliders, float temperature, RoadSurfaceCondition roadSurfaceCondition)
+        public WheelFrictionCurve GetDefaultSidewaysFrictionCurve(float numberOfColliders, float temperature, RoadSurfaceCondition roadSurfaceCondition)
         {
             return new WheelFrictionCurve
             {

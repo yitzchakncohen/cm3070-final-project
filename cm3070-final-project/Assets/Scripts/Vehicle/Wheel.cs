@@ -11,7 +11,7 @@ namespace ModularVehicleSimulator.Vehicle
         public const float DEFLECTION_SMOOTH_STEP = 1f;
         public const float EFFECTIVE_SLIP_THRESHHOLD = 0.15f;
         public const float SPEEDOMETER_SLIP_THRESHHOLD_MULTIPLIER = .75f;
-        public const float FX_SLIP_THRESHHOLD_MULTIPLIER = 1.3f;
+        public const float FX_SLIP_THRESHHOLD_MULTIPLIER = 1.5f;
         public Vector3 WheelFriction => GetWheelFrictionVector();
         public Vector3 WheelContactPoint => GetWheelContactPoint();
 
@@ -103,9 +103,7 @@ namespace ModularVehicleSimulator.Vehicle
 
         public float GetSlipThreshold(float bufferMultiplier)
         {
-            float temperature = Weather.Instance? Weather.Instance.Temperature : 20f;
-            RoadSurfaceCondition roadSurfaceCondition = Weather.Instance? Weather.Instance.RoadSurfaceCondition : RoadSurfaceCondition.None;
-            WheelFrictionCurve forwardFriction = wheelConfiguration.GetForwardFrictionCurve(numberOfColliders, temperature, roadSurfaceCondition); 
+            WheelFrictionCurve forwardFriction = wheelColliders[0].forwardFriction;
             return forwardFriction.extremumSlip * bufferMultiplier;
         }
 
@@ -256,9 +254,9 @@ namespace ModularVehicleSimulator.Vehicle
             {
                 wheelCollider.radius = wheelConfiguration.Radius;
                 wheelCollider.mass = wheelConfiguration.Weight / numberOfColliders;
-                WheelFrictionCurve forwardFriction = wheelConfiguration.GetForwardFrictionCurve(numberOfColliders, temperature, roadSurfaceCondition);
+                WheelFrictionCurve forwardFriction = wheelConfiguration.GetDefaultForwardFrictionCurve(numberOfColliders, temperature, roadSurfaceCondition);
                 wheelCollider.forwardFriction = forwardFriction;
-                WheelFrictionCurve sidewaysFriction = wheelConfiguration.GetSidewaysFrictionCurve(numberOfColliders, temperature, roadSurfaceCondition); 
+                WheelFrictionCurve sidewaysFriction = wheelConfiguration.GetDefaultSidewaysFrictionCurve(numberOfColliders, temperature, roadSurfaceCondition); 
                 wheelCollider.sidewaysFriction = sidewaysFriction;
                 wheelCollider.suspensionDistance = suspensionConfiguration.Distance;
                 wheelCollider.wheelDampingRate = driveTrain.Damping;
@@ -346,16 +344,22 @@ namespace ModularVehicleSimulator.Vehicle
             float frictionMultiplier = 1f + (deflection-nominalDeflection)/nominalDeflection * wheelConfiguration.DeflectionGrip;
             float temperature = Weather.Instance? Weather.Instance.Temperature : 20f;
             RoadSurfaceCondition roadSurfaceCondition = Weather.Instance? Weather.Instance.RoadSurfaceCondition : RoadSurfaceCondition.None;
+            WheelFrictionCurve defaultForwardFriction = wheelConfiguration.GetDefaultForwardFrictionCurve(numberOfColliders, temperature, roadSurfaceCondition);
+            WheelFrictionCurve defaultSidewaysFriction = wheelConfiguration.GetDefaultSidewaysFrictionCurve(numberOfColliders, temperature, roadSurfaceCondition);
             foreach (WheelCollider wheelCollider in wheelColliders)
             {
                 float surfaceFriction = currentSurfaceMaterials[wheelCollider] ? currentSurfaceMaterials[wheelCollider].dynamicFriction : 1f;
 
                 WheelFrictionCurve forwardFriction = wheelCollider.forwardFriction;
-                forwardFriction.stiffness = wheelConfiguration.GetForwardStiffness(temperature, roadSurfaceCondition) * surfaceFriction / numberOfColliders * frictionMultiplier;
+                forwardFriction.stiffness = wheelConfiguration.GetForwardStiffness(temperature, roadSurfaceCondition) / numberOfColliders;
+                forwardFriction.extremumValue = defaultForwardFriction.extremumValue * surfaceFriction * frictionMultiplier;
+                forwardFriction.asymptoteValue = defaultForwardFriction.asymptoteValue * surfaceFriction * frictionMultiplier;
                 wheelCollider.forwardFriction = forwardFriction;
 
                 WheelFrictionCurve sidewaysFriction = wheelCollider.sidewaysFriction;
-                sidewaysFriction.stiffness = wheelConfiguration.GetSidewaysStiffness(temperature, roadSurfaceCondition) * surfaceFriction / numberOfColliders * frictionMultiplier;
+                sidewaysFriction.stiffness = wheelConfiguration.GetSidewaysStiffness(temperature, roadSurfaceCondition) / numberOfColliders;
+                sidewaysFriction.extremumValue = defaultSidewaysFriction.extremumValue * surfaceFriction * frictionMultiplier;
+                sidewaysFriction.asymptoteValue = defaultSidewaysFriction.asymptoteValue * surfaceFriction * frictionMultiplier;
                 wheelCollider.sidewaysFriction = sidewaysFriction;
             }
         }

@@ -13,12 +13,12 @@ MonoBehaviour:
   m_Name: AllSeasonTires
   m_EditorClassIdentifier: Assembly-CSharp::ModularVehicleSimulator.Vehicle.Data.WheelConfiguration
   forwardExtremeSlip: 0.125
-  forwardExtremeValue: 0.875
+  forwardExtremeValue: 1
   forwardAsymptoteSlip: 0.7
   forwardAsymptoteValue: 0.725
   defaultForwardStiffness: 1.5
   sideWaysExtremeSlip: 0.175
-  sideWaysExtremeValue: 0.875
+  sideWaysExtremeValue: 1
   sideWaysAsymptoteSlip: 0.7
   sideWaysAsymptoteValue: 0.725
   defaultSidewaysStiffness: 1.5
