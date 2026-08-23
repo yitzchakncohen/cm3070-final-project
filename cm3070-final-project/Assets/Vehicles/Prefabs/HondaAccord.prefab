@@ -184,7 +184,7 @@ MonoBehaviour:
   vehicleController: {fileID: 3978891534158211180}
   cameraController: {fileID: 6812107340984863835}
   accelerationRampRate: 1
-  brakingRampRate: 0.5
+  brakingRampRate: 1
   steeringRampRate: 2
   accelerationReleaseRate: 8
   brakingReleaseRate: 10
@@ -492,9 +492,9 @@ MonoBehaviour:
   wheelsAudioSource: {fileID: 1285137246494932548}
   tireScreech: {fileID: 8300000, guid: cd9122599cbb06444921dbb3637ed9ac, type: 3}
   engineIdle: {fileID: 8300000, guid: 2b741dfa0149c51458b0cd763fc15cea, type: 3}
-  engineLow: {fileID: 8300000, guid: dccc82152f621824c87825d889240b99, type: 3}
-  engineMedium: {fileID: 8300000, guid: 139fd09d7108a514b8be04a5ebaa7c17, type: 3}
-  engineHigh: {fileID: 8300000, guid: ed9829075a152d44fb883f69ddd39287, type: 3}
+  engineLow: {fileID: 8300000, guid: aceb7ad2900174948b20301ab8ca5823, type: 3}
+  engineMedium: {fileID: 8300000, guid: 4454189fef3d9814e8bce98f844e72ed, type: 3}
+  engineHigh: {fileID: 8300000, guid: d745a42b5f415d44c9b87a1a45d12388, type: 3}
 --- !u!82 &2843311797402619600
 AudioSource:
   m_ObjectHideFlags: 0

@@ -9,12 +9,12 @@ namespace ModularVehicleSimulator.Vehicle
     public class VehicleController : MonoBehaviour
     {
         private const float RPM_TO_METERS_PER_SECOND = (2f * Mathf.PI) / 60f;
+        public event Action OnGearChanged;
         public float Speed => speed;
         public float RPM => engineRPM;
         public float CurrentSteeringAngle => currentTargetSteeringAngle;
         public Gear Gear => (Gear)currentGear;
         public Rigidbody ChassisRigidBody => chassisRigidBody;
-        public event Action OnGearChanged;
         public ChassisConfiguration Chassis => vehicleConfiguration.Chassis;
         public SteeringConfiguration Steering => vehicleConfiguration.Steering;
         [SerializeField] private VehicleConfiguration vehicleConfiguration;
@@ -120,6 +120,7 @@ namespace ModularVehicleSimulator.Vehicle
         public void ShiftGearPrevious()
         {
             currentGear = Mathf.Clamp(currentGear - 1, -1, GetMaxGear());
+            Debug.Log("Gear: " + Gear.ToString());
             OnGearChanged?.Invoke();
         }
 

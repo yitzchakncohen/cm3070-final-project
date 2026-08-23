@@ -1,12 +1,20 @@
+using System;
 using UnityEngine;
 
 namespace ModularVehicleSimulator.Vehicle.Audio
 {
     public class AudioController : MonoBehaviour
     {
+        private enum EnginLevel
+        {
+            Idle,
+            Low,
+            Medium,
+            High
+        }
         private const float ENGINE_MEDIUM_PERCENT = 0.25f;
         private const float ENGINE_HIGH_PERCENT = 0.75f;
-        private const float TRANSITION_DELAY = 0.35f;
+        private const float TRANSITION_DELAY = 1.0f;
         [SerializeField] private AudioSource engineAudioSource;
         [SerializeField] private AudioSource wheelsAudioSource;
         [SerializeField] private AudioClip tireScreech;
@@ -14,12 +22,15 @@ namespace ModularVehicleSimulator.Vehicle.Audio
         [SerializeField] private AudioClip engineLow;
         [SerializeField] private AudioClip engineMedium;
         [SerializeField] private AudioClip engineHigh;
+        private VehicleController vehicleController;
         private Engine engine;
         private Wheel[] wheels;
         private float transitionTimer = 0f;
+        private EnginLevel currentEngineLevel = EnginLevel.Idle;
 
-        private void Start()
+        private void Awake()
         {
+            vehicleController = transform.GetComponentInParent<VehicleController>();
             engine = transform.parent.GetComponentInChildren<Engine>();
             wheels = transform.parent.GetComponentsInChildren<Wheel>();
             engineAudioSource.clip = engineIdle;
@@ -41,7 +52,6 @@ namespace ModularVehicleSimulator.Vehicle.Audio
             {
                 if (wheel.IsGrounded() && wheel.GetAverageForwardSlip() > wheel.GetSlipThreshold(Wheel.FX_SLIP_THRESHHOLD_MULTIPLIER))
                 {
-                    Debug.Log($"vehicleForwardSlip {wheel.GetAverageForwardSlip()} | threshold {wheel.GetSlipThreshold(Wheel.FX_SLIP_THRESHHOLD_MULTIPLIER)}");
                     if(!wheelsAudioSource.isPlaying)
                     {
                         wheelsAudioSource.Play();
@@ -58,37 +68,49 @@ namespace ModularVehicleSimulator.Vehicle.Audio
         private void UpdateEngine()
         {
             transitionTimer += Time.fixedDeltaTime;
-            if(transitionTimer < TRANSITION_DELAY) return;
-            if(engine.RPM <= engine.RPMIdle)
-            {
-                engineAudioSource.clip = engineIdle; 
-                transitionTimer = 0f;
-                if(!engineAudioSource.isPlaying)
-                {
-                    engineAudioSource.Play();
-                }
-                return;               
-            }
             float currentPercent = Mathf.InverseLerp(engine.RPMIdle, engine.RPMMax, engine.RPM);
-            if(currentPercent > ENGINE_HIGH_PERCENT)
+            EnginLevel newEngineLevel;
+            if (engine.RPM <= engine.RPMIdle)
             {
-                engineAudioSource.clip = engineHigh;
-                transitionTimer = 0f;
+                newEngineLevel = EnginLevel.Idle;             
+            }
+            else if(currentPercent > ENGINE_HIGH_PERCENT)
+            {
+                newEngineLevel = EnginLevel.High;             
             }
             else if(currentPercent > ENGINE_MEDIUM_PERCENT)
             {
-                engineAudioSource.clip = engineMedium;
-                transitionTimer = 0f;
+                newEngineLevel = EnginLevel.Medium;             
             }
             else
             {
-                engineAudioSource.clip = engineLow;
-                transitionTimer = 0f;
+                newEngineLevel = EnginLevel.Low;             
             }
-            if(!engineAudioSource.isPlaying)
+
+            if(newEngineLevel == currentEngineLevel) return;
+            if(transitionTimer < TRANSITION_DELAY) return;
+
+            transitionTimer = 0f;
+            
+            currentEngineLevel = newEngineLevel;
+            engineAudioSource.Stop();
+            switch (currentEngineLevel)
             {
-                engineAudioSource.Play();
+                case EnginLevel.Low:
+                    engineAudioSource.clip = engineLow;
+                    break;
+                case EnginLevel.Medium:
+                    engineAudioSource.clip = engineMedium;
+                    break;
+                case EnginLevel.High:
+                    engineAudioSource.clip = engineHigh;
+                    break;
+                case EnginLevel.Idle:
+                default:
+                    engineAudioSource.clip = engineIdle; 
+                    break;
             }
+            engineAudioSource.Play();
         }
     }    
 }

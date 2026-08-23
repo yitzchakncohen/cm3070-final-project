@@ -10,8 +10,8 @@ namespace ModularVehicleSimulator.Vehicle
     {
         public const float DEFLECTION_SMOOTH_STEP = 1f;
         public const float EFFECTIVE_SLIP_THRESHHOLD = 0.15f;
-        public const float SPEEDOMETER_SLIP_THRESHHOLD_MULTIPLIER = .75f;
-        public const float FX_SLIP_THRESHHOLD_MULTIPLIER = 1.5f;
+        public const float SPEEDOMETER_SLIP_THRESHHOLD_MULTIPLIER = .70f;
+        public const float FX_SLIP_THRESHHOLD_MULTIPLIER = 7.0f;
         public Vector3 WheelFriction => GetWheelFrictionVector();
         public Vector3 WheelContactPoint => GetWheelContactPoint();
 
@@ -88,7 +88,6 @@ namespace ModularVehicleSimulator.Vehicle
             {
                 wheelCollider.brakeTorque = brakeTorque / numberOfColliders;
                 wheelCollider.motorTorque = torque / numberOfColliders;             
-                Debug.Log($"wheelTorque {wheelCollider.motorTorque}");
             }
         }
 
@@ -172,7 +171,6 @@ namespace ModularVehicleSimulator.Vehicle
             {
                 if(wheelCollider.GetGroundHit(out WheelHit hit))
                 {
-                    Debug.Log($"hit.force {hit.force}");
                     return true;
                 }
             }
@@ -207,7 +205,6 @@ namespace ModularVehicleSimulator.Vehicle
                 // Calculate total slip magnitude accounting for steering angle
                 float steerAngleRad = wheelCollider.steerAngle * Mathf.Deg2Rad;
                 vehicleForwardSlip = hit.forwardSlip * Mathf.Cos(steerAngleRad) - hit.sidewaysSlip * Mathf.Sin(steerAngleRad);
-
             }
 
             return vehicleForwardSlip;

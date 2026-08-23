@@ -40,7 +40,6 @@ namespace ModularVehicleSimulator.Vehicle
                 foreach (Wheel wheel in motorizedWheels)
                 {
                     float wheelTorque = ApplyOpenDifferential(totalTorque, wheel.GetEffectiveRPM(), totalRMP);
-                    Debug.Log($"wheelTorque {wheelTorque}");
                     wheel.Accelerate(wheelTorque, 0f);
                 }                
             }
@@ -78,7 +77,7 @@ namespace ModularVehicleSimulator.Vehicle
             // Calculate Wheel Torque 
             float rpmDelta = currentEngineRPM - engineInputRPM;
             float effectiveRigidity = driveTrain.Rigidity * Mathf.Abs(driveTrain.GetRatioForGear(gear));
-            float torqueFromWheels = rpmDelta * effectiveRigidity * Time.fixedDeltaTime;
+            float torqueFromWheels = rpmDelta * effectiveRigidity * Time.fixedDeltaTime / RAD_SEC_TO_RPM;
 
             // Calcultae Engine Momentum
             float netTorque = netEngineTorque - torqueFromWheels;
@@ -86,6 +85,7 @@ namespace ModularVehicleSimulator.Vehicle
 
             // Update the engine RPM
             currentEngineRPM += angularAcceleration * Time.fixedDeltaTime * RAD_SEC_TO_RPM;
+            Debug.Log($"Engine RPM Step: angularAcceleration {angularAcceleration}, currentEngineRPM {currentEngineRPM}");
             currentEngineRPM = Mathf.Clamp(currentEngineRPM, engineConfiguration.IdleRPM * IDLE_FLOOR_FACTOR, engineConfiguration.MaxRPM);
 
             // Output engine torque through the drive train to the wheels
@@ -97,7 +97,7 @@ namespace ModularVehicleSimulator.Vehicle
             else
             {
                 // Engine braking applies force to the wheels
-                return torqueFromWheels * driveTrain.GetRatioForGear(gear) * driveTrain.Loss;
+                return torqueFromWheels * driveTrain.Loss;
             }
         }
     }    
