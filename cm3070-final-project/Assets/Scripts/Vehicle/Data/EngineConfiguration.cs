@@ -20,7 +20,7 @@ namespace ModularVehicleSimulator.Vehicle.Data
         [SerializeField] private float idleRPM = 800f;
         [SerializeField] private float peakTorqueRPM = 5000f;
         [SerializeField] private float maxRPM = 6800f;
-        [SerializeField] private float peakTorqueInNewtownsMeters = 344f;
+        [SerializeField] private float peakTorqueInNewtonMeters = 344f;
         [SerializeField] private float idleTorqueMultiplier = 0.70f;
         [SerializeField] private float maxTorqueMultiplier = 0.82f;
         [SerializeField] private AnimationCurve torqueCurve;
@@ -32,7 +32,7 @@ namespace ModularVehicleSimulator.Vehicle.Data
 
         public float GetTorque(float currentRPM)
         {
-            if(engineType == EngineType.Electric) return peakTorqueInNewtownsMeters;
+            if(engineType == EngineType.Electric) return peakTorqueInNewtonMeters;
             if(currentRPM < idleRPM) return torqueCurve.Evaluate(idleRPM);
             if(currentRPM > maxRPM) return 0f;
 
@@ -65,9 +65,9 @@ namespace ModularVehicleSimulator.Vehicle.Data
         private void GenerateTorqueCurve()
         {
             torqueCurve = new AnimationCurve();
-            Keyframe idle = new Keyframe(idleRPM, idleTorqueMultiplier * peakTorqueInNewtownsMeters);
-            Keyframe peak = new Keyframe(peakTorqueRPM, peakTorqueInNewtownsMeters);
-            Keyframe max = new Keyframe(maxRPM, maxTorqueMultiplier * peakTorqueInNewtownsMeters);
+            Keyframe idle = new Keyframe(idleRPM, idleTorqueMultiplier * peakTorqueInNewtonMeters);
+            Keyframe peak = new Keyframe(peakTorqueRPM, peakTorqueInNewtonMeters);
+            Keyframe max = new Keyframe(maxRPM, maxTorqueMultiplier * peakTorqueInNewtonMeters);
             torqueCurve.AddKey(idle);
             torqueCurve.AddKey(peak);
             torqueCurve.AddKey(max);

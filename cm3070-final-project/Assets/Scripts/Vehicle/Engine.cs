@@ -85,7 +85,6 @@ namespace ModularVehicleSimulator.Vehicle
 
             // Update the engine RPM
             currentEngineRPM += angularAcceleration * Time.fixedDeltaTime * RAD_SEC_TO_RPM;
-            Debug.Log($"Engine RPM Step: angularAcceleration {angularAcceleration}, currentEngineRPM {currentEngineRPM}");
             currentEngineRPM = Mathf.Clamp(currentEngineRPM, engineConfiguration.IdleRPM * IDLE_FLOOR_FACTOR, engineConfiguration.MaxRPM);
 
             // Output engine torque through the drive train to the wheels
