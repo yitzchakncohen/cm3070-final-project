@@ -46,11 +46,7 @@ namespace ModularVehicleSimulator.UI.VehicleSettings
         {
             if(!isInitialized) return;
 
-            foreach(GearRatioRow row in gearRatioRows)
-            {
-                Debug.Log($"Gear: {row.GearRatio.Gear}, {row.GearRatio.Ratio}");
-            }
-            List<GearRatio> gearRatios = gearRatioRows.ConvertAll(row => row.GearRatio);
+            List<GearRatio> gearRatios = gearRatioRows.ConvertAll(row => new GearRatio{Gear = row.GearRatio.Gear, Ratio = row.GearRatio.Ratio});
             OnValueChanged?.Invoke(gearRatios);
         }
     }

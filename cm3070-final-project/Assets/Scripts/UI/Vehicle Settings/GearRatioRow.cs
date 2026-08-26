@@ -13,7 +13,7 @@ namespace ModularVehicleSimulator.UI.VehicleSettings
         [SerializeField] private TMP_Dropdown gearDropDown;
         [SerializeField] private TMP_InputField ratioInputField;
         private bool isInitialized = false;
-        private GearRatio gearRatio;
+        private GearRatio gearRatio = null;
 
         private void OnEnable()
         {
@@ -30,7 +30,6 @@ namespace ModularVehicleSimulator.UI.VehicleSettings
         public void Init(GearRatio gearRatio)
         {
             this.gearRatio = new GearRatio{Gear = gearRatio.Gear, Ratio = gearRatio.Ratio};
-            Debug.Log($"Gear {gearRatio.Gear}, Ratio {gearRatio.Ratio}");
             gearDropDown.value = (int)gearRatio.Gear;
             ratioInputField.text = VehicleSetting.ValidateFloat(gearRatio.Ratio.ToString());
             isInitialized = true;
@@ -38,6 +37,8 @@ namespace ModularVehicleSimulator.UI.VehicleSettings
 
         private void GearDropDown_onValueChanged(int input)
         {
+            if(!isInitialized) return;
+
             float.TryParse(ratioInputField.text, out float ratio);
             gearRatio = new GearRatio{Gear = (Gear)input, Ratio = ratio};
             OnValueChanged?.Invoke(this);
