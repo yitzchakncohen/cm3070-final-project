@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using ModularVehicleSimulator.UI.VehicleSettings.Editor;
+using ModularVehicleSimulator.Vehicle;
 using ModularVehicleSimulator.Vehicle.Data;
 using UnityEngine;
 
@@ -68,6 +69,27 @@ namespace ModularVehicleSimulator.UI.VehicleSettings
                     columnRowCount++;
                 }
                 foreach (KeyValuePair<FieldInfo, bool> setting in group.Value.BoolSettings)
+                {
+                    VehicleSetting vehicleSetting = Instantiate(settingPrefab);
+                    vehicleSetting.Init(CamelCaseToName(setting.Key.Name), setting.Value, UpdateField(group.Value.ScriptableObject, setting));
+                    settingsList.Add(vehicleSetting);
+                    columnRowCount++;
+                }
+                foreach (KeyValuePair<FieldInfo, EngineType> setting in group.Value.EngineTypeSettings)
+                {
+                    VehicleSetting vehicleSetting = Instantiate(settingPrefab);
+                    vehicleSetting.Init(CamelCaseToName(setting.Key.Name), setting.Value, UpdateField(group.Value.ScriptableObject, setting));
+                    settingsList.Add(vehicleSetting);
+                    columnRowCount++;
+                }
+                foreach (KeyValuePair<FieldInfo, List<GearRatio>> setting in group.Value.GearRatioSettings)
+                {
+                    VehicleSetting vehicleSetting = Instantiate(settingPrefab);
+                    vehicleSetting.Init(CamelCaseToName(setting.Key.Name), setting.Value, UpdateField(group.Value.ScriptableObject, setting));
+                    settingsList.Add(vehicleSetting);
+                    columnRowCount++;
+                }
+                foreach (KeyValuePair<FieldInfo, Vector3> setting in group.Value.Vector3Settings)
                 {
                     VehicleSetting vehicleSetting = Instantiate(settingPrefab);
                     vehicleSetting.Init(CamelCaseToName(setting.Key.Name), setting.Value, UpdateField(group.Value.ScriptableObject, setting));

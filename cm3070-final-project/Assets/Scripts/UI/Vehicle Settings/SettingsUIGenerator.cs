@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using ModularVehicleSimulator.Vehicle;
 using ModularVehicleSimulator.Vehicle.Data;
 using UnityEngine;
 
@@ -50,6 +51,9 @@ namespace ModularVehicleSimulator.UI.VehicleSettings.Editor
             FieldInfo[] fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
             Dictionary<FieldInfo, float> floatSettings = new Dictionary<FieldInfo, float>();
             Dictionary<FieldInfo, bool> boolSettings = new Dictionary<FieldInfo, bool>();
+            Dictionary<FieldInfo, EngineType> engineTypeSettings = new Dictionary<FieldInfo, EngineType>();
+            Dictionary<FieldInfo, Vector3> vector3Settings = new Dictionary<FieldInfo, Vector3>();
+            Dictionary<FieldInfo, List<GearRatio>> gearRatioSettings = new Dictionary<FieldInfo, List<GearRatio>>();
             
             foreach (FieldInfo field in fields)
             {
@@ -65,9 +69,26 @@ namespace ModularVehicleSimulator.UI.VehicleSettings.Editor
                 {
                     boolSettings.Add(field, (bool)field.GetValue(parentField));
                 }
+                else if(typeof(EngineType).IsAssignableFrom(fieldType))
+                {
+                    engineTypeSettings.Add(field, (EngineType)field.GetValue(parentField));
+                }
+                else if(typeof(Vector3).IsAssignableFrom(fieldType))
+                {
+                    vector3Settings.Add(field, (Vector3)field.GetValue(parentField));
+                }
+                else if(typeof(List<GearRatio>).IsAssignableFrom(fieldType))
+                {
+                    gearRatioSettings.Add(field, (List<GearRatio>)field.GetValue(parentField));
+                }
             }
 
-            return new VehicleSettingsGroupData{ScriptableObject = parentField, BoolSettings = boolSettings, FloatSettings = floatSettings};
+            return new VehicleSettingsGroupData{ScriptableObject = parentField, 
+                                                BoolSettings = boolSettings, 
+                                                FloatSettings = floatSettings,
+                                                EngineTypeSettings = engineTypeSettings,
+                                                Vector3Settings = vector3Settings,
+                                                GearRatioSettings = gearRatioSettings};
         }
 
         private static bool IsSkippable(FieldInfo fieldInfo)
@@ -90,6 +111,9 @@ namespace ModularVehicleSimulator.UI.VehicleSettings.Editor
         public ScriptableObject ScriptableObject;
         public Dictionary<FieldInfo, float> FloatSettings;
         public Dictionary<FieldInfo, bool> BoolSettings;
+        public Dictionary<FieldInfo, EngineType> EngineTypeSettings;
+        public Dictionary<FieldInfo, Vector3> Vector3Settings;
+        public Dictionary<FieldInfo, List<GearRatio>> GearRatioSettings;
     } 
 }
 
