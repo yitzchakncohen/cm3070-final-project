@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -78,7 +79,7 @@ namespace ModularVehicleSimulator.UI.VehicleSettings
                 foreach (KeyValuePair<FieldInfo, EngineType> setting in group.Value.EngineTypeSettings)
                 {
                     VehicleSetting vehicleSetting = Instantiate(settingPrefab);
-                    vehicleSetting.Init(CamelCaseToName(setting.Key.Name), setting.Value, UpdateField(group.Value.ScriptableObject, setting));
+                    vehicleSetting.Init(CamelCaseToName(setting.Key.Name), setting.Value, UpdateEnumField<EngineType>(group.Value.ScriptableObject, setting.Key));
                     settingsList.Add(vehicleSetting);
                     columnRowCount++;
                 }
@@ -100,11 +101,19 @@ namespace ModularVehicleSimulator.UI.VehicleSettings
             }
         }
 
-        private static System.Action<T> UpdateField<T>(ScriptableObject scriptableObject, KeyValuePair<FieldInfo, T> setting)
+        private static Action<T> UpdateField<T>(ScriptableObject scriptableObject, KeyValuePair<FieldInfo, T> setting)
         {
             return (newValue) =>
             {
                 setting.Key.SetValue(scriptableObject, newValue);
+            };
+        }
+
+        private static Action<object> UpdateEnumField<T>(ScriptableObject scriptableObject, FieldInfo field) where T : Enum
+        {
+            return (newValue) =>
+            {
+                field.SetValue(scriptableObject, newValue);
             };
         }
 

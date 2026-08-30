@@ -15,6 +15,7 @@ namespace ModularVehicleSimulator
         // Singleton pattern for weather
         public static Weather Instance;
         public float Temperature => temperature;
+        public Precipitation Precipitation => precipitation;
         public RoadSurfaceCondition RoadSurfaceCondition => roadSurfaceCondition;
         public Vector3 WindVelocity => windVelocity;
 
@@ -63,7 +64,6 @@ namespace ModularVehicleSimulator
             }
         }
 
-        [ContextMenu("Randomize Weather")]
         public void RandomizeWeather()
         {
             windVelocity = new Vector3(Random.Range(0, WIND_SPEED_MAX) / Mathf.Sqrt(2), 0f, Random.Range(0, WIND_SPEED_MAX) / Mathf.Sqrt(2));
@@ -84,7 +84,6 @@ namespace ModularVehicleSimulator
             UpdateWeather();
         }
 
-        [ContextMenu("Update Wather")]
         public void UpdateWeather()
         {
             if(precipitation == Precipitation.Rain)
@@ -139,6 +138,30 @@ namespace ModularVehicleSimulator
         {
             T[] values = (T[])Enum.GetValues(typeof(T));            
             return values[Random.Range(0, values.Length)];
+        }
+
+        public void SetPrecipitation(Precipitation precipitation)
+        {
+            this.precipitation = precipitation;
+            UpdateWeather();
+        }
+
+        public void SetRoadSurfaceCondition(RoadSurfaceCondition roadSurfaceCondition)
+        {
+            this.roadSurfaceCondition = roadSurfaceCondition;
+            UpdateWeather();
+        }
+
+        internal void SetWindVelocity(Vector3 windVelocity)
+        {
+            this.windVelocity = windVelocity;
+            UpdateWeather();
+        }
+
+        internal void SetTemperature(float temperature)
+        {
+            this.temperature = temperature;
+            UpdateWeather();
         }
     }    
 

@@ -21,7 +21,7 @@ namespace ModularVehicleSimulator.UI.VehicleSettings
         private Action<float> onFloatValueChanged = null;
         private Action<bool> onBoolValueChanged = null;
         private Action<Vector3> onVector3ValueChanged = null;
-        private Action<EngineType> onEngineTypeValueChanged = null;
+        private Action<object> onEnumValueChanged = null;
         private Action<List<GearRatio>> onGearRatioListValueChanged = null;
         private const string NUMERICAL_REGEX_STRING = @"[^0-9.]";
 
@@ -31,7 +31,7 @@ namespace ModularVehicleSimulator.UI.VehicleSettings
             floatValueInput.onValueChanged.AddListener(FloatValueInput_onValueChanged); 
             boolValueToggle.onValueChanged.AddListener(BoolValueToggle_onValueChanged);
             vector3Input.OnValueChanged += Vector3Input_OnValueChanged;
-            engineTypeDropDown.onValueChanged.AddListener(EngineTypeDropDown_onValueChanged);
+            engineTypeDropDown.onValueChanged.AddListener(EnumDropDown_onValueChanged);
             gearRatioList.OnValueChanged += GearRatioList_OnValueChanged;
         }
 
@@ -80,18 +80,6 @@ namespace ModularVehicleSimulator.UI.VehicleSettings
             onVector3ValueChanged = onValueChanged;
         }
 
-        public void Init(string name, EngineType value, Action<EngineType> onValueChanged)
-        {
-            settingName.text = name;
-            floatValueInput.gameObject.SetActive(false);
-            boolValueToggle.gameObject.SetActive(false);
-            vector3Input.gameObject.SetActive(false);
-            engineTypeDropDown.gameObject.SetActive(true);
-            gearRatioList.gameObject.SetActive(false);
-            engineTypeDropDown.SetValueWithoutNotify((int)value);
-            onEngineTypeValueChanged = onValueChanged;
-        }
-
         public void Init(string name, List<GearRatio> value, Action<List<GearRatio>> onValueChanged)
         {
             settingName.text = name;
@@ -102,6 +90,25 @@ namespace ModularVehicleSimulator.UI.VehicleSettings
             gearRatioList.gameObject.SetActive(true);
             gearRatioList.Init(value);
             onGearRatioListValueChanged = onValueChanged;
+        }
+
+        public void Init<T>(string name, T value, Action<object> onValueChanged) where T : Enum
+        {
+            settingName.text = name;
+            floatValueInput.gameObject.SetActive(false);
+            boolValueToggle.gameObject.SetActive(false);
+            vector3Input.gameObject.SetActive(false);
+            engineTypeDropDown.gameObject.SetActive(true);
+            gearRatioList.gameObject.SetActive(false);
+
+            // Setup list
+            engineTypeDropDown.ClearOptions();
+            List<string> options = new List<string>(Enum.GetNames(typeof(T)));
+            engineTypeDropDown.AddOptions(options);
+            engineTypeDropDown.MultiSelect = false;
+
+            engineTypeDropDown.SetValueWithoutNotify(Convert.ToInt32(value));
+            onEnumValueChanged = onValueChanged;
         }
 
         private void FloatValueInput_onValueChanged(string input)
@@ -143,9 +150,9 @@ namespace ModularVehicleSimulator.UI.VehicleSettings
             onVector3ValueChanged.Invoke(vector);
         }
 
-        private void EngineTypeDropDown_onValueChanged(int value)
+        private void EnumDropDown_onValueChanged(int value)
         {
-            onEngineTypeValueChanged.Invoke((EngineType)value);
+            onEnumValueChanged.Invoke(value);
         }
 
         private void GearRatioList_OnValueChanged(List<GearRatio> list)
