@@ -55,6 +55,7 @@ namespace ModularVehicleSimulator.UI
 
         private void UpdateCurrentVehicle()
         {
+            vehicleName.text = currentVehicle.Name;
             foreach (VehicleController vehicle in vehicles)
             {
                 if (vehicle != currentVehicle)

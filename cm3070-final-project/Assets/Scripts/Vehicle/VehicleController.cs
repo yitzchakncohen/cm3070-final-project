@@ -16,6 +16,7 @@ namespace ModularVehicleSimulator.Vehicle
         public float CurrentSteeringAngle => currentTargetSteeringAngle;
         public Gear Gear => (Gear)currentGear;
         public Rigidbody ChassisRigidBody => chassisRigidBody;
+        public VehicleConfiguration Config => vehicleConfiguration;
         public ChassisConfiguration Chassis => vehicleConfiguration.Chassis;
         public SteeringConfiguration Steering => vehicleConfiguration.Steering;
         public CameraController CameraController => cameraController;
