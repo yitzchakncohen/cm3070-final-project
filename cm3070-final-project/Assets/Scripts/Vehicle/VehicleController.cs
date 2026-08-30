@@ -122,6 +122,7 @@ namespace ModularVehicleSimulator.Vehicle
 
         public void ShiftGearNext()
         {
+            if(!vehicleConfiguration.DriveTrain.ContainsGear(currentGear + 1)) return;
             currentGear = Mathf.Clamp(currentGear + 1, -1, GetMaxGear());
             Debug.Log("Gear: " + Gear.ToString());
             OnGearChanged?.Invoke();
@@ -129,6 +130,7 @@ namespace ModularVehicleSimulator.Vehicle
 
         public void ShiftGearPrevious()
         {
+            if(!vehicleConfiguration.DriveTrain.ContainsGear(currentGear - 1)) return;
             currentGear = Mathf.Clamp(currentGear - 1, -1, GetMaxGear());
             Debug.Log("Gear: " + Gear.ToString());
             OnGearChanged?.Invoke();
