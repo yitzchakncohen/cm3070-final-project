@@ -64,15 +64,23 @@ namespace ModularVehicleSimulator.Vehicle
         {
             if(gear == Gear.Park || gear == Gear.Neutral) return 0f;
 
-            // Correct input for idle engine rpm
-            float idleDelta = Mathf.Max(engineConfiguration.IdleRPM - currentEngineRPM, 0f);
-            float idleCompensation = Mathf.Min(idleDelta / engineConfiguration.IdleRPM, IDLE_COMPENSATION_MAX);
-            float effectiveInput = Mathf.Max(idleCompensation, input);
-
             // Calculate Engine Torque
-            float engineTorque = engineConfiguration.GetTorque(currentEngineRPM) * effectiveInput;
-            float engineFriction = engineConfiguration.GetFriction(currentEngineRPM);
-            float netEngineTorque = engineTorque - engineFriction;
+            float netEngineTorque = 0f;
+            if(engineConfiguration.Type == EngineType.Gas)
+            {
+                // Correct input for idle engine rpm
+                float idleDelta = Mathf.Max(engineConfiguration.IdleRPM - currentEngineRPM, 0f);
+                float idleCompensation = Mathf.Min(idleDelta / engineConfiguration.IdleRPM, IDLE_COMPENSATION_MAX);
+                float effectiveInput = Mathf.Max(idleCompensation, input);
+                float engineTorque = engineConfiguration.GetTorque(currentEngineRPM) * effectiveInput;
+                float engineFriction = engineConfiguration.GetFriction(currentEngineRPM);
+                netEngineTorque = engineTorque - engineFriction;                
+            }
+            else if(engineConfiguration.Type == EngineType.Electric)
+            {
+                float engineTorque = engineConfiguration.GetTorque(currentEngineRPM) * input;
+                netEngineTorque = engineTorque;                    
+            }
 
             // Calculate Wheel Torque 
             float rpmDelta = currentEngineRPM - engineInputRPM;
@@ -88,9 +96,11 @@ namespace ModularVehicleSimulator.Vehicle
             currentEngineRPM = Mathf.Clamp(currentEngineRPM, engineConfiguration.IdleRPM * IDLE_FLOOR_FACTOR, engineConfiguration.MaxRPM);
 
             // Output engine torque through the drive train to the wheels
-            if (input > 0.01f || currentEngineRPM > Mathf.Abs(engineInputRPM))
+            bool idleGasEngine = currentEngineRPM > Mathf.Abs(engineInputRPM) && engineConfiguration.Type == EngineType.Gas;
+            if (input > 0.01f || idleGasEngine)
             {
                 // Combustion or idle momentum applies force to the wheels
+                Debug.Log($"Net Engine Torque {netEngineTorque}, driveTrain.GetRatioForGear(gear) {driveTrain.GetRatioForGear(gear)}, driveTrain.Loss {driveTrain.Loss}");
                 return netEngineTorque * driveTrain.GetRatioForGear(gear) * driveTrain.Loss;
             }
             else

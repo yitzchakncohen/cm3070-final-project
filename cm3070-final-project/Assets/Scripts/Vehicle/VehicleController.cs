@@ -45,7 +45,7 @@ namespace ModularVehicleSimulator.Vehicle
             engine.Init(vehicleConfiguration.Engine, vehicleConfiguration.DriveTrain, wheels);
             chassisRigidBody.centerOfMass = vehicleConfiguration.Chassis.CenterOfMass;
             brake = GetComponent<Brake>();
-            brake.Init(wheels, vehicleConfiguration.Brakes);
+            brake.Init(wheels, vehicleConfiguration.Brakes, vehicleConfiguration.Engine.Type);
             foreach (AntiRollBar antiRollBar in GetComponentsInChildren<AntiRollBar>())
             {
                 antiRollBar.Init(chassisRigidBody, Steering);                
@@ -68,7 +68,7 @@ namespace ModularVehicleSimulator.Vehicle
             // Parking Break
             if(currentGear == (int)Gear.Park)
             {
-                Brake(1f);
+                Brake(1f, 0f);
             }
         }
 
@@ -105,9 +105,9 @@ namespace ModularVehicleSimulator.Vehicle
             engine.Accelerate(Gear, accelerationInput);
         }
 
-        public void Brake(float brakeInput)
+        public void Brake(float brakeInput, float accelerationInput)
         {
-            brake.ApplyForce(brakeInput);
+            brake.ApplyForce(brakeInput,accelerationInput);
         }
 
         public void ShiftGearNext()
@@ -146,6 +146,7 @@ namespace ModularVehicleSimulator.Vehicle
  
             if(engineRPM >= vehicleConfiguration.Engine.MaxRPM && currentGear > 2)
             {
+                if(!vehicleConfiguration.DriveTrain.ContainsGear(currentGear + 1)) return;
                 ShiftGearNext();
                 autoShiftTimer = 0f;
             }

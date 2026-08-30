@@ -43,7 +43,7 @@ namespace ModularVehicleSimulator.Input
         void FixedUpdate()
         {
             vehicleController.Steer(currentSteering);
-            vehicleController.Brake(currentBraking);
+            vehicleController.Brake(currentBraking, currentAcceleration);
             vehicleController.Accelerate(currentAcceleration);            
         }
 

@@ -44,6 +44,7 @@ namespace ModularVehicleSimulator.Debugging
                 string forward = wheel.IsFront ? "Front" : "Rear";
                 string side = wheel.IsRight ? "Right" : "Left";
                 debugValues.Add($"{forward}, {side} Friction", $"{wheel.WheelFriction.magnitude} [N]");
+                debugValues.Add($"{forward}, {side} Slip", $"{wheel.GetAverageForwardSlip()}");
             }
             return debugValues;
         }

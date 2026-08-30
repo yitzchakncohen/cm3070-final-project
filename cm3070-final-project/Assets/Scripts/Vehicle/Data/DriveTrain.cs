@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace ModularVehicleSimulator.Vehicle.Data
@@ -25,6 +26,11 @@ namespace ModularVehicleSimulator.Vehicle.Data
             {
                 return finalDriveRatio;
             }
+        }
+
+        public bool ContainsGear(int gear)
+        {
+            return gearRatios.Any((ratio) => ratio.Gear == (Gear)gear);
         }
     }
 

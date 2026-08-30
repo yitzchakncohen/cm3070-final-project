@@ -73,13 +73,13 @@ namespace ModularVehicleSimulator.Vehicle
             ApplyDeflection();
             UpdateSurfaceMaterial();
             UpdateTireFriction(currentDeflection);
+            UpdateWheelAngles();
         }
 
         public void Steer(float leftSteeringAngle, float rightSteeringAngle)
         {
             this.rightSteeringAngle = rightSteeringAngle;
             this.leftSteeringAngle = leftSteeringAngle;
-            UpdateWheelAngles();
         }
 
         public void Accelerate(float torque, float brakeTorque)
@@ -87,7 +87,7 @@ namespace ModularVehicleSimulator.Vehicle
             foreach (WheelCollider wheelCollider in wheelColliders)
             {
                 wheelCollider.brakeTorque = brakeTorque / numberOfColliders;
-                wheelCollider.motorTorque = torque / numberOfColliders;             
+                wheelCollider.motorTorque = torque / numberOfColliders;    
             }
         }
 
@@ -366,7 +366,7 @@ namespace ModularVehicleSimulator.Vehicle
         {
             float wheelXPosition = chassisConfiguration.Track/2f;
             float wheelZPosition = chassisConfiguration.WheelBase/2f;
-            float wheelYPosition = 0f;
+            float wheelYPosition = chassisConfiguration.GroundClearance;
             if(IsFront && IsLeft)
             {
                 transform.localPosition = new Vector3(-wheelXPosition, wheelYPosition, wheelZPosition);

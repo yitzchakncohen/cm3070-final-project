@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f12d2afce5ee9da40981e1e855060f43, type: 3}
-  m_Name: HondaAccord2010
+  m_Name: NissanLeaf2010
   m_EditorClassIdentifier: Assembly-CSharp::ModularVehicleSimulator.Vehicle.Data.VehicleConfiguration
-  vehicleName: Honda Accord 2010 EX-L
-  engineConfiguration: {fileID: 11400000, guid: 3433407d0df08054cae4f3f26177ffc1, type: 2}
-  driveTrain: {fileID: 11400000, guid: 6967533a9b293c24a87575cc2e12916b, type: 2}
+  vehicleName: Nissan Leaf 2010
+  engineConfiguration: {fileID: 11400000, guid: 20d256d2f0a1a7949a89e565ce82121b, type: 2}
+  driveTrain: {fileID: 11400000, guid: e9ffabf7a8f74114c8a493f15057a02a, type: 2}
   wheelConfiguration: {fileID: 11400000, guid: 850de84dac6ffe144835c7f668a00b8f, type: 2}
-  suspensionConfiguration: {fileID: 11400000, guid: aa57690acb149b14ca01d26fbc86020a, type: 2}
+  suspensionConfiguration: {fileID: 11400000, guid: 500c0e0f635e8e840a660cda58286882, type: 2}
   brakesConfiguration: {fileID: 11400000, guid: b111f873510bd374591b5c4f105e583d, type: 2}
-  chassisConfiguration: {fileID: 11400000, guid: e20a9ff7369f81645955127ad1cee6f6, type: 2}
+  chassisConfiguration: {fileID: 11400000, guid: f53767ca60faa264d9ded5da64db9356, type: 2}
   steeringConfiguration: {fileID: 11400000, guid: 1fd75c3ce865b5547aa21b4315f8d7d1, type: 2}
