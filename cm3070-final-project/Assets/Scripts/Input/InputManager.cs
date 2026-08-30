@@ -1,6 +1,7 @@
 using ModularVehicleSimulator.Vehicle;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Users;
 using UnityEngine.SceneManagement;
 
 namespace ModularVehicleSimulator.Input
@@ -14,7 +15,6 @@ namespace ModularVehicleSimulator.Input
         private const string CONTROLLER_SCHEME = "Controller";
         private PlayerInput playerInput;
         [SerializeField] private VehicleController vehicleController;
-        [SerializeField] private CameraController cameraController;
         [SerializeField] private float accelerationRampRate = 3.0f;
         [SerializeField] private float brakingRampRate = 3.0f;
         [SerializeField] private float steeringRampRate = 4.0f;
@@ -31,6 +31,29 @@ namespace ModularVehicleSimulator.Input
         private void Awake()
         {
             playerInput = GetComponent<PlayerInput>();
+        }
+
+        private void OnEnable()
+        {
+            playerInput.ActivateInput();
+            if (playerInput.user.valid)
+            {
+                playerInput.user.UnpairDevices();
+                foreach (var device in InputSystem.devices)
+                {
+                    InputUser.PerformPairingWithDevice(device, user: playerInput.user);
+                }
+            }
+            InputSystem.Update();
+        }
+
+        private void OnDisable()
+        {
+            playerInput.DeactivateInput();            
+            if (playerInput.user.valid)
+            {
+                playerInput.user.UnpairDevices();
+            }
         }
 
         void Update()
@@ -81,7 +104,7 @@ namespace ModularVehicleSimulator.Input
         {
             if(!context.performed) return;
 
-            cameraController.ToggleCamera();
+            vehicleController.ToggleCamera();
         }
 
         public void OnRestart(InputAction.CallbackContext context)

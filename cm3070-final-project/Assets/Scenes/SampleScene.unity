@@ -628,6 +628,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1040809351288588936, guid: c9d5d2376dfca634e95db3a14ff9fd0f, type: 3}
   m_PrefabInstance: {fileID: 1156138075}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1221012789 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3978891534158211180, guid: c9d5d2376dfca634e95db3a14ff9fd0f, type: 3}
+  m_PrefabInstance: {fileID: 1156138075}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41381c64fde21564fbb8afc02370dd60, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VehicleController
 --- !u!1 &1226090282
 GameObject:
   m_ObjectHideFlags: 0
@@ -673,6 +684,17 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1227978479 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 758556271023405016, guid: b1aafae26284b9e439dfce1be318be61, type: 3}
+  m_PrefabInstance: {fileID: 7072911794040835729}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44f9f82b0465c0147a1f19c2acc3918e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VehicleSelectionMenu
 --- !u!1 &1283461600
 GameObject:
   m_ObjectHideFlags: 0
@@ -1014,6 +1036,10 @@ PrefabInstance:
       propertyPath: vehicleController
       value: 
       objectReference: {fileID: 1752206798}
+    - target: {fileID: 2228306698023081907, guid: f0654f326ec3ae64e8ae1fe2a7c2f7cf, type: 3}
+      propertyPath: vehicleSelectionMenu
+      value: 
+      objectReference: {fileID: 1227978479}
     - target: {fileID: 2246914388994658939, guid: f0654f326ec3ae64e8ae1fe2a7c2f7cf, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -1652,6 +1678,18 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 758556271023405016, guid: b1aafae26284b9e439dfce1be318be61, type: 3}
+      propertyPath: vehicles.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 758556271023405016, guid: b1aafae26284b9e439dfce1be318be61, type: 3}
+      propertyPath: 'vehicles.Array.data[0]'
+      value: 
+      objectReference: {fileID: 1752206798}
+    - target: {fileID: 758556271023405016, guid: b1aafae26284b9e439dfce1be318be61, type: 3}
+      propertyPath: 'vehicles.Array.data[1]'
+      value: 
+      objectReference: {fileID: 1221012789}
     - target: {fileID: 817675922730821106, guid: b1aafae26284b9e439dfce1be318be61, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -3894,6 +3932,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4999432451807355179, guid: b1aafae26284b9e439dfce1be318be61, type: 3}
       propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5012525721928361441, guid: b1aafae26284b9e439dfce1be318be61, type: 3}
+      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5016098051847012798, guid: b1aafae26284b9e439dfce1be318be61, type: 3}

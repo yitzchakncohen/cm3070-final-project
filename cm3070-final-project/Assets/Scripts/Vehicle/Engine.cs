@@ -100,7 +100,7 @@ namespace ModularVehicleSimulator.Vehicle
             if (input > 0.01f || idleGasEngine)
             {
                 // Combustion or idle momentum applies force to the wheels
-                Debug.Log($"Net Engine Torque {netEngineTorque}, driveTrain.GetRatioForGear(gear) {driveTrain.GetRatioForGear(gear)}, driveTrain.Loss {driveTrain.Loss}");
+                // Debug.Log($"Net Engine Torque {netEngineTorque}, driveTrain.GetRatioForGear(gear) {driveTrain.GetRatioForGear(gear)}, driveTrain.Loss {driveTrain.Loss}");
                 return netEngineTorque * driveTrain.GetRatioForGear(gear) * driveTrain.Loss;
             }
             else

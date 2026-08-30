@@ -12,33 +12,38 @@ namespace ModularVehicleSimulator.UI
     {
         private const float WHEEL_ROTATION_MAX = 540f;
         private const float UPDATE_DIGITAL_INTERVAL = 0.5f;
-        [SerializeField] private InputManager inputManager;
-        [SerializeField] private VehicleController vehicleController;
         [SerializeField] private Image accelerator;
         [SerializeField] private Image brake;
         [SerializeField] private RectTransform steeringWheel;
         [SerializeField] private TMP_Text gearText;
         [SerializeField] private Odemeter speedomdeter;
         [SerializeField] private Odemeter odemeter;
+        [SerializeField] private VehicleSelectionMenu vehicleSelectionMenu;
+        private VehicleController vehicleController;
         private SteeringConfiguration steeringConfiguration;
+        private InputManager inputManager;
 
-        private void Start()
+        private void Awake()
         {
-            VehicleController_OnGearChanged();
             speedomdeter.Init("km/h", 20f) ;
             odemeter.Init("x1000r/min", 0.5f) ;
+            vehicleController = FindAnyObjectByType<VehicleController>(FindObjectsInactive.Exclude);
+            inputManager = vehicleController.GetComponent<InputManager>();
             steeringConfiguration = vehicleController.Steering;
+            VehicleController_OnGearChanged();
         }
 
         private void OnEnable()
         {
             vehicleController.OnGearChanged += VehicleController_OnGearChanged;
+            vehicleSelectionMenu.OnChangeVehicle += VehicleSelectionMenu_OnChangeVehicle;
             InvokeRepeating(nameof(UpdateDigitalDisplays), 0f, UPDATE_DIGITAL_INTERVAL);
         }
 
         private void OnDisable()
         {
             vehicleController.OnGearChanged -= VehicleController_OnGearChanged;
+            vehicleSelectionMenu.OnChangeVehicle -= VehicleSelectionMenu_OnChangeVehicle;
             CancelInvoke(nameof(UpdateDigitalDisplays));
         }
 
@@ -66,6 +71,15 @@ namespace ModularVehicleSimulator.UI
         {
             speedomdeter.UpdateDigital(vehicleController.Speed * 3.6f);
             odemeter.UpdateDigital(vehicleController.RPM);
+        }
+
+        private void VehicleSelectionMenu_OnChangeVehicle(VehicleController controller)
+        {
+            OnDisable();
+            vehicleController = controller;
+            steeringConfiguration = vehicleController.Steering;
+            inputManager = vehicleController.GetComponent<InputManager>();
+            OnEnable();
         }
     }
 }

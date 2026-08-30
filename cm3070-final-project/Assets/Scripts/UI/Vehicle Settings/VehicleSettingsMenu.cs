@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using ModularVehicleSimulator.UI.VehicleSettings.Editor;
 using ModularVehicleSimulator.Vehicle;
 using ModularVehicleSimulator.Vehicle.Data;
+using TMPro;
 using UnityEngine;
 
 namespace ModularVehicleSimulator.UI.VehicleSettings
@@ -16,6 +17,7 @@ namespace ModularVehicleSimulator.UI.VehicleSettings
         [SerializeField] private VehicleSetting settingPrefab;
         [SerializeField] private GameObject columnPrefab;
         [SerializeField] private Transform columnsContainer;
+        [SerializeField] private TMP_Text subtitle;
         [SerializeField] private int columnRowMax = 8;
         
         private void Awake()
@@ -32,6 +34,7 @@ namespace ModularVehicleSimulator.UI.VehicleSettings
         [ContextMenu("Generate UI")]
         public void GenerateUI()
         {
+            subtitle.text = vehicleConfiguration.Name;
             for (int i = 0; i < columnsContainer.childCount; i++)
             {
                 Destroy(columnsContainer.GetChild(i).gameObject);

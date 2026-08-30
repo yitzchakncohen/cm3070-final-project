@@ -4,8 +4,12 @@ namespace ModularVehicleSimulator.Vehicle
 {
     public class CameraController : MonoBehaviour
     {
+        public Camera SelectioCamera => selectionCamera;
         [SerializeField] private CinemachineCamera[] cameras;
+        [SerializeField] private Camera selectionCamera;
+        [SerializeField] private Transform selectionCameraRotation;
         private int currentCamera = 0;
+        private float rotationSpeed = 10;
 
         private void Awake()
         {
@@ -19,6 +23,14 @@ namespace ModularVehicleSimulator.Vehicle
                 {
                     cameras[i].gameObject.SetActive(false);                    
                 }
+            }
+        }
+
+        private void FixedUpdate()
+        {
+            if(selectionCamera.gameObject.activeSelf)
+            {
+                selectionCameraRotation.Rotate(0f, rotationSpeed * Time.fixedDeltaTime, 0f, Space.Self);
             }
         }
 

@@ -10,6 +10,7 @@ namespace ModularVehicleSimulator.Vehicle
     {
         private const float RPM_TO_METERS_PER_SECOND = (2f * Mathf.PI) / 60f;
         public event Action OnGearChanged;
+        public string Name => vehicleConfiguration.Name;
         public float Speed => speed;
         public float RPM => engineRPM;
         public float CurrentSteeringAngle => currentTargetSteeringAngle;
@@ -17,8 +18,11 @@ namespace ModularVehicleSimulator.Vehicle
         public Rigidbody ChassisRigidBody => chassisRigidBody;
         public ChassisConfiguration Chassis => vehicleConfiguration.Chassis;
         public SteeringConfiguration Steering => vehicleConfiguration.Steering;
+        public CameraController CameraController => cameraController;
+        public Camera SelectioCamera => cameraController.SelectioCamera;
         [SerializeField] private VehicleConfiguration vehicleConfiguration;
         [SerializeField] private Rigidbody chassisRigidBody;
+        private CameraController cameraController;
         private Wheel[] wheels;
         private Engine engine;
         private Brake brake;
@@ -30,6 +34,7 @@ namespace ModularVehicleSimulator.Vehicle
 
         private void Start()
         {
+            cameraController = GetComponent<CameraController>();
             wheels = GetComponentsInChildren<Wheel>();
             foreach (Wheel wheel in wheels)
             {
@@ -108,6 +113,11 @@ namespace ModularVehicleSimulator.Vehicle
         public void Brake(float brakeInput, float accelerationInput)
         {
             brake.ApplyForce(brakeInput,accelerationInput);
+        }
+
+        public void ToggleCamera()
+        {
+            cameraController.ToggleCamera();
         }
 
         public void ShiftGearNext()
