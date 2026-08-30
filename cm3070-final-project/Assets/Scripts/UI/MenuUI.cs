@@ -2,6 +2,7 @@ using System;
 using ModularVehicleSimulator.UI.VehicleSettings;
 using ModularVehicleSimulator.Vehicle;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace ModularVehicleSimulator.UI
@@ -21,9 +22,11 @@ namespace ModularVehicleSimulator.UI
         [SerializeField] private Button weatherOpenButton;
         [SerializeField] private Button weatherCloseButton;
         [SerializeField] private Button restartButton;
+        private PlayerInput[] playerInputs;
 
         private void Start()
         {
+            playerInputs = FindObjectsByType<PlayerInput>(FindObjectsSortMode.None);
             vehicleSelection.Init();
         }
 
@@ -61,11 +64,13 @@ namespace ModularVehicleSimulator.UI
             vehicleSelection.gameObject.SetActive(false);
             controls.SetActive(false);
             weather.gameObject.SetActive(false);
+            DeactivatePlayerInput();
         }
 
         private void VehicleSettingsCloseButton_onClick()
         {
             vehicleSettings.gameObject.SetActive(false);
+            ActivatePlayerInput();
         }
 
         private void VehicleSelectionOpenButton_onClick()
@@ -74,11 +79,13 @@ namespace ModularVehicleSimulator.UI
             vehicleSelection.gameObject.SetActive(true);
             controls.SetActive(false);
             weather.gameObject.SetActive(false);
+            DeactivatePlayerInput();
         }
 
         private void VehicleSelectionCloseButton_onClick()
         {
             vehicleSelection.gameObject.SetActive(false);
+            ActivatePlayerInput();
         }
 
         private void controlsOpenButton_onClick()
@@ -87,11 +94,13 @@ namespace ModularVehicleSimulator.UI
             vehicleSelection.gameObject.SetActive(false);
             controls.SetActive(true);
             weather.gameObject.SetActive(false);
+            DeactivatePlayerInput();
         }
 
         private void controlsCloseButton_onClick()
         {
             controls.SetActive(false);
+            ActivatePlayerInput();
         }
 
         private void weatherOpenButton_onClick()
@@ -100,21 +109,40 @@ namespace ModularVehicleSimulator.UI
             vehicleSelection.gameObject.SetActive(false);
             controls.SetActive(false);
             weather.gameObject.SetActive(true);
+            DeactivatePlayerInput();
         }
 
         private void weatherCloseButton_onClick()
         {
             weather.gameObject.SetActive(false);
+            ActivatePlayerInput();
         }
 
         private void RestartButton_onClick()
         {
             // TODO reset vehicle position.
+            ActivatePlayerInput();
         }
 
         private void VehicleSelection_OnChangeVehicle(VehicleController controller)
         {
             vehicleSettings.UpdateVehicle(controller.Config);
+        }
+
+        private void ActivatePlayerInput()
+        {
+            foreach (PlayerInput playerInput in playerInputs)
+            {
+                playerInput.ActivateInput();
+            }
+        }
+
+        private void DeactivatePlayerInput()
+        {
+            foreach (PlayerInput playerInput in playerInputs)
+            {
+                playerInput.DeactivateInput();
+            }
         }
     }    
 }

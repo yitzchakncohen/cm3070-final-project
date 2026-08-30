@@ -35,7 +35,6 @@ namespace ModularVehicleSimulator.Input
 
         private void OnEnable()
         {
-            playerInput.ActivateInput();
             if (playerInput.user.valid)
             {
                 playerInput.user.UnpairDevices();
@@ -49,7 +48,6 @@ namespace ModularVehicleSimulator.Input
 
         private void OnDisable()
         {
-            playerInput.DeactivateInput();            
             if (playerInput.user.valid)
             {
                 playerInput.user.UnpairDevices();
