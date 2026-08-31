@@ -1,5 +1,3 @@
-#if UNITY_EDITOR
-
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -7,7 +5,7 @@ using ModularVehicleSimulator.Vehicle;
 using ModularVehicleSimulator.Vehicle.Data;
 using UnityEngine;
 
-namespace ModularVehicleSimulator.UI.VehicleSettings.Editor
+namespace ModularVehicleSimulator.UI.VehicleSettings
 {
     public static class SettingsUIGenerator
     {
@@ -116,5 +114,3 @@ namespace ModularVehicleSimulator.UI.VehicleSettings.Editor
         public Dictionary<FieldInfo, List<GearRatio>> GearRatioSettings;
     } 
 }
-
-#endif

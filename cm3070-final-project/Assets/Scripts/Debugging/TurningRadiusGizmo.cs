@@ -31,7 +31,9 @@ namespace ModularVehicleSimulator.Debugging
             if(!isDebuggingEnabled) return;
             if(wheels == null) return;
 
+#if UNITY_EDITOR
             Handles.color = debugColor;
+#endif
             Gizmos.color = debugColor;
 
             if (frontRight != null && frontLeft != null && backRight != null && backLeft != null)

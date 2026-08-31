@@ -3,6 +3,7 @@ using ModularVehicleSimulator.UI.VehicleSettings;
 using ModularVehicleSimulator.Vehicle;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace ModularVehicleSimulator.UI
@@ -120,8 +121,9 @@ namespace ModularVehicleSimulator.UI
 
         private void RestartButton_onClick()
         {
-            // TODO reset vehicle position.
             ActivatePlayerInput();
+            // TODO reset vehicle position.
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
 
         private void VehicleSelection_OnChangeVehicle(VehicleController controller)
