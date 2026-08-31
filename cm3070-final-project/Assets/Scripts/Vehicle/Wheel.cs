@@ -97,7 +97,6 @@ namespace ModularVehicleSimulator.Vehicle
             foreach (WheelCollider wheelCollider in wheelColliders)
             {
                 wheelCollider.motorTorque = 0f;
-                Debug.Log($"{gameObject.name} Collider Torque: {brakeTorquePerCollider}" );
                 wheelCollider.brakeTorque = brakingInput * brakeTorquePerCollider;            
             }
         }

@@ -29,7 +29,7 @@ namespace ModularVehicleSimulator.Vehicle
         {
             foreach (Wheel wheel in wheels)
             {
-                if(engineType == EngineType.Electric && brakeInput < 0.01f && throttleInput < 0.01f)
+                if(engineType == EngineType.Electric && brakesConfiguration.RegenerativeBrakingEnabled && brakeInput < 0.01f && throttleInput < 0.01f)
                 {
                     float regenerativeBrakeTorque = Mathf.Clamp01(wheel.GetSpeedometerRPM() * VehiclePhysics.RPM_TO_METERS_PER_SECOND / REGENERATIVE_BRAKING_CUTOFF_KMH) * brakesConfiguration.RegenerativeBrakeTorque;
                     float brakeTorque = ApplyABS(wheel, regenerativeBrakeTorque / motorizedWheelCount);

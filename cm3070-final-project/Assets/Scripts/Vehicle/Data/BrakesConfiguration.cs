@@ -9,12 +9,14 @@ namespace ModularVehicleSimulator.Vehicle.Data
         public float RegenerativeBrakeTorque => regenerativeBrakeTorqueInNewtonMeters;
         public float FrontBias => fontBrakeBias;
         public bool ABSEnabled => enableABS;
+        public bool RegenerativeBrakingEnabled => enableRegenerativeBraking;
         public float ABSSlipThreshholdMultiplier => aBSSlipThresholdMultiplier;
         public float ABSOscillationSpeed => aBSOscillationSpeed;
         [SerializeField] private float brakeTorqueInNewtonMeters = 3000f;
         [SerializeField] private float regenerativeBrakeTorqueInNewtonMeters = 600f;
         [SerializeField] private float fontBrakeBias = 0.7f;
         [SerializeField] private bool enableABS = false;
+        [SerializeField] private bool enableRegenerativeBraking = true;
         [SerializeField] private float aBSSlipThresholdMultiplier = 1.1f;
         [SerializeField] private float aBSOscillationSpeed = 20f;
     }
