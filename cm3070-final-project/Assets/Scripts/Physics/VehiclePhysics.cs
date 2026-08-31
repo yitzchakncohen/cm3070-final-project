@@ -6,6 +6,7 @@ namespace ModularVehicleSimulator.Physics
 {
     public static class VehiclePhysics
     {
+        public const float RPM_TO_METERS_PER_SECOND = (2f * Mathf.PI) / 60f;
         public const int SPHERE_SEGMENTS = 24;
         #region Tires
         public static float GetNominalTireDeflection(float mass, float numberOfWheels, float stiffness)

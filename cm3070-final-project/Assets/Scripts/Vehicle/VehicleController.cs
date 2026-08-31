@@ -9,7 +9,6 @@ namespace ModularVehicleSimulator.Vehicle
     [RequireComponent(typeof(Engine), typeof(Brake), typeof(CameraController))]
     public class VehicleController : MonoBehaviour
     {
-        private const float RPM_TO_METERS_PER_SECOND = (2f * Mathf.PI) / 60f;
         public event Action OnGearChanged;
         public string Name => vehicleConfiguration.Name;
         public float Speed => speed;
@@ -82,7 +81,7 @@ namespace ModularVehicleSimulator.Vehicle
         public void Steer(float steeringInput)
         {
             float rpm = Mathf.Abs(wheels.Where(wheel => wheel.IsMotorized).Average(wheel => wheel.GetEffectiveRPM()));
-            float speed = rpm * vehicleConfiguration.Wheels.Radius * RPM_TO_METERS_PER_SECOND;
+            float speed = rpm * vehicleConfiguration.Wheels.Radius * VehiclePhysics.RPM_TO_METERS_PER_SECOND;
 
             currentTargetSteeringAngle = VehiclePhysics.GetTargetSteeringAngle(
                 steeringInput,
@@ -141,7 +140,7 @@ namespace ModularVehicleSimulator.Vehicle
         private void CalculateCurrentSpeed()
         {
             float wheelRPM = Mathf.Abs(wheels.Where(wheel => wheel.IsMotorized).Average(wheel => wheel.GetSpeedometerRPM()));
-            speed = wheelRPM * vehicleConfiguration.Wheels.Radius * RPM_TO_METERS_PER_SECOND;
+            speed = wheelRPM * vehicleConfiguration.Wheels.Radius * VehiclePhysics.RPM_TO_METERS_PER_SECOND;
             if (speed == 0f)
             {
                 speed = chassisRigidBody.linearVelocity.magnitude;

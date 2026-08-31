@@ -7,6 +7,7 @@ namespace ModularVehicleSimulator.Vehicle
 {
     public class Brake : MonoBehaviour
     {
+        private const float REGENERATIVE_BRAKING_CUTOFF_KMH = 5f;
         private BrakesConfiguration brakesConfiguration;
         private EngineType engineType;
         private Wheel[] wheels;
@@ -30,7 +31,8 @@ namespace ModularVehicleSimulator.Vehicle
             {
                 if(engineType == EngineType.Electric && brakeInput < 0.01f && throttleInput < 0.01f)
                 {
-                    float brakeTorque = ApplyABS(wheel, brakesConfiguration.RegenerativeBrakeTorque / motorizedWheelCount);
+                    float regenerativeBrakeTorque = Mathf.Clamp01(wheel.GetSpeedometerRPM() * VehiclePhysics.RPM_TO_METERS_PER_SECOND / REGENERATIVE_BRAKING_CUTOFF_KMH) * brakesConfiguration.RegenerativeBrakeTorque;
+                    float brakeTorque = ApplyABS(wheel, regenerativeBrakeTorque / motorizedWheelCount);
                     if(wheel.IsMotorized)
                     {
                         wheel.Brake(1.0f, brakeTorque);
