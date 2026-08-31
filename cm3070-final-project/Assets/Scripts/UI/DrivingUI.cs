@@ -97,6 +97,7 @@ namespace ModularVehicleSimulator.UI
             steeringConfiguration = vehicleController.Steering;
             inputManager = vehicleController.GetComponent<InputManager>();
             OnEnable();
+            VehicleController_OnGearChanged();
         }
     }
 }
