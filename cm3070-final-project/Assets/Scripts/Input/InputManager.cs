@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 
 namespace ModularVehicleSimulator.Input
 {
+    [RequireComponent(typeof(PlayerInput), typeof(VehicleController))]
     public class InputManager : MonoBehaviour
     {
         public float CurrentAcceleration => currentAcceleration;
@@ -14,7 +15,7 @@ namespace ModularVehicleSimulator.Input
         private const string KEYBOARD_SCHEME = "Keyboard";
         private const string CONTROLLER_SCHEME = "Controller";
         private PlayerInput playerInput;
-        [SerializeField] private VehicleController vehicleController;
+        private VehicleController vehicleController;
         [SerializeField] private float accelerationRampRate = 3.0f;
         [SerializeField] private float brakingRampRate = 3.0f;
         [SerializeField] private float steeringRampRate = 4.0f;
@@ -31,6 +32,7 @@ namespace ModularVehicleSimulator.Input
         private void Awake()
         {
             playerInput = GetComponent<PlayerInput>();
+            vehicleController = GetComponent<VehicleController>();
         }
 
         private void OnEnable()

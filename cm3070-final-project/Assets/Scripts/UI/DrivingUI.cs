@@ -15,7 +15,7 @@ namespace ModularVehicleSimulator.UI
         [SerializeField] private Image accelerator;
         [SerializeField] private Image brake;
         [SerializeField] private RectTransform steeringWheel;
-        [SerializeField] private TMP_Text gearText;
+        [SerializeField] private TMP_Text[] gearText;
         [SerializeField] private Odemeter speedomdeter;
         [SerializeField] private Odemeter odemeter;
         [SerializeField] private VehicleSelectionMenu vehicleSelectionMenu;
@@ -64,7 +64,24 @@ namespace ModularVehicleSimulator.UI
 
         private void VehicleController_OnGearChanged()
         {
-            gearText.text = vehicleController.Gear.ToLetter();
+            int currentGear = (int)vehicleController.Gear;
+            CheckGear(currentGear, -2);
+            CheckGear(currentGear, -1);
+            gearText[2].text = vehicleController.Gear.ToLetter();
+            CheckGear(currentGear, 1);
+            CheckGear(currentGear, 2);
+        }
+
+        private void CheckGear(int currentGear, int offset)
+        {
+            if (vehicleController.Config.DriveTrain.ContainsGear(currentGear + offset))
+            {
+                gearText[2 + offset].text = ((Gear)(currentGear + offset)).ToLetter();                    
+            }
+            else
+            {
+                gearText[2 + offset].text = string.Empty;
+            }
         }
 
         private void UpdateDigitalDisplays()

@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace ModularVehicleSimulator.Vehicle
 {
+    [RequireComponent(typeof(Engine), typeof(Brake), typeof(CameraController))]
     public class VehicleController : MonoBehaviour
     {
         private const float RPM_TO_METERS_PER_SECOND = (2f * Mathf.PI) / 60f;
