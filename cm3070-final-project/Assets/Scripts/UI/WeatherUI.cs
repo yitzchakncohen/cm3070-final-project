@@ -11,6 +11,7 @@ namespace ModularVehicleSimulator.UI
         [SerializeField] private VehicleSetting roadSurfaceCondition;
         [SerializeField] private VehicleSetting windVelocity;
         [SerializeField] private VehicleSetting temperature;
+        [SerializeField] private VehicleSetting gravity;
         [SerializeField] private Button randomButton;
         private Weather weather;
 
@@ -32,6 +33,7 @@ namespace ModularVehicleSimulator.UI
             roadSurfaceCondition.Init("Road Surface Condition", weather.RoadSurfaceCondition, UpdateRoadSurfaceCondition);
             windVelocity.Init("Wind Velocity", weather.WindVelocity, UpdateWindVelocity);
             temperature.Init("Temperature", weather.Temperature, UpdateTemperature);
+            gravity.Init("Gravity", UnityEngine.Physics.gravity, UpdateGravity);
         }
 
         private void UpdatePrecipitation(object precipitatioObject)
@@ -54,6 +56,11 @@ namespace ModularVehicleSimulator.UI
         private void UpdateTemperature(float temperature)
         {
             weather.SetTemperature(temperature);
+        }
+
+        private void UpdateGravity(Vector3 gravity)
+        {
+            UnityEngine.Physics.gravity = gravity;
         }
 
         private void RandomizeWeather()

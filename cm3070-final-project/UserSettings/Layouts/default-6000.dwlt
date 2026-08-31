@@ -1536,29 +1536,7 @@ MonoBehaviour:
     - m_Data: 56282
     m_LastClickedID:
       m_Data: 56282
-    m_ExpandedIDs:
-    - m_Data: 0
-    - m_Data: 60136
-    - m_Data: 60138
-    - m_Data: 60140
-    - m_Data: 60142
-    - m_Data: 60144
-    - m_Data: 60146
-    - m_Data: 60148
-    - m_Data: 60150
-    - m_Data: 60152
-    - m_Data: 60154
-    - m_Data: 60156
-    - m_Data: 60158
-    - m_Data: 60160
-    - m_Data: 60162
-    - m_Data: 60164
-    - m_Data: 60166
-    - m_Data: 60168
-    - m_Data: 60170
-    - m_Data: 60172
-    - m_Data: 60174
-    - m_Data: 60176
+    m_ExpandedIDs: []
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1589,29 +1567,7 @@ MonoBehaviour:
     m_SelectedIDs: []
     m_LastClickedID:
       m_Data: 0
-    m_ExpandedIDs:
-    - m_Data: 0
-    - m_Data: 60136
-    - m_Data: 60138
-    - m_Data: 60140
-    - m_Data: 60142
-    - m_Data: 60144
-    - m_Data: 60146
-    - m_Data: 60148
-    - m_Data: 60150
-    - m_Data: 60152
-    - m_Data: 60154
-    - m_Data: 60156
-    - m_Data: 60158
-    - m_Data: 60160
-    - m_Data: 60162
-    - m_Data: 60164
-    - m_Data: 60166
-    - m_Data: 60168
-    - m_Data: 60170
-    - m_Data: 60172
-    - m_Data: 60174
-    - m_Data: 60176
+    m_ExpandedIDs: []
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
