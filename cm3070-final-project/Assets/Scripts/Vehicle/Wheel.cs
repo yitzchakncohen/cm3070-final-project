@@ -82,7 +82,7 @@ namespace ModularVehicleSimulator.Vehicle
             this.leftSteeringAngle = leftSteeringAngle;
         }
 
-        public void Accelerate(float torque, float brakeTorque)
+        public void Accelerate(float torque, float brakeTorque = 0f)
         {
             foreach (WheelCollider wheelCollider in wheelColliders)
             {
@@ -97,6 +97,7 @@ namespace ModularVehicleSimulator.Vehicle
             foreach (WheelCollider wheelCollider in wheelColliders)
             {
                 wheelCollider.motorTorque = 0f;
+                Debug.Log($"{gameObject.name} Collider Torque: {brakeTorquePerCollider}" );
                 wheelCollider.brakeTorque = brakingInput * brakeTorquePerCollider;            
             }
         }
@@ -231,11 +232,11 @@ namespace ModularVehicleSimulator.Vehicle
             {
                 if (IsLeft)
                 {
-                    wheelCollider.steerAngle = Mathf.MoveTowards(wheelCollider.steerAngle, rightSteeringAngle, steeringConfiguration.SteeringSpeed * Time.fixedDeltaTime);
+                    wheelCollider.steerAngle = Mathf.MoveTowards(wheelCollider.steerAngle, leftSteeringAngle, steeringConfiguration.SteeringSpeed * Time.fixedDeltaTime);
                 }
                 else
                 {
-                    wheelCollider.steerAngle = Mathf.MoveTowards(wheelCollider.steerAngle, leftSteeringAngle, steeringConfiguration.SteeringSpeed * Time.fixedDeltaTime);
+                    wheelCollider.steerAngle = Mathf.MoveTowards(wheelCollider.steerAngle, rightSteeringAngle, steeringConfiguration.SteeringSpeed * Time.fixedDeltaTime);
                 }
                 wheelCollider.GetWorldPose(out Vector3 wheelPosition, out rotation);
                 position = position + wheelPosition;
@@ -293,6 +294,7 @@ namespace ModularVehicleSimulator.Vehicle
             foreach (WheelCollider wheelCollider in wheelColliders)
             {
                 wheelCollider.radius = currentWheelRadius;
+                wheelCollider.forceAppPointDistance = GetForceAppPointDistance();
             }
             float currentWidth = wheelConfiguration.Width + bulge;
             UpdateWheelWidth(currentWidth);

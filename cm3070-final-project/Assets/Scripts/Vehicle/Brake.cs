@@ -1,3 +1,4 @@
+using System.Linq;
 using ModularVehicleSimulator.Physics;
 using ModularVehicleSimulator.Vehicle.Data;
 using UnityEngine;
@@ -9,31 +10,38 @@ namespace ModularVehicleSimulator.Vehicle
         private BrakesConfiguration brakesConfiguration;
         private EngineType engineType;
         private Wheel[] wheels;
+        private int frontWheelCount = 2;
+        private int backWheelCount = 2;
+        private int motorizedWheelCount = 2;
 
         public void Init(Wheel[] wheels, BrakesConfiguration brakesConfiguration, EngineType engineType)
         {
             this.wheels = wheels; 
             this.brakesConfiguration = brakesConfiguration;
             this.engineType = engineType;
+            frontWheelCount = wheels.Count(wheel => wheel.IsFront);
+            backWheelCount = wheels.Count(wheel => !wheel.IsFront);
+            motorizedWheelCount = wheels.Count(wheel => wheel.IsMotorized);
         }
 
         public void ApplyForce(float brakeInput, float throttleInput)
         {
             foreach (Wheel wheel in wheels)
             {
-                if(engineType == EngineType.Electric && throttleInput < 0.01f)
+                if(engineType == EngineType.Electric && brakeInput < 0.01f && throttleInput < 0.01f)
                 {
+                    float brakeTorque = ApplyABS(wheel, brakesConfiguration.RegenerativeBrakeTorque / motorizedWheelCount);
                     if(wheel.IsMotorized)
                     {
-                        wheel.Brake(1.0f, brakesConfiguration.RegenerativeBrakeTorque);
+                        wheel.Brake(1.0f, brakeTorque);
                     }
                 }
                 else
                 {
-                    float brakeTorque = brakesConfiguration.Torque * brakesConfiguration.FrontBias;
+                    float brakeTorque = brakesConfiguration.Torque * brakesConfiguration.FrontBias / frontWheelCount;
                     if (!wheel.IsFront)
                     {
-                        brakeTorque = brakesConfiguration.Torque * (1 - brakesConfiguration.FrontBias);
+                        brakeTorque = brakesConfiguration.Torque * (1 - brakesConfiguration.FrontBias) / backWheelCount;
                     }
 
                     brakeTorque = ApplyABS(wheel, brakeTorque);

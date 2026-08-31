@@ -32,32 +32,19 @@ namespace ModularVehicleSimulator.Vehicle
         {
             float engineInputRPM = motorizedWheels.Average(wheel => wheel.GetEffectiveRPM()) * driveTrain.GetRatioForGear(gear);
             float totalTorque = GetWheelTorque(gear, accelerationInput, engineInputRPM);
-            float totalRMP = motorizedWheels.Sum(wheel => wheel.GetEffectiveRPM());
+            // float totalRMP = motorizedWheels.Sum(wheel => wheel.GetEffectiveRPM());
 
             // Apply the engine torque or braking to the wheels
-            if(accelerationInput > 0.01f || currentEngineRPM > Mathf.Abs(engineInputRPM))
+            foreach (Wheel wheel in motorizedWheels)
             {
-                foreach (Wheel wheel in motorizedWheels)
-                {
-                    float wheelTorque = ApplyOpenDifferential(totalTorque, wheel.GetEffectiveRPM(), totalRMP);
-                    wheel.Accelerate(wheelTorque, 0f);
-                }                
-            }
-            else
-            {
-                foreach (Wheel wheel in motorizedWheels)
-                {
-                    float wheelTorque = ApplyOpenDifferential(totalTorque, wheel.GetEffectiveRPM(), totalRMP);
-                    wheel.Accelerate(0f, Mathf.Abs(wheelTorque));
-                } 
-            }
+                float wheelTorque = ApplyOpenDifferential(totalTorque, motorizedWheels.Count);
+                wheel.Accelerate(wheelTorque);
+            }                
         }
 
-        private float ApplyOpenDifferential(float inputTorque, float wheelRPM, float totalRMP)
+        private float ApplyOpenDifferential(float inputTorque, int numberOfWheels)
         {
-            totalRMP = Mathf.Max(0.001f, Mathf.Abs(totalRMP));
-            wheelRPM = Mathf.Abs(wheelRPM);
-            return inputTorque * (wheelRPM / totalRMP);
+            return inputTorque / numberOfWheels;
         }
 
         private float GetWheelTorque(Gear gear, float input, float engineInputRPM)
