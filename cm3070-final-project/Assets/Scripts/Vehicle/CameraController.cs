@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using Unity.Cinemachine;
 using UnityEngine;
 namespace ModularVehicleSimulator.Vehicle
@@ -5,23 +7,23 @@ namespace ModularVehicleSimulator.Vehicle
     public class CameraController : MonoBehaviour
     {
         public Camera SelectioCamera => selectionCamera;
-        [SerializeField] private CinemachineCamera[] cameras;
+        [SerializeField] private List<CameraLabel> cameras;
         [SerializeField] private Camera selectionCamera;
         [SerializeField] private Transform selectionCameraRotation;
-        private int currentCamera = 0;
+        private CameraType currentCamera = CameraType.LockToTarget;
         private float rotationSpeed = 10;
 
         private void Awake()
         {
-            for (int i = 0; i < cameras.Length; i++)
+            foreach (CameraLabel camera in cameras)
             {
-                if(i == currentCamera)
+                if(camera.Type == currentCamera)
                 {
-                    cameras[i].gameObject.SetActive(true);                    
+                    camera.gameObject.SetActive(true);
                 }
                 else
                 {
-                    cameras[i].gameObject.SetActive(false);                    
+                    camera.gameObject.SetActive(false);
                 }
             }
         }
@@ -36,9 +38,16 @@ namespace ModularVehicleSimulator.Vehicle
 
         public void ToggleCamera()
         {
-            cameras[currentCamera].gameObject.SetActive(false);
-            currentCamera = (currentCamera + 1) % cameras.Length;
-            cameras[currentCamera].gameObject.SetActive(true);
+            cameras.Find(camera => camera.Type == currentCamera).gameObject.SetActive(false);
+            currentCamera = (CameraType)(((int)currentCamera + 1) % Enum.GetValues(typeof(CameraType)).Length);
+            cameras.Find(camera => camera.Type == currentCamera).gameObject.SetActive(true);
         }        
+    }
+
+    public enum CameraType
+    {
+        FixedAngle,
+        LockToTarget,
+        FirstPerson
     }
 }

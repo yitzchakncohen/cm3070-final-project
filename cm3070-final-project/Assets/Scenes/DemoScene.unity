@@ -542,10 +542,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: NissanLeaf
       objectReference: {fileID: 0}
-    - target: {fileID: 803433713257916642, guid: c9d5d2376dfca634e95db3a14ff9fd0f, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 1040809351288588936, guid: c9d5d2376dfca634e95db3a14ff9fd0f, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -587,36 +583,16 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3898848190349982366, guid: c9d5d2376dfca634e95db3a14ff9fd0f, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3898848190349982366, guid: c9d5d2376dfca634e95db3a14ff9fd0f, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 10
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 3898848190349982366, guid: c9d5d2376dfca634e95db3a14ff9fd0f, type: 3}
       propertyPath: m_LocalPosition.z
       value: -10
-      objectReference: {fileID: 0}
-    - target: {fileID: 3898848190349982366, guid: c9d5d2376dfca634e95db3a14ff9fd0f, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0.92387956
-      objectReference: {fileID: 0}
-    - target: {fileID: 3898848190349982366, guid: c9d5d2376dfca634e95db3a14ff9fd0f, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0.38268343
-      objectReference: {fileID: 0}
-    - target: {fileID: 3898848190349982366, guid: c9d5d2376dfca634e95db3a14ff9fd0f, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3898848190349982366, guid: c9d5d2376dfca634e95db3a14ff9fd0f, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5034789330704128647, guid: c9d5d2376dfca634e95db3a14ff9fd0f, type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6091736848660054912, guid: c9d5d2376dfca634e95db3a14ff9fd0f, type: 3}
-      propertyPath: field of view
-      value: 60
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
