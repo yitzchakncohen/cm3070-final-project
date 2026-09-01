@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 3819695382013388903}
   - component: {fileID: 3486038819420399294}
   - component: {fileID: 3978891534158211180}
-  - component: {fileID: 6812107340984863835}
   - component: {fileID: 184680343560197519}
   - component: {fileID: 1870346533073608262}
   - component: {fileID: 7970761858409370905}
@@ -201,24 +200,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::VehicleController
   vehicleConfiguration: {fileID: 11400000, guid: f0366b6265389a942ac05ceb3812e70d, type: 2}
   chassisRigidBody: {fileID: 1611960791474144282}
---- !u!114 &6812107340984863835
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 803433713257916642}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7d56956944c026549baece7df5168daa, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ModularVehicleSimulator.Vehicle.CameraController
-  cameras:
-  - {fileID: 41663100551711930}
-  - {fileID: 7549460060361687176}
-  - {fileID: 4522976769204162973}
-  selectionCamera: {fileID: 4816667916016317032}
-  selectionCameraRotation: {fileID: 148543307258946427}
+  cameraController: {fileID: 2636226642717632943}
 --- !u!114 &184680343560197519
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -808,6 +790,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1040809351288588936}
     m_Modifications:
+    - target: {fileID: 117830711431558225, guid: 3c3749485ff308f4d9fc36334361709d, type: 3}
+      propertyPath: selectionCamera
+      value: 
+      objectReference: {fileID: 4816667916016317032}
+    - target: {fileID: 117830711431558225, guid: 3c3749485ff308f4d9fc36334361709d, type: 3}
+      propertyPath: selectionCameraRotation
+      value: 
+      objectReference: {fileID: 148543307258946427}
     - target: {fileID: 472514128925441531, guid: 3c3749485ff308f4d9fc36334361709d, type: 3}
       propertyPath: Target.TrackingTarget
       value: 
@@ -816,9 +806,33 @@ PrefabInstance:
       propertyPath: m_Name
       value: Cameras
       objectReference: {fileID: 0}
-    - target: {fileID: 5305812091800363908, guid: 3c3749485ff308f4d9fc36334361709d, type: 3}
+    - target: {fileID: 6061578443036537848, guid: 3c3749485ff308f4d9fc36334361709d, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6061578443036537848, guid: 3c3749485ff308f4d9fc36334361709d, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6061578443036537848, guid: 3c3749485ff308f4d9fc36334361709d, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 1.08
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6061578443036537848, guid: 3c3749485ff308f4d9fc36334361709d, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6061578443036537848, guid: 3c3749485ff308f4d9fc36334361709d, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6061578443036537848, guid: 3c3749485ff308f4d9fc36334361709d, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6061578443036537848, guid: 3c3749485ff308f4d9fc36334361709d, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6061578443036537848, guid: 3c3749485ff308f4d9fc36334361709d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -845,39 +859,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3c3749485ff308f4d9fc36334361709d, type: 3}
---- !u!114 &41663100551711930 stripped
+--- !u!114 &2636226642717632943 stripped
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 2712108281861034308, guid: 3c3749485ff308f4d9fc36334361709d, type: 3}
+  m_CorrespondingSourceObject: {fileID: 117830711431558225, guid: 3c3749485ff308f4d9fc36334361709d, type: 3}
   m_PrefabInstance: {fileID: 2681713543406460414}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c6b41f560d21ffa4fb172f3b51f70b52, type: 3}
+  m_Script: {fileID: 11500000, guid: 7d56956944c026549baece7df5168daa, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ModularVehicleSimulator.Vehicle.CameraLabel
---- !u!114 &4522976769204162973 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 2014106471135612003, guid: 3c3749485ff308f4d9fc36334361709d, type: 3}
-  m_PrefabInstance: {fileID: 2681713543406460414}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c6b41f560d21ffa4fb172f3b51f70b52, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ModularVehicleSimulator.Vehicle.CameraLabel
---- !u!114 &7549460060361687176 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5616637101442538870, guid: 3c3749485ff308f4d9fc36334361709d, type: 3}
-  m_PrefabInstance: {fileID: 2681713543406460414}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c6b41f560d21ffa4fb172f3b51f70b52, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ModularVehicleSimulator.Vehicle.CameraLabel
+  m_EditorClassIdentifier: Assembly-CSharp::ModularVehicleSimulator.Vehicle.CameraController
 --- !u!4 &8153856426771688966 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6061578443036537848, guid: 3c3749485ff308f4d9fc36334361709d, type: 3}

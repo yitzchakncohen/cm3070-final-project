@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace ModularVehicleSimulator.Vehicle
 {
-    [RequireComponent(typeof(Engine), typeof(Brake), typeof(CameraController))]
+    [RequireComponent(typeof(Engine), typeof(Brake))]
     public class VehicleController : MonoBehaviour
     {
         public event Action OnGearChanged;
@@ -23,7 +23,7 @@ namespace ModularVehicleSimulator.Vehicle
         public Camera SelectioCamera => cameraController.SelectioCamera;
         [SerializeField] private VehicleConfiguration vehicleConfiguration;
         [SerializeField] private Rigidbody chassisRigidBody;
-        private CameraController cameraController;
+        [SerializeField] private CameraController cameraController;
         private Wheel[] wheels;
         private Engine engine;
         private Brake brake;
@@ -35,7 +35,6 @@ namespace ModularVehicleSimulator.Vehicle
 
         private void Start()
         {
-            cameraController = GetComponent<CameraController>();
             wheels = GetComponentsInChildren<Wheel>();
             foreach (Wheel wheel in wheels)
             {

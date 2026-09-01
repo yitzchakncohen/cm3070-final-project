@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
-using Unity.Cinemachine;
 using UnityEngine;
 namespace ModularVehicleSimulator.Vehicle
 {
     public class CameraController : MonoBehaviour
     {
+        public event Action<CameraType> OnCameraTypeChanged;
         public Camera SelectioCamera => selectionCamera;
+        public CameraType Type => currentCamera;
         [SerializeField] private List<CameraLabel> cameras;
         [SerializeField] private Camera selectionCamera;
         [SerializeField] private Transform selectionCameraRotation;
@@ -28,6 +29,11 @@ namespace ModularVehicleSimulator.Vehicle
             }
         }
 
+        private void OnEnable()
+        {
+            OnCameraTypeChanged?.Invoke(currentCamera);
+        }
+
         private void FixedUpdate()
         {
             if(selectionCamera.gameObject.activeSelf)
@@ -41,6 +47,7 @@ namespace ModularVehicleSimulator.Vehicle
             cameras.Find(camera => camera.Type == currentCamera).gameObject.SetActive(false);
             currentCamera = (CameraType)(((int)currentCamera + 1) % Enum.GetValues(typeof(CameraType)).Length);
             cameras.Find(camera => camera.Type == currentCamera).gameObject.SetActive(true);
+            OnCameraTypeChanged?.Invoke(currentCamera);
         }        
     }
 

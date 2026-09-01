@@ -19,30 +19,39 @@ namespace ModularVehicleSimulator.UI
         [SerializeField] private Odemeter speedomdeter;
         [SerializeField] private Odemeter odemeter;
         [SerializeField] private VehicleSelectionMenu vehicleSelectionMenu;
+        [SerializeField] private CameraUI cameraUI;
         private VehicleController vehicleController;
         private SteeringConfiguration steeringConfiguration;
         private InputManager inputManager;
 
-        private void Awake()
+        private void Start()
         {
             speedomdeter.Init("km/h", 20f) ;
             odemeter.Init("x1000r/min", 0.5f) ;
             vehicleController = FindAnyObjectByType<VehicleController>(FindObjectsInactive.Exclude);
+            cameraUI.Init(vehicleController.CameraController);
             inputManager = vehicleController.GetComponent<InputManager>();
             steeringConfiguration = vehicleController.Steering;
             VehicleController_OnGearChanged();
+            OnEnable();
         }
 
         private void OnEnable()
         {
-            vehicleController.OnGearChanged += VehicleController_OnGearChanged;
+            if(vehicleController != null)
+            {
+                vehicleController.OnGearChanged += VehicleController_OnGearChanged;                
+            }
             vehicleSelectionMenu.OnChangeVehicle += VehicleSelectionMenu_OnChangeVehicle;
             InvokeRepeating(nameof(UpdateDigitalDisplays), 0f, UPDATE_DIGITAL_INTERVAL);
         }
 
         private void OnDisable()
         {
-            vehicleController.OnGearChanged -= VehicleController_OnGearChanged;
+            if(vehicleController != null)
+            {
+                vehicleController.OnGearChanged -= VehicleController_OnGearChanged;                
+            }
             vehicleSelectionMenu.OnChangeVehicle -= VehicleSelectionMenu_OnChangeVehicle;
             CancelInvoke(nameof(UpdateDigitalDisplays));
         }
@@ -94,6 +103,7 @@ namespace ModularVehicleSimulator.UI
         {
             OnDisable();
             vehicleController = controller;
+            cameraUI.Init(vehicleController.CameraController);
             steeringConfiguration = vehicleController.Steering;
             inputManager = vehicleController.GetComponent<InputManager>();
             OnEnable();

@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 3819695382013388903}
   - component: {fileID: 3486038819420399294}
   - component: {fileID: 3978891534158211180}
-  - component: {fileID: 6812107340984863835}
   - component: {fileID: 184680343560197519}
   - component: {fileID: 1870346533073608262}
   - component: {fileID: 7970761858409370905}
@@ -201,24 +200,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::VehicleController
   vehicleConfiguration: {fileID: 11400000, guid: 71f516efbaa933b4a990f8f52280bda6, type: 2}
   chassisRigidBody: {fileID: 1611960791474144282}
---- !u!114 &6812107340984863835
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 803433713257916642}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7d56956944c026549baece7df5168daa, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ModularVehicleSimulator.Vehicle.CameraController
-  cameras:
-  - {fileID: 856674319426307796}
-  - {fileID: 7183964277154319078}
-  - {fileID: 3869533226749434867}
-  selectionCamera: {fileID: 3859934183958130798}
-  selectionCameraRotation: {fileID: 8963056218801817744}
+  cameraController: {fileID: 3450393612890694593}
 --- !u!114 &184680343560197519
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -788,6 +770,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1040809351288588936}
     m_Modifications:
+    - target: {fileID: 117830711431558225, guid: 3c3749485ff308f4d9fc36334361709d, type: 3}
+      propertyPath: selectionCamera
+      value: 
+      objectReference: {fileID: 3859934183958130798}
+    - target: {fileID: 117830711431558225, guid: 3c3749485ff308f4d9fc36334361709d, type: 3}
+      propertyPath: selectionCameraRotation
+      value: 
+      objectReference: {fileID: 8963056218801817744}
     - target: {fileID: 472514128925441531, guid: 3c3749485ff308f4d9fc36334361709d, type: 3}
       propertyPath: Target.TrackingTarget
       value: 
@@ -857,39 +847,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3c3749485ff308f4d9fc36334361709d, type: 3}
---- !u!114 &856674319426307796 stripped
+--- !u!114 &3450393612890694593 stripped
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 2712108281861034308, guid: 3c3749485ff308f4d9fc36334361709d, type: 3}
+  m_CorrespondingSourceObject: {fileID: 117830711431558225, guid: 3c3749485ff308f4d9fc36334361709d, type: 3}
   m_PrefabInstance: {fileID: 3332906569710049168}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c6b41f560d21ffa4fb172f3b51f70b52, type: 3}
+  m_Script: {fileID: 11500000, guid: 7d56956944c026549baece7df5168daa, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ModularVehicleSimulator.Vehicle.CameraLabel
---- !u!114 &3869533226749434867 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 2014106471135612003, guid: 3c3749485ff308f4d9fc36334361709d, type: 3}
-  m_PrefabInstance: {fileID: 3332906569710049168}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c6b41f560d21ffa4fb172f3b51f70b52, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ModularVehicleSimulator.Vehicle.CameraLabel
---- !u!114 &7183964277154319078 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5616637101442538870, guid: 3c3749485ff308f4d9fc36334361709d, type: 3}
-  m_PrefabInstance: {fileID: 3332906569710049168}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c6b41f560d21ffa4fb172f3b51f70b52, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ModularVehicleSimulator.Vehicle.CameraLabel
+  m_EditorClassIdentifier: Assembly-CSharp::ModularVehicleSimulator.Vehicle.CameraController
 --- !u!4 &8817997113531671656 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6061578443036537848, guid: 3c3749485ff308f4d9fc36334361709d, type: 3}

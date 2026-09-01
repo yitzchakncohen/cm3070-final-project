@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using ModularVehicleSimulator.UI.VehicleSettings;
 using ModularVehicleSimulator.Vehicle;
 using UnityEngine;
@@ -24,11 +26,13 @@ namespace ModularVehicleSimulator.UI
         [SerializeField] private Button weatherCloseButton;
         [SerializeField] private Button restartButton;
         private PlayerInput[] playerInputs;
+        private List<VehicleController> vehicles;
 
         private void Start()
         {
-            playerInputs = FindObjectsByType<PlayerInput>(FindObjectsSortMode.None);
-            vehicleSelection.Init();
+            playerInputs = FindObjectsByType<PlayerInput>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            vehicles = FindObjectsByType<VehicleController>(FindObjectsInactive.Include, FindObjectsSortMode.None).ToList();
+            vehicleSelection.Init(vehicles);
         }
 
         private void OnEnable()

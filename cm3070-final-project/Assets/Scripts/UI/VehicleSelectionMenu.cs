@@ -11,14 +11,15 @@ namespace ModularVehicleSimulator.UI
     public class VehicleSelectionMenu : MonoBehaviour
     {
         public event Action<VehicleController> OnChangeVehicle;
-        [SerializeField] private List<VehicleController> vehicles;
+        private List<VehicleController> vehicles;
         [SerializeField] private TMP_Text vehicleName;
         [SerializeField] private Button nextButton;
         [SerializeField] private Button previousButton;
         private VehicleController currentVehicle;
 
-        public void Init()
+        public void Init(List<VehicleController> vehicles)
         {
+            this.vehicles = vehicles;
             currentVehicle = vehicles.Find(vehicle => vehicle.gameObject.activeSelf);
             vehicleName.text = currentVehicle.Name;
             OnChangeVehicle?.Invoke(currentVehicle);
