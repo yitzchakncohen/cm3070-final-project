@@ -139,7 +139,10 @@ namespace ModularVehicleSimulator.UI
         {
             foreach (PlayerInput playerInput in playerInputs)
             {
-                playerInput.ActivateInput();
+                if(playerInput.isActiveAndEnabled)
+                {
+                    playerInput.ActivateInput();                    
+                }
             }
         }
 

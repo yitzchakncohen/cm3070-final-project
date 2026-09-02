@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using ModularVehicleSimulator.Input;
 using ModularVehicleSimulator.Vehicle;
 using TMPro;
 using UnityEngine;
@@ -23,6 +24,13 @@ namespace ModularVehicleSimulator.UI
             currentVehicle = vehicles.Find(vehicle => vehicle.gameObject.activeSelf);
             vehicleName.text = currentVehicle.Name;
             OnChangeVehicle?.Invoke(currentVehicle);
+            foreach (VehicleController vehicle in vehicles)
+            {
+                if(vehicle != currentVehicle)
+                {
+                    vehicle.GetComponent<InputManager>().OnDisable();                    
+                }
+            }
         }
 
         private void OnEnable()
@@ -41,33 +49,22 @@ namespace ModularVehicleSimulator.UI
         {
             int index = vehicles.IndexOf(currentVehicle);
             int newIndex = (index + 1) % vehicles.Count;
-            currentVehicle = vehicles[newIndex];
-            UpdateCurrentVehicle();
+            UpdateCurrentVehicle(vehicles[newIndex]);
         }
 
         private void OnPreviousButtonClick()
         {
             int index = vehicles.IndexOf(currentVehicle);
             int newIndex = (index - 1 % vehicles.Count + vehicles.Count) % vehicles.Count;
-            currentVehicle = vehicles[newIndex];
-            OnChangeVehicle?.Invoke(currentVehicle);
-            UpdateCurrentVehicle();
+            UpdateCurrentVehicle(vehicles[newIndex]);
         }
 
-        private void UpdateCurrentVehicle()
+        private void UpdateCurrentVehicle(VehicleController newVehicle)
         {
             vehicleName.text = currentVehicle.Name;
-            foreach (VehicleController vehicle in vehicles)
-            {
-                if (vehicle != currentVehicle)
-                {
-                    SetVehicle(vehicle, false);
-                }
-                else
-                {
-                    SetVehicle(vehicle, true);
-                }
-            }
+            SetVehicle(currentVehicle, false);
+            SetVehicle(newVehicle, true);
+            currentVehicle = newVehicle;
             OnChangeVehicle?.Invoke(currentVehicle);
         }
 

@@ -470,17 +470,6 @@ MonoBehaviour:
   rainFX: {fileID: 508521187}
   snowFX: {fileID: 432697585}
   windFX: {fileID: 1797185767}
---- !u!114 &815890131 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3486038819420399294, guid: fe90f64ee2c4c9f4a96622c9bdf413b5, type: 3}
-  m_PrefabInstance: {fileID: 5519926273512699615}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 35d26fbcb4f154b4396e3465915bf338, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::InputManager
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -754,17 +743,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1752206798 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3978891534158211180, guid: fe90f64ee2c4c9f4a96622c9bdf413b5, type: 3}
-  m_PrefabInstance: {fileID: 5519926273512699615}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 41381c64fde21564fbb8afc02370dd60, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::VehicleController
 --- !u!4 &1752206799 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1040809351288588936, guid: fe90f64ee2c4c9f4a96622c9bdf413b5, type: 3}
@@ -1051,11 +1029,11 @@ PrefabInstance:
     - target: {fileID: 2228306698023081907, guid: f0654f326ec3ae64e8ae1fe2a7c2f7cf, type: 3}
       propertyPath: inputManager
       value: 
-      objectReference: {fileID: 815890131}
+      objectReference: {fileID: 0}
     - target: {fileID: 2228306698023081907, guid: f0654f326ec3ae64e8ae1fe2a7c2f7cf, type: 3}
       propertyPath: vehicleController
       value: 
-      objectReference: {fileID: 1752206798}
+      objectReference: {fileID: 0}
     - target: {fileID: 2228306698023081907, guid: f0654f326ec3ae64e8ae1fe2a7c2f7cf, type: 3}
       propertyPath: vehicleSelectionMenu
       value: 
@@ -1747,7 +1725,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4426191097320354032, guid: fe90f64ee2c4c9f4a96622c9bdf413b5, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 6
+      value: 6.79
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2121,7 +2099,7 @@ PrefabInstance:
     - target: {fileID: 758556271023405016, guid: b1aafae26284b9e439dfce1be318be61, type: 3}
       propertyPath: 'vehicles.Array.data[0]'
       value: 
-      objectReference: {fileID: 1752206798}
+      objectReference: {fileID: 0}
     - target: {fileID: 758556271023405016, guid: b1aafae26284b9e439dfce1be318be61, type: 3}
       propertyPath: 'vehicles.Array.data[1]'
       value: 

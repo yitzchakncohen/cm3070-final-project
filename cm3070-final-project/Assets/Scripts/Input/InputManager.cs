@@ -40,16 +40,15 @@ namespace ModularVehicleSimulator.Input
             if (playerInput.user.valid)
             {
                 playerInput.user.UnpairDevices();
-                foreach (var device in InputSystem.devices)
-                {
-                    InputUser.PerformPairingWithDevice(device, user: playerInput.user);
-                }
+                playerInput.neverAutoSwitchControlSchemes = false;
+                playerInput.ActivateInput();
             }
             InputSystem.Update();
         }
 
-        private void OnDisable()
+        public void OnDisable()
         {
+            if(playerInput == null) playerInput = GetComponent<PlayerInput>();
             if (playerInput.user.valid)
             {
                 playerInput.user.UnpairDevices();
