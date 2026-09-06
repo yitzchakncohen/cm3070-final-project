@@ -14,6 +14,7 @@ namespace ModularVehicleSimulator.Vehicle
         public const float FX_SLIP_THRESHHOLD_MULTIPLIER = 7.5f;
         public Vector3 WheelFriction => GetWheelFrictionVector();
         public Vector3 WheelContactPoint => GetWheelContactPoint();
+        public float SteerAngle => wheelColliders.Average(collider => collider.steerAngle);
 
         public bool IsMotorized => isMotorized;
         public bool IsSteerable => isSteerable;
@@ -21,6 +22,7 @@ namespace ModularVehicleSimulator.Vehicle
         public bool IsLeft => transform.localPosition.x < 0f;
         public bool IsRight => transform.localPosition.x > 0f;
         public float RPM => wheelColliders.Average(wheelCollider => wheelCollider.rpm);
+        public float Radius => wheelColliders.Average(wheelCollider => wheelCollider.radius);
         private int numberOfColliders => wheelColliders.Length;
         [SerializeField] private bool isMotorized = true;
         [SerializeField] private bool isSteerable = true;
@@ -91,13 +93,13 @@ namespace ModularVehicleSimulator.Vehicle
             }
         }
 
-        public void Brake(float brakingInput, float brakeTorque)
+        public void Brake(float brakeTorque)
         {
             float brakeTorquePerCollider = brakeTorque / numberOfColliders;
             foreach (WheelCollider wheelCollider in wheelColliders)
             {
                 wheelCollider.motorTorque = 0f;
-                wheelCollider.brakeTorque = brakingInput * brakeTorquePerCollider;            
+                wheelCollider.brakeTorque = brakeTorquePerCollider;            
             }
         }
 

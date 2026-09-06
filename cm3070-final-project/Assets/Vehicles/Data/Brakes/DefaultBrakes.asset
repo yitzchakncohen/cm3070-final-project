@@ -13,7 +13,14 @@ MonoBehaviour:
   m_Name: DefaultBrakes
   m_EditorClassIdentifier: Assembly-CSharp::ModularVehicleSimulator.Vehicle.Data.BrakesConfiguration
   brakeTorqueInNewtonMeters: 3000
+  regenerativeBrakeTorqueInNewtonMeters: 600
   fontBrakeBias: 0.7
+  enableRegenerativeBraking: 1
   enableABS: 1
-  aBSSlipThreshold: 0.4
+  aBSSlipThresholdMultiplier: 1.1
   aBSOscillationSpeed: 20
+  enableBrakeTorqueVectoring: 1
+  vectoringBrakeTorqueInNewtonMeters: 400
+  understeerThresholdInDegreesPerSecond: 4.5
+  understeerSpeedMinInMetersPerSecond: 5
+  understeerSpeedMaxInMetersPerSecond: 5

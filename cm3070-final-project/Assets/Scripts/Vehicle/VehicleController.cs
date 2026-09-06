@@ -50,7 +50,7 @@ namespace ModularVehicleSimulator.Vehicle
             engine.Init(vehicleConfiguration.Engine, vehicleConfiguration.DriveTrain, wheels);
             chassisRigidBody.centerOfMass = vehicleConfiguration.Chassis.CenterOfMass;
             brake = GetComponent<Brake>();
-            brake.Init(wheels, vehicleConfiguration.Brakes, vehicleConfiguration.Engine.Type);
+            brake.Init(wheels, vehicleConfiguration.Brakes, vehicleConfiguration.Engine.Type, vehicleConfiguration.Chassis, chassisRigidBody, vehicleConfiguration.Wheels);
             foreach (AntiRollBar antiRollBar in GetComponentsInChildren<AntiRollBar>())
             {
                 antiRollBar.Init(chassisRigidBody, Steering);                
@@ -79,16 +79,7 @@ namespace ModularVehicleSimulator.Vehicle
 
         public void Steer(float steeringInput)
         {
-            float rpm = Mathf.Abs(wheels.Where(wheel => wheel.IsMotorized).Average(wheel => wheel.GetEffectiveRPM()));
-            float speed = rpm * vehicleConfiguration.Wheels.Radius * VehiclePhysics.RPM_TO_METERS_PER_SECOND;
-
-            currentTargetSteeringAngle = VehiclePhysics.GetTargetSteeringAngle(
-                steeringInput,
-                speed,
-                vehicleConfiguration.Steering.HighSpeedThreshold,
-                vehicleConfiguration.Steering.MaxSteeringAngleAtRest,
-                vehicleConfiguration.Steering.MaxSteeringAngleAtHighSpeed
-            );
+            UpdateCurrentSteeringAngle(steeringInput);
             VehiclePhysics.GetAckermannSteeringAngles(
                 vehicleConfiguration.Chassis.WheelBase,
                 vehicleConfiguration.Chassis.Track,
@@ -98,7 +89,7 @@ namespace ModularVehicleSimulator.Vehicle
             );
             foreach (Wheel wheel in wheels)
             {
-                if(wheel.IsSteerable)
+                if (wheel.IsSteerable)
                 {
                     wheel.Steer(rightSteeringAngle, leftSteeringAngle);
                 }
@@ -112,7 +103,7 @@ namespace ModularVehicleSimulator.Vehicle
 
         public void Brake(float brakeInput, float accelerationInput)
         {
-            brake.ApplyForce(brakeInput,accelerationInput);
+            brake.ApplyForce(brakeInput, accelerationInput, currentTargetSteeringAngle);
         }
 
         public void ToggleCamera()
@@ -138,13 +129,26 @@ namespace ModularVehicleSimulator.Vehicle
 
         private void CalculateCurrentSpeed()
         {
-            float wheelRPM = Mathf.Abs(wheels.Where(wheel => wheel.IsMotorized).Average(wheel => wheel.GetSpeedometerRPM()));
-            speed = wheelRPM * vehicleConfiguration.Wheels.Radius * VehiclePhysics.RPM_TO_METERS_PER_SECOND;
+            speed = VehiclePhysics.GetVehicleSpeed(wheels, vehicleConfiguration.Wheels.Radius);
             if (speed == 0f)
             {
                 speed = chassisRigidBody.linearVelocity.magnitude;
             }
             // Debug.Log($"Speed[m/s]: {speed} [km/h] {speed * 3.6f} velocity {chassisRigidBody.linearVelocity.magnitude * 3.6f}");
+        }
+
+        private void UpdateCurrentSteeringAngle(float steeringInput)
+        {
+            float rpm = Mathf.Abs(wheels.Where(wheel => wheel.IsMotorized).Average(wheel => wheel.GetEffectiveRPM()));
+            float speed = rpm * vehicleConfiguration.Wheels.Radius * VehiclePhysics.RPM_TO_METERS_PER_SECOND;
+
+            currentTargetSteeringAngle = VehiclePhysics.GetTargetSteeringAngle(
+                steeringInput,
+                speed,
+                vehicleConfiguration.Steering.HighSpeedThreshold,
+                vehicleConfiguration.Steering.MaxSteeringAngleAtRest,
+                vehicleConfiguration.Steering.MaxSteeringAngleAtHighSpeed
+            );
         }
 
         private void UpdateTransmission()

@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using ModularVehicleSimulator.Vehicle;
 using UnityEngine;
 
 namespace ModularVehicleSimulator.Physics
@@ -7,7 +9,24 @@ namespace ModularVehicleSimulator.Physics
     public static class VehiclePhysics
     {
         public const float RPM_TO_METERS_PER_SECOND = (2f * Mathf.PI) / 60f;
+        public const float METERS_PER_SECOND_TO_KM_PER_HOUR = 3.6f;
         public const int SPHERE_SEGMENTS = 24;
+
+        public static float GetVehicleSpeed(Wheel[] wheels, float radius)
+        {
+            Wheel[] nonMotorizedWheels = wheels.Where(wheel => !wheel.IsMotorized).ToArray();
+            float rpm = 0 ;
+            if(nonMotorizedWheels.Length > 0)
+            {
+                rpm = Mathf.Abs(nonMotorizedWheels.Average(wheel => wheel.GetEffectiveRPM()));                
+            }
+            else
+            {
+                rpm = Mathf.Abs(wheels.Average(wheel => wheel.GetEffectiveRPM()));
+            }
+            float forwardSpeed = rpm * radius * RPM_TO_METERS_PER_SECOND;
+            return forwardSpeed;
+        }
         #region Tires
         public static float GetNominalTireDeflection(float mass, float numberOfWheels, float stiffness)
         {
@@ -80,12 +99,12 @@ namespace ModularVehicleSimulator.Physics
             }
 
             float tanOfTargetAngle = Mathf.Tan(Mathf.Abs(targetAngle) * Mathf.Deg2Rad);
-            if(targetAngle > 0)
+            if(targetAngle > 0) // Turning Right
             {
                 rightSteeringAngle = Mathf.Rad2Deg * Mathf.Atan(wheelBase / ((wheelBase / tanOfTargetAngle) + (track/2))) * Mathf.Sign(targetAngle);
                 leftSteeringAngle = Mathf.Rad2Deg * Mathf.Atan(wheelBase / ((wheelBase / tanOfTargetAngle) - (track/2))) * Mathf.Sign(targetAngle);
             }
-            else
+            else // Turning Left
             {
                 rightSteeringAngle = Mathf.Rad2Deg * Mathf.Atan(wheelBase / ((wheelBase / tanOfTargetAngle) - (track/2))) * Mathf.Sign(targetAngle);
                 leftSteeringAngle = Mathf.Rad2Deg * Mathf.Atan(wheelBase / ((wheelBase / tanOfTargetAngle) + (track/2))) * Mathf.Sign(targetAngle);
