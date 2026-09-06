@@ -139,16 +139,26 @@ namespace ModularVehicleSimulator.Vehicle
 
         private void UpdateCurrentSteeringAngle(float steeringInput)
         {
-            float rpm = Mathf.Abs(wheels.Where(wheel => wheel.IsMotorized).Average(wheel => wheel.GetEffectiveRPM()));
-            float speed = rpm * vehicleConfiguration.Wheels.Radius * VehiclePhysics.RPM_TO_METERS_PER_SECOND;
+            float speed = VehiclePhysics.GetVehicleSpeed(wheels, vehicleConfiguration.Wheels.Radius);
 
-            currentTargetSteeringAngle = VehiclePhysics.GetTargetSteeringAngle(
+            float rawTargetSteeringAngle = VehiclePhysics.GetTargetSteeringAngle(
                 steeringInput,
                 speed,
                 vehicleConfiguration.Steering.HighSpeedThreshold,
                 vehicleConfiguration.Steering.MaxSteeringAngleAtRest,
                 vehicleConfiguration.Steering.MaxSteeringAngleAtHighSpeed
             );
+
+            currentTargetSteeringAngle = ApplyPowerSteering(rawTargetSteeringAngle, speed);
+        }
+
+        private float ApplyPowerSteering(float rawTargetSteeringAngle, float speed)
+        {
+            float speedFactor = Mathf.InverseLerp(0f, vehicleConfiguration.Steering.HighSpeedThreshold, speed);
+            float powerAssist = Mathf.Lerp(vehicleConfiguration.Steering.SteeringAssistMax, vehicleConfiguration.Steering.SteeringAssistMin, speedFactor);
+            float turningSpeed = vehicleConfiguration.Steering.SteeringSpeed * powerAssist;
+            float targetSteeringAngle = Mathf.MoveTowards(currentTargetSteeringAngle, rawTargetSteeringAngle, turningSpeed * Time.fixedDeltaTime);
+            return targetSteeringAngle;
         }
 
         private void UpdateTransmission()

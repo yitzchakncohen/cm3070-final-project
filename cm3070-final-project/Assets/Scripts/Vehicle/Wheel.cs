@@ -229,16 +229,10 @@ namespace ModularVehicleSimulator.Vehicle
         {
             Vector3 position = Vector3.zero;
             Quaternion rotation = Quaternion.identity;
+            float targetAngle = IsLeft ? leftSteeringAngle : rightSteeringAngle;
             foreach (WheelCollider wheelCollider in wheelColliders)
             {
-                if (IsLeft)
-                {
-                    wheelCollider.steerAngle = Mathf.MoveTowards(wheelCollider.steerAngle, leftSteeringAngle, steeringConfiguration.SteeringSpeed * Time.fixedDeltaTime);
-                }
-                else
-                {
-                    wheelCollider.steerAngle = Mathf.MoveTowards(wheelCollider.steerAngle, rightSteeringAngle, steeringConfiguration.SteeringSpeed * Time.fixedDeltaTime);
-                }
+                wheelCollider.steerAngle = targetAngle;
                 wheelCollider.GetWorldPose(out Vector3 wheelPosition, out rotation);
                 position = position + wheelPosition;
             }

@@ -9,12 +9,16 @@ namespace ModularVehicleSimulator.Vehicle.Data
         public float MaxSteeringAngleAtHighSpeed => maxSteeringAngleAtHighSpeed;
         public float HighSpeedThreshold => highSpeedThresholdInMetersPerSecond;
         public float SteeringSpeed => steeringSpeedInDegreesPerSecond;
+        public float SteeringAssistMin  => steeringAssistMin;
+        public float SteeringAssistMax => steeringAssistMax;
         public float FrontStiffness => antiRollBarStiffnessFront;
         public float RearStiffness => antiRollBarStiffnessRear;
         [SerializeField] private float maxSteeringAngleAtRest = 38f;
         [SerializeField] private float maxSteeringAngleAtHighSpeed = 38f;
         [SerializeField] private float highSpeedThresholdInMetersPerSecond = 30f;
         [SerializeField] private float steeringSpeedInDegreesPerSecond = 90f;
+        [SerializeField] private float steeringAssistMin = 0.75f;
+        [SerializeField] private float steeringAssistMax= 1.25f;
         [SerializeField] private float antiRollBarStiffnessFront = 12000f;
         [SerializeField] private float antiRollBarStiffnessRear = 8000f;
     }
