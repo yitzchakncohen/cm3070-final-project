@@ -11,6 +11,7 @@ namespace ModularVehicleSimulator.UI.VehicleSettings
 {
     public class VehicleSettingsMenu : MonoBehaviour
     {
+        public event Action OnUpdateField;
         [SerializeField] private VehicleConfiguration vehicleConfiguration;
         [SerializeField] private VehicleSettingsGroup groupPrefab;
         [SerializeField] private VehicleSetting settingPrefab;
@@ -67,35 +68,35 @@ namespace ModularVehicleSimulator.UI.VehicleSettings
                 foreach (KeyValuePair<FieldInfo, float> setting in group.Value.FloatSettings)
                 {
                     VehicleSetting vehicleSetting = Instantiate(settingPrefab);
-                    vehicleSetting.Init(CamelCaseToName(setting.Key.Name), setting.Value, UpdateField(group.Value.ScriptableObject, setting));
+                    vehicleSetting.Init(CamelCaseToName(setting.Key.Name), setting.Value, UpdateField(group.Value.ScriptableObject, setting, OnUpdateField));
                     settingsList.Add(vehicleSetting);
                     columnRowCount++;
                 }
                 foreach (KeyValuePair<FieldInfo, bool> setting in group.Value.BoolSettings)
                 {
                     VehicleSetting vehicleSetting = Instantiate(settingPrefab);
-                    vehicleSetting.Init(CamelCaseToName(setting.Key.Name), setting.Value, UpdateField(group.Value.ScriptableObject, setting));
+                    vehicleSetting.Init(CamelCaseToName(setting.Key.Name), setting.Value, UpdateField(group.Value.ScriptableObject, setting, OnUpdateField));
                     settingsList.Add(vehicleSetting);
                     columnRowCount++;
                 }
                 foreach (KeyValuePair<FieldInfo, EngineType> setting in group.Value.EngineTypeSettings)
                 {
                     VehicleSetting vehicleSetting = Instantiate(settingPrefab);
-                    vehicleSetting.Init(CamelCaseToName(setting.Key.Name), setting.Value, UpdateEnumField<EngineType>(group.Value.ScriptableObject, setting.Key));
+                    vehicleSetting.Init(CamelCaseToName(setting.Key.Name), setting.Value, UpdateEnumField<EngineType>(group.Value.ScriptableObject, setting.Key, OnUpdateField));
                     settingsList.Add(vehicleSetting);
                     columnRowCount++;
                 }
                 foreach (KeyValuePair<FieldInfo, List<GearRatio>> setting in group.Value.GearRatioSettings)
                 {
                     VehicleSetting vehicleSetting = Instantiate(settingPrefab);
-                    vehicleSetting.Init(CamelCaseToName(setting.Key.Name), setting.Value, UpdateField(group.Value.ScriptableObject, setting));
+                    vehicleSetting.Init(CamelCaseToName(setting.Key.Name), setting.Value, UpdateField(group.Value.ScriptableObject, setting, OnUpdateField));
                     settingsList.Add(vehicleSetting);
                     columnRowCount++;
                 }
                 foreach (KeyValuePair<FieldInfo, Vector3> setting in group.Value.Vector3Settings)
                 {
                     VehicleSetting vehicleSetting = Instantiate(settingPrefab);
-                    vehicleSetting.Init(CamelCaseToName(setting.Key.Name), setting.Value, UpdateField(group.Value.ScriptableObject, setting));
+                    vehicleSetting.Init(CamelCaseToName(setting.Key.Name), setting.Value, UpdateField(group.Value.ScriptableObject, setting, OnUpdateField));
                     settingsList.Add(vehicleSetting);
                     columnRowCount++;
                 }
@@ -103,19 +104,21 @@ namespace ModularVehicleSimulator.UI.VehicleSettings
             }
         }
 
-        private static Action<T> UpdateField<T>(ScriptableObject scriptableObject, KeyValuePair<FieldInfo, T> setting)
+        private static Action<T> UpdateField<T>(ScriptableObject scriptableObject, KeyValuePair<FieldInfo, T> setting, Action updateFieldevent)
         {
             return (newValue) =>
             {
                 setting.Key.SetValue(scriptableObject, newValue);
+                updateFieldevent?.Invoke();
             };
         }
 
-        private static Action<object> UpdateEnumField<T>(ScriptableObject scriptableObject, FieldInfo field) where T : Enum
+        private static Action<object> UpdateEnumField<T>(ScriptableObject scriptableObject, FieldInfo field, Action updateFieldevent) where T : Enum
         {
             return (newValue) =>
             {
                 field.SetValue(scriptableObject, newValue);
+                updateFieldevent?.Invoke();
             };
         }
 
