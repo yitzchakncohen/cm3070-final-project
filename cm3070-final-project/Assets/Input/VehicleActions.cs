@@ -162,7 +162,7 @@ public partial class @VehicleActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""baacbb8e-b527-4997-b1c2-dccae53a7e32"",
-                    ""path"": ""<Keyboard>/upArrow"",
+                    ""path"": ""<Keyboard>/w"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard"",
@@ -184,7 +184,7 @@ public partial class @VehicleActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""62f3a95c-a410-4d76-b6fa-c5a2838875c6"",
-                    ""path"": ""<Keyboard>/downArrow"",
+                    ""path"": ""<Keyboard>/s"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard"",
@@ -206,7 +206,7 @@ public partial class @VehicleActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": ""negative"",
                     ""id"": ""d920a4b5-eb5e-45aa-b3ba-aa93980d9a16"",
-                    ""path"": ""<Keyboard>/leftArrow"",
+                    ""path"": ""<Keyboard>/a"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard"",
@@ -217,7 +217,7 @@ public partial class @VehicleActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": ""positive"",
                     ""id"": ""73ec68f3-c0eb-4600-8289-5ca825acf01b"",
-                    ""path"": ""<Keyboard>/rightArrow"",
+                    ""path"": ""<Keyboard>/d"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard"",
@@ -272,7 +272,7 @@ public partial class @VehicleActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": ""negative"",
                     ""id"": ""af2621dc-457b-4610-9e32-b2484c8545ee"",
-                    ""path"": ""<Keyboard>/s"",
+                    ""path"": ""<Keyboard>/downArrow"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard"",
@@ -283,7 +283,7 @@ public partial class @VehicleActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": ""positive"",
                     ""id"": ""e0927cc7-eb9f-41d1-ae37-5af69bd2d100"",
-                    ""path"": ""<Keyboard>/w"",
+                    ""path"": ""<Keyboard>/upArrow"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard"",

@@ -3427,7 +3427,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8374752155573117912, guid: b757deb12ba30704d84117cebd19f2e5, type: 3}
       propertyPath: m_text
-      value: <sprite name=jr> / <sprite name=kl> <sprite name=kr>
+      value: <sprite name=jr> / <sprite name=a> <sprite name=d>
       objectReference: {fileID: 0}
     - target: {fileID: 8591363194506364236, guid: b757deb12ba30704d84117cebd19f2e5, type: 3}
       propertyPath: m_AnchorMax.y
@@ -4431,7 +4431,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8374752155573117912, guid: b757deb12ba30704d84117cebd19f2e5, type: 3}
       propertyPath: m_text
-      value: <sprite name=du> / <sprite name=w>
+      value: <sprite name=du> / <sprite name=ku>
       objectReference: {fileID: 0}
     - target: {fileID: 8591363194506364236, guid: b757deb12ba30704d84117cebd19f2e5, type: 3}
       propertyPath: m_AnchorMax.y
@@ -4581,7 +4581,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8374752155573117912, guid: b757deb12ba30704d84117cebd19f2e5, type: 3}
       propertyPath: m_text
-      value: '<sprite name=lt> / <sprite name=kd> '
+      value: '<sprite name=lt> / <sprite name=s> '
       objectReference: {fileID: 0}
     - target: {fileID: 8591363194506364236, guid: b757deb12ba30704d84117cebd19f2e5, type: 3}
       propertyPath: m_AnchorMax.y
@@ -4724,6 +4724,10 @@ PrefabInstance:
     - target: {fileID: 5504143201051670040, guid: b757deb12ba30704d84117cebd19f2e5, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: -20.11
+      objectReference: {fileID: 0}
+    - target: {fileID: 8374752155573117912, guid: b757deb12ba30704d84117cebd19f2e5, type: 3}
+      propertyPath: m_text
+      value: '<sprite name=rt> / <sprite name=w> '
       objectReference: {fileID: 0}
     - target: {fileID: 8591363194506364236, guid: b757deb12ba30704d84117cebd19f2e5, type: 3}
       propertyPath: m_AnchorMax.y
@@ -5846,7 +5850,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8374752155573117912, guid: b757deb12ba30704d84117cebd19f2e5, type: 3}
       propertyPath: m_text
-      value: <sprite name=dd> / <sprite name=s>
+      value: <sprite name=dd> / <sprite name=kd>
       objectReference: {fileID: 0}
     - target: {fileID: 8591363194506364236, guid: b757deb12ba30704d84117cebd19f2e5, type: 3}
       propertyPath: m_AnchorMax.y
