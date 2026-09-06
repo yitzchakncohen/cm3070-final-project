@@ -173,13 +173,13 @@ namespace ModularVehicleSimulator.Vehicle
             
             if(autoShiftTimer < vehicleConfiguration.Engine.MinAutoShiftTime) return;
  
-            if(engineRPM >= vehicleConfiguration.Engine.MaxRPM && currentGear > 2)
+            if(engineRPM >= vehicleConfiguration.Engine.MaxRPM && currentGear > (int)Gear.Drive)
             {
                 if(!vehicleConfiguration.DriveTrain.ContainsGear(currentGear + 1)) return;
                 ShiftGearNext();
                 autoShiftTimer = 0f;
             }
-            else if(engineRPM < vehicleConfiguration.Engine.IdleRPM && currentGear > 2)
+            else if(engineRPM < vehicleConfiguration.Engine.IdleRPM && currentGear > (int)Gear.Drive)
             {
                 ShiftGearPrevious();
                 autoShiftTimer = 0f;
