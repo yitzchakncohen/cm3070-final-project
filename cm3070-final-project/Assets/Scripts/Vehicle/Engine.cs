@@ -53,24 +53,22 @@ namespace ModularVehicleSimulator.Vehicle
 
             // Calculate Engine Torque
             float netEngineTorque = 0f;
+            float idleDelta = Mathf.Max(engineConfiguration.IdleRPM - currentEngineRPM, 0f);
+            float idleCompensation = Mathf.Min(idleDelta / engineConfiguration.IdleRPM, IDLE_COMPENSATION_MAX);
+            float effectiveInput = Mathf.Max(idleCompensation, input);
+            float engineTorque = engineConfiguration.GetTorque(currentEngineRPM) * effectiveInput;
             if(engineConfiguration.Type == EngineType.Gas)
             {
-                // Correct input for idle engine rpm
-                float idleDelta = Mathf.Max(engineConfiguration.IdleRPM - currentEngineRPM, 0f);
-                float idleCompensation = Mathf.Min(idleDelta / engineConfiguration.IdleRPM, IDLE_COMPENSATION_MAX);
-                float effectiveInput = Mathf.Max(idleCompensation, input);
-                float engineTorque = engineConfiguration.GetTorque(currentEngineRPM) * effectiveInput;
                 float engineFriction = engineConfiguration.GetFriction(currentEngineRPM);
                 netEngineTorque = engineTorque - engineFriction;                
             }
             else if(engineConfiguration.Type == EngineType.Electric)
             {
-                float engineTorque = engineConfiguration.GetTorque(currentEngineRPM) * input;
                 netEngineTorque = engineTorque;                    
             }
 
             // Calculate Wheel Torque 
-            float rpmDelta = currentEngineRPM - engineInputRPM;
+            float rpmDelta = currentEngineRPM - (engineInputRPM * Mathf.Sign(driveTrain.GetRatioForGear(gear)));
             float effectiveRigidity = driveTrain.Rigidity * Mathf.Abs(driveTrain.GetRatioForGear(gear));
             float torqueFromWheels = rpmDelta * effectiveRigidity * Time.fixedDeltaTime / RAD_SEC_TO_RPM;
 
@@ -83,8 +81,9 @@ namespace ModularVehicleSimulator.Vehicle
             currentEngineRPM = Mathf.Clamp(currentEngineRPM, engineConfiguration.IdleRPM * IDLE_FLOOR_FACTOR, engineConfiguration.MaxRPM);
 
             // Output engine torque through the drive train to the wheels
-            bool idleGasEngine = currentEngineRPM > Mathf.Abs(engineInputRPM) && engineConfiguration.Type == EngineType.Gas;
-            if (input > 0.01f || idleGasEngine)
+            // Still simulated for an EV
+            bool idleEngineCreep = currentEngineRPM > Mathf.Abs(engineInputRPM);
+            if (input > 0.01f || idleEngineCreep)
             {
                 // Combustion or idle momentum applies force to the wheels
                 // Debug.Log($"Net Engine Torque {netEngineTorque}, driveTrain.GetRatioForGear(gear) {driveTrain.GetRatioForGear(gear)}, driveTrain.Loss {driveTrain.Loss}");
@@ -93,6 +92,7 @@ namespace ModularVehicleSimulator.Vehicle
             else
             {
                 // Engine braking applies force to the wheels
+                Debug.Log("torqueFromWheels: " + torqueFromWheels);
                 return torqueFromWheels * driveTrain.Loss;
             }
         }

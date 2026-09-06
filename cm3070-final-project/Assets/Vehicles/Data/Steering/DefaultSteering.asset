@@ -12,9 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 521489a31441b7b4cb1bfcb59fae057d, type: 3}
   m_Name: DefaultSteering
   m_EditorClassIdentifier: Assembly-CSharp::ModularVehicleSimulator.Vehicle.Data.SteeringConfiguration
-  maxSteeringAngleAtRest: 38
-  maxSteeringAngleAtHighSpeed: 38
+  maxSteeringAngleAtRest: 38.6
+  maxSteeringAngleAtHighSpeed: 38.6
   highSpeedThresholdInMetersPerSecond: 30
   steeringSpeedInDegreesPerSecond: 90
+  steeringAssistMin: 0.75
+  steeringAssistMax: 1.25
   antiRollBarStiffnessFront: 12000
   antiRollBarStiffnessRear: 8000

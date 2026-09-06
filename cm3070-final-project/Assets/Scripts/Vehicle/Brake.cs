@@ -65,7 +65,7 @@ namespace ModularVehicleSimulator.Vehicle
                     float brakeTorque = brakesConfiguration.Torque * brakeInput * bias / wheelCount;
                     brakeTorque = ApplyBrakeTorqueVectoring(wheel, targetSteeringAngle, brakeTorque, forwardSpeed);
                     brakeTorque = ApplyABS(wheel, brakeTorque);
-                    wheel.Brake(brakeTorque);                    
+                    wheel.Brake(brakeTorque);     
                 }
             }
         }
