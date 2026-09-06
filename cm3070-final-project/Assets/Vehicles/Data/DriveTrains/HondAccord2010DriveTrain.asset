@@ -13,21 +13,21 @@ MonoBehaviour:
   m_Name: HondAccord2010DriveTrain
   m_EditorClassIdentifier: Assembly-CSharp::ModularVehicleSimulator.Vehicle.Data.DriveTrain
   gearRatios:
-  - Gear: -1
-    Ratio: 0
   - Gear: 0
-    Ratio: -1.889
-  - Gear: 1
     Ratio: 0
+  - Gear: 1
+    Ratio: -1.889
   - Gear: 2
-    Ratio: 2.697
+    Ratio: 0
   - Gear: 3
-    Ratio: 1.606
+    Ratio: 2.697
   - Gear: 4
-    Ratio: 1.071
+    Ratio: 1.606
   - Gear: 5
-    Ratio: 0.766
+    Ratio: 1.071
   - Gear: 6
+    Ratio: 0.766
+  - Gear: 7
     Ratio: 0.612
   loss: 0.85
   finalDriveRatio: 4.31

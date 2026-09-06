@@ -107,7 +107,9 @@ namespace ModularVehicleSimulator.UI.VehicleSettings
             engineTypeDropDown.AddOptions(options);
             engineTypeDropDown.MultiSelect = false;
 
-            engineTypeDropDown.SetValueWithoutNotify(Convert.ToInt32(value));
+            // In case of negative enum values
+            int index = options.IndexOf(value.ToString());
+            engineTypeDropDown.SetValueWithoutNotify(index);
             onEnumValueChanged = onValueChanged;
         }
 

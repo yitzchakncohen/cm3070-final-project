@@ -27,7 +27,7 @@ namespace ModularVehicleSimulator.Vehicle
         private Wheel[] wheels;
         private Engine engine;
         private Brake brake;
-        private int currentGear = -1;
+        private int currentGear = 0;
         private float speed = 0f;
         private float engineRPM = 0f;
         private float autoShiftTimer = 0f;
@@ -114,16 +114,14 @@ namespace ModularVehicleSimulator.Vehicle
         public void ShiftGearNext()
         {
             if(!vehicleConfiguration.DriveTrain.ContainsGear(currentGear + 1)) return;
-            currentGear = Mathf.Clamp(currentGear + 1, -1, GetMaxGear());
-            Debug.Log("Gear: " + Gear.ToString());
+            currentGear = Mathf.Clamp(currentGear + 1, 0, GetMaxGear());
             OnGearChanged?.Invoke();
         }
 
         public void ShiftGearPrevious()
         {
             if(!vehicleConfiguration.DriveTrain.ContainsGear(currentGear - 1)) return;
-            currentGear = Mathf.Clamp(currentGear - 1, -1, GetMaxGear());
-            Debug.Log("Gear: " + Gear.ToString());
+            currentGear = Mathf.Clamp(currentGear - 1, 0, GetMaxGear());
             OnGearChanged?.Invoke();
         }
 

@@ -13,13 +13,13 @@ MonoBehaviour:
   m_Name: NissanLeafDriveTrain
   m_EditorClassIdentifier: Assembly-CSharp::ModularVehicleSimulator.Vehicle.Data.DriveTrain
   gearRatios:
-  - Gear: -1
-    Ratio: 0
   - Gear: 0
-    Ratio: -1
-  - Gear: 1
     Ratio: 0
+  - Gear: 1
+    Ratio: -1
   - Gear: 2
+    Ratio: 0
+  - Gear: 3
     Ratio: 1
   loss: 1
   finalDriveRatio: 8.193

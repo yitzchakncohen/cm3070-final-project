@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using ModularVehicleSimulator.Vehicle;
 using ModularVehicleSimulator.Vehicle.Data;
 using TMPro;
@@ -30,8 +31,10 @@ namespace ModularVehicleSimulator.UI.VehicleSettings
         public void Init(GearRatio gearRatio)
         {
             this.gearRatio = new GearRatio{Gear = gearRatio.Gear, Ratio = gearRatio.Ratio};
-            gearDropDown.value = (int)gearRatio.Gear;
-            ratioInputField.text = VehicleSetting.ValidateFloat(gearRatio.Ratio.ToString());
+            int index = Array.IndexOf(Enum.GetNames(typeof(Gear)), this.gearRatio.Gear.ToString());
+            Debug.Log(this.gearRatio.Gear + " " + index);
+            gearDropDown.SetValueWithoutNotify(index);
+            ratioInputField.text = VehicleSetting.ValidateFloat(this.gearRatio.Ratio.ToString());
             isInitialized = true;
         }
 
