@@ -77,6 +77,11 @@ namespace ModularVehicleSimulator.Vehicle
             }
         }
 
+        public void Reset()
+        {
+            engine.Reset();
+        }
+
         public void Steer(float steeringInput)
         {
             UpdateCurrentSteeringAngle(steeringInput);

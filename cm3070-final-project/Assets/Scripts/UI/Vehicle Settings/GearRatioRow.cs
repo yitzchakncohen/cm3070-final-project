@@ -32,7 +32,6 @@ namespace ModularVehicleSimulator.UI.VehicleSettings
         {
             this.gearRatio = new GearRatio{Gear = gearRatio.Gear, Ratio = gearRatio.Ratio};
             int index = Array.IndexOf(Enum.GetNames(typeof(Gear)), this.gearRatio.Gear.ToString());
-            Debug.Log(this.gearRatio.Gear + " " + index);
             gearDropDown.SetValueWithoutNotify(index);
             ratioInputField.text = VehicleSetting.ValidateFloat(this.gearRatio.Ratio.ToString());
             isInitialized = true;

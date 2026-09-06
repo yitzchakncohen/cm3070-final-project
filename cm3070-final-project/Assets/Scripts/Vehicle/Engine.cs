@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using ModularVehicleSimulator.Vehicle.Data;
@@ -25,6 +26,11 @@ namespace ModularVehicleSimulator.Vehicle
             this.driveTrain = driveTrain;
             this.wheels = wheels;
             motorizedWheels = wheels.Where(wheel => wheel.IsMotorized).ToList();
+            currentEngineRPM = engineConfiguration.IdleRPM;
+        }
+
+        public void Reset()
+        {
             currentEngineRPM = engineConfiguration.IdleRPM;
         }
 
@@ -92,7 +98,6 @@ namespace ModularVehicleSimulator.Vehicle
             else
             {
                 // Engine braking applies force to the wheels
-                Debug.Log("torqueFromWheels: " + torqueFromWheels);
                 return torqueFromWheels * driveTrain.Loss;
             }
         }

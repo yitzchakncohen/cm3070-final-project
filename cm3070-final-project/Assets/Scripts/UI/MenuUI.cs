@@ -47,6 +47,7 @@ namespace ModularVehicleSimulator.UI
             weatherCloseButton.onClick.AddListener(weatherCloseButton_onClick);
             restartButton.onClick.AddListener(RestartButton_onClick);
             vehicleSelection.OnChangeVehicle += VehicleSelection_OnChangeVehicle;
+            vehicleSettings.OnUpdateField += VehicleSettings_OnUpdateField;
         }
 
         private void OnDisable()
@@ -61,6 +62,7 @@ namespace ModularVehicleSimulator.UI
             weatherCloseButton.onClick.RemoveAllListeners();
             restartButton.onClick.RemoveAllListeners();
             vehicleSelection.OnChangeVehicle -= VehicleSelection_OnChangeVehicle;
+            vehicleSettings.OnUpdateField -= VehicleSettings_OnUpdateField;
         }
 
         private void VehicleSettingsOpenButton_onClick()
@@ -133,6 +135,11 @@ namespace ModularVehicleSimulator.UI
         private void VehicleSelection_OnChangeVehicle(VehicleController controller)
         {
             vehicleSettings.UpdateVehicle(controller.Config);
+        }
+
+        private void VehicleSettings_OnUpdateField()
+        {
+            vehicles.Find(vehicle => vehicle.gameObject.activeSelf).Reset();
         }
 
         private void ActivatePlayerInput()
