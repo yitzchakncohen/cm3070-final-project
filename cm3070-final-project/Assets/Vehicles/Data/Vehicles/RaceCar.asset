@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f12d2afce5ee9da40981e1e855060f43, type: 3}
+  m_Name: RaceCar
+  m_EditorClassIdentifier: Assembly-CSharp::ModularVehicleSimulator.Vehicle.Data.VehicleConfiguration
+  vehicleName: Race Car
+  engineConfiguration: {fileID: 11400000, guid: dcc6638dd0d470f43a3df98eec398629, type: 2}
+  driveTrain: {fileID: 11400000, guid: 1b3193e3b87192047ba2187bb4d3fccb, type: 2}
+  wheelConfiguration: {fileID: 11400000, guid: 6cee147904e002a4d898dc43019917f5, type: 2}
+  suspensionConfiguration: {fileID: 11400000, guid: a99dd272bdc6f2943b938657dc679120, type: 2}
+  brakesConfiguration: {fileID: 11400000, guid: 1fd925c68e2736a47ace6af56d266af7, type: 2}
+  chassisConfiguration: {fileID: 11400000, guid: b28c122fb6de02b4aa3345b8c10e7723, type: 2}
+  steeringConfiguration: {fileID: 11400000, guid: ec7d0f1e99f9de240befc95cb056dd4a, type: 2}

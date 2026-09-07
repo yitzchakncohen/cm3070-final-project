@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2bba608f66d90448be54725225d1bc4, type: 3}
+  m_Name: RaceCarDriveTrain
+  m_EditorClassIdentifier: Assembly-CSharp::ModularVehicleSimulator.Vehicle.Data.DriveTrain
+  gearRatios:
+  - Gear: 0
+    Ratio: 0
+  - Gear: 1
+    Ratio: -3.1
+  - Gear: 2
+    Ratio: 0
+  - Gear: 3
+    Ratio: 3.2
+  - Gear: 4
+    Ratio: 2.1
+  - Gear: 5
+    Ratio: 1.55
+  - Gear: 6
+    Ratio: 1.22
+  - Gear: 7
+    Ratio: 1
+  loss: 0.92
+  finalDriveRatio: 3.73
+  damping: 1.2

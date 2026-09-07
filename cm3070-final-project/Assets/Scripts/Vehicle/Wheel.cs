@@ -8,7 +8,7 @@ namespace ModularVehicleSimulator.Vehicle
 {
     public class Wheel : MonoBehaviour
     {
-        public const float DEFLECTION_SMOOTH_STEP = 1f;
+        public const float DEFLECTION_SMOOTH_STEP = 0.05f;
         public const float EFFECTIVE_SLIP_THRESHHOLD = 0.15f;
         public const float SPEEDOMETER_SLIP_THRESHHOLD_MULTIPLIER = .50f;
         public const float FX_SLIP_THRESHHOLD_MULTIPLIER = 7.5f;
