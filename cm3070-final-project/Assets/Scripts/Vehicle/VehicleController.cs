@@ -9,6 +9,7 @@ namespace ModularVehicleSimulator.Vehicle
     [RequireComponent(typeof(Engine), typeof(Brake))]
     public class VehicleController : MonoBehaviour
     {
+        private const string CHASSIS_LAYER = "Chassis";
         public event Action OnGearChanged;
         public string Name => vehicleConfiguration.Name;
         public float Speed => speed;
@@ -23,6 +24,7 @@ namespace ModularVehicleSimulator.Vehicle
         public Camera SelectioCamera => cameraController.SelectioCamera;
         [SerializeField] private VehicleConfiguration vehicleConfiguration;
         [SerializeField] private Rigidbody chassisRigidBody;
+        [SerializeField] private Transform chassisModel;
         [SerializeField] private CameraController cameraController;
         private Wheel[] wheels;
         private Engine engine;
@@ -32,6 +34,12 @@ namespace ModularVehicleSimulator.Vehicle
         private float engineRPM = 0f;
         private float autoShiftTimer = 0f;
         private float currentTargetSteeringAngle = 0f;
+
+        private void Awake()
+        {
+            int layer = LayerMask.NameToLayer(CHASSIS_LAYER);
+            VehiclePhysics.SetChildrenLayerRecursive(chassisModel, layer);
+        }
 
         private void Start()
         {

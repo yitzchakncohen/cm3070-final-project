@@ -200,6 +200,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::VehicleController
   vehicleConfiguration: {fileID: 11400000, guid: 1191e328a9c11844a92defe51863ee62, type: 2}
   chassisRigidBody: {fileID: 1611960791474144282}
+  chassisModel: {fileID: 1903409234266190911}
   cameraController: {fileID: 2636226642717632943}
 --- !u!114 &184680343560197519
 MonoBehaviour:
@@ -761,11 +762,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1755173606253276430, guid: 3c3749485ff308f4d9fc36334361709d, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -2.77
       objectReference: {fileID: 0}
     - target: {fileID: 1755173606253276430, guid: 3c3749485ff308f4d9fc36334361709d, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 6
+      value: 4.67
       objectReference: {fileID: 0}
     - target: {fileID: 6061578443036537848, guid: 3c3749485ff308f4d9fc36334361709d, type: 3}
       propertyPath: m_LocalPosition.x

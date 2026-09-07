@@ -331,5 +331,16 @@ namespace ModularVehicleSimulator.Physics
             }
         }
         #endregion
+
+        public static void SetChildrenLayerRecursive(Transform parent, int layer)
+        {
+            foreach (Transform child in parent)
+            {
+                child.gameObject.layer = layer;
+                if (child.childCount == 0) return;
+
+                SetChildrenLayerRecursive(child, layer);
+            }
+        }
     }
 }

@@ -200,6 +200,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::VehicleController
   vehicleConfiguration: {fileID: 11400000, guid: f0366b6265389a942ac05ceb3812e70d, type: 2}
   chassisRigidBody: {fileID: 1611960791474144282}
+  chassisModel: {fileID: 163573672587749733}
   cameraController: {fileID: 2636226642717632943}
 --- !u!114 &184680343560197519
 MonoBehaviour:

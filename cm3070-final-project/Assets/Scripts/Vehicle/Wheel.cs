@@ -12,6 +12,7 @@ namespace ModularVehicleSimulator.Vehicle
         public const float EFFECTIVE_SLIP_THRESHHOLD = 0.15f;
         public const float SPEEDOMETER_SLIP_THRESHHOLD_MULTIPLIER = .50f;
         public const float FX_SLIP_THRESHHOLD_MULTIPLIER = 7.5f;
+        public const string TIRES_LAYER = "Tag";
         public Vector3 WheelFriction => GetWheelFrictionVector();
         public Vector3 WheelContactPoint => GetWheelContactPoint();
         public float SteerAngle => wheelColliders.Average(collider => collider.steerAngle);
@@ -45,6 +46,8 @@ namespace ModularVehicleSimulator.Vehicle
         private void Awake()
         {
             wheelColliders = GetComponentsInChildren<WheelCollider>();
+            int layer = LayerMask.NameToLayer(TIRES_LAYER);
+            VehiclePhysics.SetChildrenLayerRecursive(transform, layer);
         }
 
         public void Init(WheelConfiguration wheels, 
