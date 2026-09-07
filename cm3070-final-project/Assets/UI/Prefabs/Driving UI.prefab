@@ -787,8 +787,9 @@ MonoBehaviour:
   - {fileID: 2309185839121129961}
   - {fileID: 2725257742933315988}
   speedomdeter: {fileID: 8000952589103521555}
-  odemeter: {fileID: 1700020156481531273}
+  tachometer: {fileID: 1700020156481531273}
   vehicleSelectionMenu: {fileID: 0}
+  vehicleSettingsMenu: {fileID: 0}
   cameraUI: {fileID: 3928805125129275836}
 --- !u!1 &2387351967999979644
 GameObject:

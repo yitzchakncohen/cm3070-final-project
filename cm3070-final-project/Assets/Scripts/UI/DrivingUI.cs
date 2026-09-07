@@ -18,7 +18,7 @@ namespace ModularVehicleSimulator.UI
         [SerializeField] private RectTransform steeringWheel;
         [SerializeField] private TMP_Text[] gearText;
         [SerializeField] private Odemeter speedomdeter;
-        [SerializeField] private Odemeter odemeter;
+        [SerializeField] private Odemeter tachometer;
         [SerializeField] private VehicleSelectionMenu vehicleSelectionMenu;
         [SerializeField] private VehicleSettingsMenu vehicleSettingsMenu;
         [SerializeField] private CameraUI cameraUI;
@@ -29,7 +29,7 @@ namespace ModularVehicleSimulator.UI
         private void Start()
         {
             speedomdeter.Init("km/h", 20f);
-            odemeter.Init("x1000r/min", 0.5f);
+            tachometer.Init("x1000r/min", 0.5f);
             vehicleController = FindAnyObjectByType<VehicleController>(FindObjectsInactive.Exclude);
             cameraUI.Init(vehicleController.CameraController);
             inputManager = vehicleController.GetComponent<InputManager>();
@@ -66,7 +66,7 @@ namespace ModularVehicleSimulator.UI
             brake.fillAmount = inputManager.CurrentBraking;
             UpdateSteeringWheel();
             speedomdeter.UpdateNeedle(vehicleController.Speed * 3.6f);
-            odemeter.UpdateNeedle(vehicleController.RPM / 1000f);
+            tachometer.UpdateNeedle(vehicleController.RPM / 1000f);
         }
 
         private void UpdateSteeringWheel()
@@ -100,7 +100,7 @@ namespace ModularVehicleSimulator.UI
         private void UpdateDigitalDisplays()
         {
             speedomdeter.UpdateDigital(vehicleController.Speed * 3.6f);
-            odemeter.UpdateDigital(vehicleController.RPM);
+            tachometer.UpdateDigital(vehicleController.RPM);
         }
 
         private void VehicleSelectionMenu_OnChangeVehicle(VehicleController controller)
@@ -117,7 +117,7 @@ namespace ModularVehicleSimulator.UI
         private void VehicleSettingsMenu_OnUpdateField()
         {
             speedomdeter.Init("km/h", 20f);
-            odemeter.Init("x1000r/min", 0.5f);
+            tachometer.Init("x1000r/min", 0.5f);
             VehicleController_OnGearChanged();
         }
     }

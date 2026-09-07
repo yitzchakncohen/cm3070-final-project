@@ -8,7 +8,7 @@ namespace ModularVehicleSimulator.Vehicle
 {
     public class Engine : MonoBehaviour
     {
-        public float RPM => currentEngineRPM;
+        public float RPM => engineConfiguration.Type == EngineType.Gas ? currentEngineRPM : lastEngineRPM;
         public float RPMIdle => engineConfiguration.IdleRPM;
         public float RPMMax => engineConfiguration.MaxRPM;
         private const float RAD_SEC_TO_RPM = 60f / (2f * Mathf.PI);
@@ -19,6 +19,7 @@ namespace ModularVehicleSimulator.Vehicle
         private Wheel[] wheels;
         private List<Wheel> motorizedWheels;
         private float currentEngineRPM = 0f;
+        private float lastEngineRPM = 0f;
 
         public void Init(EngineConfiguration engineConfiguration, DriveTrain driveTrain, Wheel[] wheels)
         {
@@ -36,8 +37,8 @@ namespace ModularVehicleSimulator.Vehicle
 
         public void Accelerate(Gear gear, float accelerationInput)
         {
-            float engineInputRPM = motorizedWheels.Average(wheel => wheel.GetEffectiveRPM()) * driveTrain.GetRatioForGear(gear);
-            float totalTorque = GetWheelTorque(gear, accelerationInput, engineInputRPM);
+            lastEngineRPM = motorizedWheels.Average(wheel => wheel.GetEffectiveRPM()) * driveTrain.GetRatioForGear(gear);
+            float totalTorque = GetWheelTorque(gear, accelerationInput, lastEngineRPM);
             // float totalRMP = motorizedWheels.Sum(wheel => wheel.GetEffectiveRPM());
 
             // Apply the engine torque or braking to the wheels
