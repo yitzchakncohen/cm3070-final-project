@@ -1659,7 +1659,7 @@ MonoBehaviour:
   columnPrefab: {fileID: 8805273565372150970, guid: 3e0ca70e582be25429d7ce32203879b9, type: 3}
   columnsContainer: {fileID: 2482521349275665332}
   subtitle: {fileID: 900213072476969838}
-  columnRowMax: 20
+  columnRowMax: 24
   toolTip: {fileID: 5310766215263139814}
 --- !u!1 &6032463520916427143
 GameObject:

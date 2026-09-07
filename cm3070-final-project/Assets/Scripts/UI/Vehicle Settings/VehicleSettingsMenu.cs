@@ -39,6 +39,11 @@ namespace ModularVehicleSimulator.UI.VehicleSettings
 
         private void OnDestroy()
         {
+            UnsubscribeEvents();
+        }
+
+        private void UnsubscribeEvents()
+        {
             foreach (VehicleSetting setting in globalSettingsList.Keys)
             {
                 setting.OnEnter -= VehicleSetting_OnEnter;
@@ -49,85 +54,178 @@ namespace ModularVehicleSimulator.UI.VehicleSettings
         [ContextMenu("Generate UI")]
         public void GenerateUI()
         {
-            foreach (VehicleSetting setting in globalSettingsList.Keys)
-            {
-                setting.OnEnter -= VehicleSetting_OnEnter;
-                setting.OnExit -= VehicleSetting_OnExit;
-            }
-            globalSettingsList.Clear(); 
+            UnsubscribeEvents();
+            globalSettingsList.Clear();
 
             subtitle.text = vehicleConfiguration.Name;
+            // Initialize Column Container
             for (int i = 0; i < columnsContainer.childCount; i++)
             {
                 Destroy(columnsContainer.GetChild(i).gameObject);
             }
+
             VehicleSettingsData vehicleSettings = SettingsUIGenerator.GenerateUI(vehicleConfiguration);
+            // Initialize Column 
             GameObject currentColumn = Instantiate(columnPrefab, columnsContainer);
             for (int i = 0; i < currentColumn.transform.childCount; i++)
             {
                 Destroy(currentColumn.transform.GetChild(i).gameObject);
             }
             int columnRowCount = 0;
-            
+
             foreach (KeyValuePair<string, VehicleSettingsGroupData> group in vehicleSettings.VehicleSettingsGroups)
             {
-                // Check column row count
-                int columnCount = columnRowCount + group.Value.FloatSettings.Count + group.Value.BoolSettings.Count + 1;
-                if(columnRowCount != 0 && columnCount > columnRowMax)
+                int groupsPerGroup = 1;
+                if (columnRowCount + 1 > columnRowMax)
                 {
-                    currentColumn = Instantiate(columnPrefab, columnsContainer);
-                    for (int i = 0; i < currentColumn.transform.childCount; i++)
-                    {
-                        Destroy(currentColumn.transform.GetChild(i).gameObject);
-                    }
-                    columnRowCount = 0;
+                    CreateNewColumn(out currentColumn, out columnRowCount);
                 }
-
+                
                 VehicleSettingsGroup vehicleSettingsGroup = Instantiate(groupPrefab, currentColumn.transform);
-                List<VehicleSetting> settingsList = new List<VehicleSetting>();
+                List<VehicleSetting> groupSettingsList = new List<VehicleSetting>();
+
                 columnRowCount++; // Title row
 
                 foreach (KeyValuePair<FieldInfo, float> setting in group.Value.FloatSettings)
                 {
-                    VehicleSetting vehicleSetting = Instantiate(settingPrefab);
+                    VehicleSetting vehicleSetting = CreateVehicleSetting(
+                        ref currentColumn, 
+                        ref columnRowCount, 
+                        ref vehicleSettingsGroup, 
+                        ref groupSettingsList, 
+                        ref groupsPerGroup, 
+                        setting, 
+                        group.Key);
                     vehicleSetting.Init(CamelCaseToName(setting.Key.Name), setting.Value, UpdateField(group.Value.ScriptableObject, setting, OnUpdateField));
-                    settingsList.Add(vehicleSetting);
-                    AddToGlobalList(setting.Key, vehicleSetting);
-                    columnRowCount++;
                 }
                 foreach (KeyValuePair<FieldInfo, bool> setting in group.Value.BoolSettings)
                 {
-                    VehicleSetting vehicleSetting = Instantiate(settingPrefab);
+                    VehicleSetting vehicleSetting = CreateVehicleSetting(
+                        ref currentColumn, 
+                        ref columnRowCount, 
+                        ref vehicleSettingsGroup, 
+                        ref groupSettingsList, 
+                        ref groupsPerGroup, 
+                        setting, 
+                        group.Key);
                     vehicleSetting.Init(CamelCaseToName(setting.Key.Name), setting.Value, UpdateField(group.Value.ScriptableObject, setting, OnUpdateField));
-                    settingsList.Add(vehicleSetting);
-                    AddToGlobalList(setting.Key, vehicleSetting);
-                    columnRowCount++;
                 }
                 foreach (KeyValuePair<FieldInfo, EngineType> setting in group.Value.EngineTypeSettings)
                 {
-                    VehicleSetting vehicleSetting = Instantiate(settingPrefab);
+                    VehicleSetting vehicleSetting = CreateVehicleSetting(
+                        ref currentColumn, 
+                        ref columnRowCount, 
+                        ref vehicleSettingsGroup, 
+                        ref groupSettingsList, 
+                        ref groupsPerGroup, 
+                        setting, 
+                        group.Key);
                     vehicleSetting.Init(CamelCaseToName(setting.Key.Name), setting.Value, UpdateEnumField<EngineType>(group.Value.ScriptableObject, setting.Key, OnUpdateField));
-                    settingsList.Add(vehicleSetting);
-                    AddToGlobalList(setting.Key, vehicleSetting);
-                    columnRowCount++;
                 }
                 foreach (KeyValuePair<FieldInfo, List<GearRatio>> setting in group.Value.GearRatioSettings)
                 {
-                    VehicleSetting vehicleSetting = Instantiate(settingPrefab);
+                    VehicleSetting vehicleSetting = CreateVehicleSetting(
+                        ref currentColumn, 
+                        ref columnRowCount, 
+                        ref vehicleSettingsGroup, 
+                        ref groupSettingsList, 
+                        ref groupsPerGroup, 
+                        setting, 
+                        group.Key);
                     vehicleSetting.Init(CamelCaseToName(setting.Key.Name), setting.Value, UpdateField(group.Value.ScriptableObject, setting, OnUpdateField));
-                    settingsList.Add(vehicleSetting);
-                    AddToGlobalList(setting.Key, vehicleSetting);
-                    columnRowCount++;
                 }
                 foreach (KeyValuePair<FieldInfo, Vector3> setting in group.Value.Vector3Settings)
                 {
-                    VehicleSetting vehicleSetting = Instantiate(settingPrefab);
+                    VehicleSetting vehicleSetting = CreateVehicleSetting(
+                        ref currentColumn, 
+                        ref columnRowCount, 
+                        ref vehicleSettingsGroup, 
+                        ref groupSettingsList, 
+                        ref groupsPerGroup, 
+                        setting, 
+                        group.Key);
                     vehicleSetting.Init(CamelCaseToName(setting.Key.Name), setting.Value, UpdateField(group.Value.ScriptableObject, setting, OnUpdateField));
-                    settingsList.Add(vehicleSetting);
-                    AddToGlobalList(setting.Key, vehicleSetting);
-                    columnRowCount++;
                 }
-                vehicleSettingsGroup.Init(CamelCaseToName(group.Key), settingsList);
+                
+                // Finalize active group if it has more than zero settings.
+                if (groupSettingsList.Count > 0)
+                {
+                    string title = groupsPerGroup > 1 ? $"{group.Key} {groupsPerGroup}" : group.Key;
+                    vehicleSettingsGroup.Init(CamelCaseToName(title), groupSettingsList);
+                }
+                else
+                {
+                    // Clean up empty group
+                    Destroy(vehicleSettingsGroup.gameObject);
+                    columnRowCount--; 
+                }
+            }
+        }
+
+        private VehicleSetting CreateVehicleSetting<T>(
+            ref GameObject currentColumn, 
+            ref int columnRowCount, 
+            ref VehicleSettingsGroup vehicleSettingsGroup, 
+            ref List<VehicleSetting> groupSettingsList, 
+            ref int groupsPerGroup, 
+            KeyValuePair<FieldInfo, T> setting, 
+            string groupName)
+        {
+            CheckColumnRowCount(
+                ref currentColumn, 
+                ref columnRowCount, 
+                ref vehicleSettingsGroup, 
+                ref groupSettingsList, 
+                ref groupsPerGroup, 
+                groupName
+                );
+            
+            VehicleSetting vehicleSetting = Instantiate(settingPrefab);
+            groupSettingsList.Add(vehicleSetting);
+            AddToGlobalList(setting.Key, vehicleSetting);
+            columnRowCount++;
+
+            return vehicleSetting;
+        }
+
+        private void CheckColumnRowCount(
+            ref GameObject currentColumn, 
+            ref int columnRowCount, 
+            ref VehicleSettingsGroup vehicleSettingsGroup, 
+            ref List<VehicleSetting> groupSettingsList, 
+            ref int groupsPerGroup, 
+            string baseGroupName)
+        {
+            Debug.Log(baseGroupName + " | columnRowCount: " + columnRowCount);
+            if (columnRowCount >= columnRowMax)
+            {
+                Debug.Log(groupSettingsList.Count);
+                if (groupSettingsList.Count > 0)
+                {
+                    string title = groupsPerGroup > 1 ? $"{baseGroupName} {groupsPerGroup}" : baseGroupName;
+                    vehicleSettingsGroup.Init(CamelCaseToName(title), groupSettingsList);
+                }
+                else
+                {
+                    Destroy(vehicleSettingsGroup.gameObject);
+                }
+
+                CreateNewColumn(out currentColumn, out columnRowCount);
+                groupsPerGroup++;
+
+                vehicleSettingsGroup = Instantiate(groupPrefab, currentColumn.transform);
+                groupSettingsList = new List<VehicleSetting>();
+                columnRowCount++;
+            }
+        }
+
+        private void CreateNewColumn(out GameObject currentColumn, out int columnRowCount)
+        {
+            currentColumn = Instantiate(columnPrefab, columnsContainer);
+            columnRowCount = 0;
+            for (int i = 0; i < currentColumn.transform.childCount; i++)
+            {
+                Destroy(currentColumn.transform.GetChild(i).gameObject);
             }
         }
 
@@ -202,12 +300,12 @@ namespace ModularVehicleSimulator.UI.VehicleSettings
 
         private void VehicleSetting_OnEnter(VehicleSetting setting)
         {
-            if(globalSettingsList.ContainsKey(setting))
+            if (globalSettingsList.ContainsKey(setting))
             {
                 TooltipAttribute tooltipAttribute = globalSettingsList[setting].GetCustomAttribute<TooltipAttribute>();
-                if(tooltipAttribute != null)
+                if (tooltipAttribute != null)
                 {
-                    ShowTooltip(tooltipAttribute.tooltip, setting.GetComponent<RectTransform>());                                    
+                    ShowTooltip(tooltipAttribute.tooltip, setting.GetComponent<RectTransform>());
                 }
             }
         }
