@@ -128,13 +128,14 @@ namespace ModularVehicleSimulator.Physics
         #endregion
 
         #region  Air Resistance
-        public static List<Vector2> GetCollidersCrossSectionPolygon(Collider[] colliders, Vector3 forwardDirection, Vector3 upDirection, Vector3 center)
+        public static void GetCollidersCrossSectionPolygon(Collider[] colliders, Vector3 forwardDirection, Vector3 upDirection, Vector3 center, List<Vector2> crossSectionBuffer)
         {
             forwardDirection.Normalize();
             (Vector3 u, Vector3 v) = Get2DBasisPlane(forwardDirection, upDirection);
             UpdateBoundingPoints(colliders, u, v, center);
             UpdateConvexHull();
-            return new List<Vector2>(convexHullBuffer);
+            crossSectionBuffer.Clear();
+            crossSectionBuffer.AddRange(convexHullBuffer);
         }
 
         public static float GetAreaOfConvexHull(List<Vector2> convexHull)

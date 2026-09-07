@@ -24,8 +24,7 @@ namespace ModularVehicleSimulator.Debugging
             if(!isDebuggingEnabled) return;
             if(airResistance == null) return;
 
-            List<Vector2> crossSection = airResistance.CrossSection;
-            if(crossSection.Count < 3) return;
+            if(airResistance.CrossSection != null && airResistance.CrossSection.Count < 3) return;
             if(vehicleController.ChassisRigidBody.linearVelocity.sqrMagnitude < 0.01f) return;
 
             Vector3 direction = (vehicleController.ChassisRigidBody.linearVelocity - Weather.Instance.WindVelocity).normalized;
@@ -35,10 +34,10 @@ namespace ModularVehicleSimulator.Debugging
 
             Gizmos.color = debugColor;
 
-            for (int i = 0; i < crossSection.Count; i++)
+            for (int i = 0; i < airResistance.CrossSection.Count; i++)
             {
-                Vector2 p1 = crossSection[i];
-                Vector2 p2 = crossSection[(i + 1) % crossSection.Count]; // Loop around to first vertex
+                Vector2 p1 = airResistance.CrossSection[i];
+                Vector2 p2 = airResistance.CrossSection[(i + 1) % airResistance.CrossSection.Count]; // Loop around to first vertex
 
                 // Un-project 2D points back into 3D world space
                 Vector3 worldP1 = center + (u * p1.x) + (v * p1.y);
