@@ -122,7 +122,8 @@ namespace ModularVehicleSimulator.Physics
 
         public static float ABSStepFunction(float brakeTorque, float oscillationSpeed)
         {
-            brakeTorque = Mathf.Sin(Time.deltaTime * oscillationSpeed) > 0f ? brakeTorque : 0f;
+            float angularFrequency = oscillationSpeed * 2f * Mathf.PI;
+            brakeTorque = Mathf.Sin(Time.fixedTime * angularFrequency) > 0f ? brakeTorque : 0f;
             return brakeTorque;
         }
         #endregion
