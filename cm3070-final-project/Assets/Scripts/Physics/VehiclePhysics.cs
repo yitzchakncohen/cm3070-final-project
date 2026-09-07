@@ -11,6 +11,10 @@ namespace ModularVehicleSimulator.Physics
         public const float RPM_TO_METERS_PER_SECOND = (2f * Mathf.PI) / 60f;
         public const float METERS_PER_SECOND_TO_KM_PER_HOUR = 3.6f;
         public const int SPHERE_SEGMENTS = 24;
+        // Shared buffers to avoid GC allocations during runtime
+        private static readonly List<Vector2> boundingPointsBuffer = new List<Vector2>();
+        private static readonly List<Vector2> convexHullBuffer = new List<Vector2>();
+        private static readonly List<Vector3> meshVerticesBuffer = new List<Vector3>();
 
         public static float GetVehicleSpeed(Wheel[] wheels, float radius)
         {
@@ -124,13 +128,13 @@ namespace ModularVehicleSimulator.Physics
         #endregion
 
         #region  Air Resistance
-        public static List<Vector2> GetCollidersCrossSectionPolygon(Collider[] colliders, Vector3 direction, Vector3 center)
+        public static List<Vector2> GetCollidersCrossSectionPolygon(Collider[] colliders, Vector3 forwardDirection, Vector3 upDirection, Vector3 center)
         {
-            direction = direction.normalized;
-            (Vector3 u, Vector3 v) = Get2DBasisPlane(direction);
-            List<Vector2> boundingPoints = GetBoundingPoints(colliders, u, v, center);
-            List<Vector2> convexHull = GetConvexHull(boundingPoints);
-            return convexHull;
+            forwardDirection.Normalize();
+            (Vector3 u, Vector3 v) = Get2DBasisPlane(forwardDirection, upDirection);
+            UpdateBoundingPoints(colliders, u, v, center);
+            UpdateConvexHull();
+            return new List<Vector2>(convexHullBuffer);
         }
 
         public static float GetAreaOfConvexHull(List<Vector2> convexHull)
@@ -149,9 +153,9 @@ namespace ModularVehicleSimulator.Physics
             return Mathf.Abs(area * 0.5f);
         }
 
-        private static List<Vector2> GetBoundingPoints(Collider[] colliders, Vector3 u, Vector3 v, Vector3 center)
+        private static void UpdateBoundingPoints(Collider[] colliders, Vector3 u, Vector3 v, Vector3 center)
         {
-            List<Vector2> boundingPoints = new List<Vector2>();
+            boundingPointsBuffer.Clear();
 
             foreach (Collider collider in colliders)
             {
@@ -160,73 +164,65 @@ namespace ModularVehicleSimulator.Physics
                 switch (collider)
                 {
                     case BoxCollider boxCollider:
-                        Vector3[] boxVertices = GetBoxVertices(boxCollider);
-                        boundingPoints.AddRange(ProjectPointsToPlane(boxVertices, u, v, center));
+                        AddBoxVertices(boxCollider, u, v, center);
                         break;
                     case SphereCollider sphereCollider:
-                        List<Vector3> sphereVertices = GetSphereVertices(sphereCollider, u, v);
-                        boundingPoints.AddRange(ProjectPointsToPlane(sphereVertices, u, v, center));
+                        AddSphereVertices(sphereCollider, u, v, center);
                         break;
                     case CapsuleCollider capsuleCollider:
-                        List<Vector3> capsuleVertices = GetCapsuleVertices(capsuleCollider, u, v);
-                        boundingPoints.AddRange(ProjectPointsToPlane(capsuleVertices, u, v, center));
+                        AddCapsuleVertices(capsuleCollider, u, v, center);
                         break;
                     case MeshCollider meshCollider:
-                        Vector3[] meshVertices = GetMeshVertices(meshCollider);
-                        boundingPoints.AddRange(ProjectPointsToPlane(meshVertices, u, v, center));
+                        AddMeshVertices(meshCollider, u, v, center);
                         break;
                 }
             }
-
-            return boundingPoints;
         }
 
         // Monotone Chain Algorithm
         // https://www.geeksforgeeks.org/dsa/convex-hull-monotone-chain-algorithm/
-        private static List<Vector2> GetConvexHull(List<Vector2> boundingPoints)
+        private static void UpdateConvexHull()
         {
-            if(boundingPoints.Count < 3) return boundingPoints;
+            convexHullBuffer.Clear();
+            if(boundingPointsBuffer.Count < 3) return;
 
-            List<Vector2> convexHull = new List<Vector2>();
             // Sort from left to right
-            boundingPoints.Sort((a, b) => a.x != b.x ? a.x.CompareTo(b.x) : a.y.CompareTo(b.y));
+            boundingPointsBuffer.Sort((a, b) => a.x != b.x ? a.x.CompareTo(b.x) : a.y.CompareTo(b.y));
 
             // Lower hull
-            foreach (Vector2 point in boundingPoints)
+            foreach (Vector2 point in boundingPointsBuffer)
             {
                 // Check Orientation
-                while(convexHull.Count >= 2 && 
-                        GetRelativeCrossProduct2D(convexHull[convexHull.Count -2], convexHull[convexHull.Count -1], point) <=0)
+                while(convexHullBuffer.Count >= 2 && 
+                        GetRelativeCrossProduct2D(convexHullBuffer[convexHullBuffer.Count -2], convexHullBuffer[convexHullBuffer.Count -1], point) <=0)
                 {
-                    convexHull.RemoveAt(convexHull.Count - 1);
+                    convexHullBuffer.RemoveAt(convexHullBuffer.Count - 1);
                 }
-                convexHull.Add(point);
+                convexHullBuffer.Add(point);
             }
 
             // Upper hull
-            int lowerHullBounds = convexHull.Count + 1;
-            for (int i = boundingPoints.Count - 2; i >= 0; i--)
+            int lowerHullBounds = convexHullBuffer.Count + 1;
+            for (int i = boundingPointsBuffer.Count - 2; i >= 0; i--)
             {
-                while(convexHull.Count >= lowerHullBounds && 
-                    GetRelativeCrossProduct2D(convexHull[convexHull.Count -2], convexHull[convexHull.Count -1], boundingPoints[i]) <= 0)
+                while(convexHullBuffer.Count >= lowerHullBounds && 
+                    GetRelativeCrossProduct2D(convexHullBuffer[convexHullBuffer.Count -2], convexHullBuffer[convexHullBuffer.Count -1], boundingPointsBuffer[i]) <= 0)
                 {
-                    convexHull.RemoveAt(convexHull.Count - 1);                    
+                    convexHullBuffer.RemoveAt(convexHullBuffer.Count - 1);                    
                 }
 
-                convexHull.Add(boundingPoints[i]);                    
+                convexHullBuffer.Add(boundingPointsBuffer[i]);                    
             }
 
             // Remove duplicate point
-            convexHull.RemoveAt(convexHull.Count - 1);
-
-            return convexHull;        
+            convexHullBuffer.RemoveAt(convexHullBuffer.Count - 1);
         }
 
-        public static (Vector3, Vector3) Get2DBasisPlane(Vector3 direction)
+        public static (Vector3, Vector3) Get2DBasisPlane(Vector3 forwardDirection, Vector3 upDirection)
         {
-            Vector3 referenceVector = GetPlaneReferenceVector(direction);
-            Vector3 u = Vector3.Cross(direction, referenceVector);
-            Vector3 v = Vector3.Cross(direction, u);
+            Vector3 referenceVector = forwardDirection.y > 0.99f  ? Vector3.forward : upDirection;
+            Vector3 u = Vector3.Cross(referenceVector, forwardDirection).normalized;
+            Vector3 v = Vector3.Cross(forwardDirection, u).normalized;
             return (u, v);
         }
 
@@ -235,37 +231,27 @@ namespace ModularVehicleSimulator.Physics
             return (a.x - origin.x) * (b.y - origin.y) - (a.y - origin.y) * (b.x - origin.x);
         }
 
-        private static Vector3 GetPlaneReferenceVector(Vector3 direction)
+        private static void AddBoxVertices(BoxCollider boxCollider, Vector3 u, Vector3 v, Vector3 center)
         {
-            if(direction.y > 0.99f)
+            Vector3 boxColliderHalfSize = boxCollider.size * 0.5f;
+            Vector3 boxColliderCenter = boxCollider.center;
+            // No GC allocation by using loops to add corner points.
+            for (int x = -1; x <= 1; x += 2) 
             {
-                return Vector3.forward;
+                for (int y = -1; y <= 1; y += 2)
+                {
+                    for (int z = -1; z <= 1; z += 2)
+                    {
+                        Vector3 localCorner = boxColliderCenter + new Vector3(x * boxColliderHalfSize.x, y * boxColliderHalfSize.y, z * boxColliderHalfSize.z);
+                        Vector3 worldPoint = boxCollider.transform.TransformPoint(localCorner);
+                        boundingPointsBuffer.Add(ProjectToPlane(worldPoint, u, v, center));
+                    }
+                }
             }
-            return Vector3.up;
         }
 
-        private static Vector3[] GetBoxVertices(BoxCollider boxCollider)
+        private static void AddSphereVertices(SphereCollider sphereCollider, Vector3 u, Vector3 v, Vector3 center)
         {
-            float halfSizeX = boxCollider.size.x / 2f;
-            float halfSizeY = boxCollider.size.y / 2f;
-            float halfSizeZ = boxCollider.size.z / 2f;
-            Vector3[] localCorners = new Vector3[8]
-            {
-                boxCollider.center + new Vector3(-halfSizeX, -halfSizeY, -halfSizeZ),
-                boxCollider.center + new Vector3(-halfSizeX, -halfSizeY,  halfSizeZ),
-                boxCollider.center + new Vector3(-halfSizeX,  halfSizeY, -halfSizeZ),
-                boxCollider.center + new Vector3(-halfSizeX,  halfSizeY,  halfSizeZ),
-                boxCollider.center + new Vector3( halfSizeX, -halfSizeY, -halfSizeZ),
-                boxCollider.center + new Vector3( halfSizeX, -halfSizeY,  halfSizeZ),
-                boxCollider.center + new Vector3( halfSizeX,  halfSizeY, -halfSizeZ),
-                boxCollider.center + new Vector3( halfSizeX,  halfSizeY,  halfSizeZ)
-            };
-            return Array.ConvertAll(localCorners, corner => boxCollider.transform.TransformPoint(corner));
-        }
-
-        private static List<Vector3> GetSphereVertices(SphereCollider sphereCollider, Vector3 u, Vector3 v)
-        {
-            List<Vector3> vertices = new List<Vector3>();
             Vector3 worldCenter = sphereCollider.transform.TransformPoint(sphereCollider.center);
             Vector3 lossyScale = sphereCollider.transform.lossyScale;
             
@@ -277,22 +263,21 @@ namespace ModularVehicleSimulator.Physics
             {
                 float angle = i * step;
                 Vector3 worldPoint = worldCenter + (u * Mathf.Cos(angle) + v * Mathf.Sin(angle)) * worldRadius;
-                vertices.Add(worldPoint);
+                boundingPointsBuffer.Add(ProjectToPlane(worldPoint, u, v, center));
             }
 
-            return vertices;
         }
 
-        private static List<Vector3> GetCapsuleVertices(CapsuleCollider capsuleCollider, Vector3 u, Vector3 v)
+        private static void AddCapsuleVertices(CapsuleCollider capsuleCollider, Vector3 u, Vector3 v, Vector3 center)
         {
-            List<Vector3> vertices = new List<Vector3>();
             Vector3 worldCenter = capsuleCollider.transform.TransformPoint(capsuleCollider.center);
             Vector3 lossyScale = capsuleCollider.transform.lossyScale;
             Vector3 capsuleAxis = CapsuleIntToDirection(capsuleCollider.transform, capsuleCollider.direction);
             
             float maxScale = Mathf.Max(Mathf.Abs(lossyScale.x), Mathf.Max(Mathf.Abs(lossyScale.y), Mathf.Abs(lossyScale.z)));
+            float dirScale = capsuleCollider.direction == 0 ? lossyScale.x : (capsuleCollider.direction == 1 ? lossyScale.y : lossyScale.z);
             float worldRadius = capsuleCollider.radius * maxScale;
-            float worldHeight = Mathf.Max(capsuleCollider.height * lossyScale[capsuleCollider.direction], worldRadius * 2f);
+            float worldHeight = Mathf.Max(capsuleCollider.height * dirScale, worldRadius * 2f);
             float cylinderHalfHeight = (worldHeight * 0.5f) - worldRadius;
             Vector3 topCapsuleCenter = worldCenter + capsuleAxis * cylinderHalfHeight;
             Vector3 bottomCapsuleCenter = worldCenter - capsuleAxis * cylinderHalfHeight;
@@ -304,30 +289,25 @@ namespace ModularVehicleSimulator.Physics
                 float angle = i * step;
                 Vector3 offset = (u * Mathf.Cos(angle) + v * Mathf.Sin(angle)) * worldRadius;
                 Vector3 point1 = topCapsuleCenter + offset;
-                vertices.Add(point1);
+                boundingPointsBuffer.Add(ProjectToPlane(point1, u, v, center));
                 Vector3 point2 = bottomCapsuleCenter + offset;
-                vertices.Add(point2);
+                boundingPointsBuffer.Add(ProjectToPlane(point2, u, v, center));
             }
-
-            return vertices;
         }
 
-        private static Vector3[] GetMeshVertices(MeshCollider meshCollider)
+        private static void AddMeshVertices(MeshCollider meshCollider, Vector3 u, Vector3 v, Vector3 center)
         {
             Mesh mesh = meshCollider.sharedMesh;
-            if(mesh == null) return Array.Empty<Vector3>();
+            if(mesh == null) return;
+            meshVerticesBuffer.Clear();
+            mesh.GetVertices(meshVerticesBuffer);
+            int count = meshVerticesBuffer.Count;
 
-            return Array.ConvertAll(mesh.vertices, point => meshCollider.transform.TransformPoint(point));
-        }
-
-        private static Vector2[] ProjectPointsToPlane(Vector3[] points, Vector3 u, Vector3 v, Vector3 center)
-        {
-            return Array.ConvertAll(points, point => ProjectToPlane(point, u, v, center));
-        }
-
-        private static Vector2[] ProjectPointsToPlane(List<Vector3> points, Vector3 u, Vector3 v, Vector3 center)
-        {
-            return Array.ConvertAll(points.ToArray(), point => ProjectToPlane(point, u, v, center));
+            for(int i = 0; i < count; i++)
+            {
+                Vector3 point = meshCollider.transform.TransformPoint(meshVerticesBuffer[i]);
+                boundingPointsBuffer.Add(ProjectToPlane(point, u, v, center));
+            }
         }
 
         private static Vector2 ProjectToPlane(Vector3 point, Vector3 u, Vector3 v, Vector3 center)
@@ -341,11 +321,11 @@ namespace ModularVehicleSimulator.Physics
             switch (integer)
             {
                 case 0:
-                    return transform.TransformPoint(Vector3.right).normalized;
+                    return transform.TransformDirection(Vector3.right).normalized;
                 case 1:
-                    return transform.TransformPoint(Vector3.up).normalized;
+                    return transform.TransformDirection(Vector3.up).normalized;
                 default:
-                    return transform.TransformPoint(Vector3.forward).normalized;
+                    return transform.TransformDirection(Vector3.forward).normalized;
             }
         }
         #endregion

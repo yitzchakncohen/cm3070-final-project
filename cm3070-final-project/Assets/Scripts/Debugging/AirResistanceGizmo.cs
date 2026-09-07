@@ -28,10 +28,10 @@ namespace ModularVehicleSimulator.Debugging
             if(crossSection.Count < 3) return;
             if(vehicleController.ChassisRigidBody.linearVelocity.sqrMagnitude < 0.01f) return;
 
-            Vector3 direction = vehicleController.ChassisRigidBody.linearVelocity.normalized;
+            Vector3 direction = (vehicleController.ChassisRigidBody.linearVelocity - Weather.Instance.WindVelocity).normalized;
             Vector3 center = vehicleController.ChassisRigidBody.worldCenterOfMass;
 
-            (Vector3 u, Vector3 v) = VehiclePhysics.Get2DBasisPlane(direction);
+            (Vector3 u, Vector3 v) = VehiclePhysics.Get2DBasisPlane(direction, vehicleController.ChassisRigidBody.transform.up);
 
             Gizmos.color = debugColor;
 
