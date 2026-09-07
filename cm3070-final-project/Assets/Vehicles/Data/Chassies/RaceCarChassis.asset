@@ -12,13 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7f1cdbaedb1eb74389bdcd0a39c77eb, type: 3}
   m_Name: RaceCarChassis
   m_EditorClassIdentifier: Assembly-CSharp::ChassisConfiguration
-  massInKG: 1510
+  massInKG: 1180
   wheelBaseInMeters: 2.45
   trackInMeters: 1.698
-  centerOfMassOffsetInMeters: {x: 0, y: 0.418, z: 0.243049}
+  centerOfMassOffsetInMeters: {x: 0, y: 0.25, z: 0.05}
   numberOfWheels: 4
-  groundClearance: 0.146
-  dragCoefficient: 0.31
-  liftCoefficient: -0.15
-  frontLiftRatio: 0.45
+  groundClearance: 0.06
+  dragCoefficient: 0.42
+  liftCoefficient: -1.2
+  frontLiftRatio: 0.48
   chassisMaterial: {fileID: 13400000, guid: f036cf55b83d5274aa72099b7ffb2f50, type: 2}

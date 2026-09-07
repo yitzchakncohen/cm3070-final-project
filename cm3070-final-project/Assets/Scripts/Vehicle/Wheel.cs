@@ -75,7 +75,7 @@ namespace ModularVehicleSimulator.Vehicle
 
         private void FixedUpdate()
         {
-            ApplyDeflection();
+            // ApplyDeflection(); // Not Stable
             UpdateSurfaceMaterial();
             UpdateTireFriction(currentDeflection);
             UpdateWheelAngles();

@@ -26,7 +26,7 @@ namespace ModularVehicleSimulator.UI.VehicleSettings
         private Action<Vector3> onVector3ValueChanged = null;
         private Action<object> onEnumValueChanged = null;
         private Action<List<GearRatio>> onGearRatioListValueChanged = null;
-        private const string NUMERICAL_REGEX_STRING = @"[^0-9.]";
+        private const string NUMERICAL_REGEX_STRING = @"[^0-9.-]";
 
         private void Start()
         {
