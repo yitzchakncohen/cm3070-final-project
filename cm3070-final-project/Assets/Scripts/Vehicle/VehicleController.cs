@@ -166,7 +166,7 @@ namespace ModularVehicleSimulator.Vehicle
 
         private void UpdateTransmission()
         {
-            engineRPM = currentGear == 0 ? 0 : engine.RPM;
+            engineRPM = currentGear == 0 ? 0 : Mathf.Abs(engine.RPM);
             autoShiftTimer += Time.deltaTime;
 
             if(!vehicleConfiguration.Engine.IsAutomaticTransmision) return;

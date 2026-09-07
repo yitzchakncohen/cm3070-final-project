@@ -6,11 +6,14 @@ using System;
 using ModularVehicleSimulator.Vehicle;
 using System.Collections.Generic;
 using ModularVehicleSimulator.Vehicle.Data;
+using UnityEngine.EventSystems;
 
 namespace ModularVehicleSimulator.UI.VehicleSettings
 {
-    public class VehicleSetting : MonoBehaviour
+    public class VehicleSetting : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
+        public event Action<VehicleSetting> OnEnter;
+        public event Action<VehicleSetting> OnExit;
         [SerializeField] private TMP_Text settingName;
         [SerializeField] private TMP_InputField floatValueInput;
         [SerializeField] private Toggle boolValueToggle;
@@ -160,6 +163,16 @@ namespace ModularVehicleSimulator.UI.VehicleSettings
         private void GearRatioList_OnValueChanged(List<GearRatio> list)
         {
             onGearRatioListValueChanged.Invoke(list);
+        }
+
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            OnEnter?.Invoke(this);
+        }
+
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            OnExit?.Invoke(this);
         }
     }
 }

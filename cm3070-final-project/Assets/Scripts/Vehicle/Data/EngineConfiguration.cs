@@ -12,22 +12,37 @@ namespace ModularVehicleSimulator.Vehicle.Data
         public float MaxRPM => maxRPM;
         public float MinAutoShiftTime => minAutomaticTransmissionShiftTime;
         public bool IsAutomaticTransmision => isAutomaticTransmision;
+        [Tooltip("Gas or electric vehicle (EV).")]
         [SerializeField] private EngineType engineType;
+        [Tooltip("Drive gears change automatically \nas RPM reaches max or idle.")]
         [SerializeField] private bool isAutomaticTransmision = true;
+        [Tooltip("Minimum time between \nautomatic gear shifting.")]
         [SerializeField] private float minAutomaticTransmissionShiftTime = 1.0f;
+        [Tooltip("Momemntum of the rotating engine \ncomponents (or simulated intertia in an EV)")]
         [SerializeField] private float inertiaInKgSquareMeters = 0.2f;
         [Header("Torque Curve")]
+        [Tooltip("The engines rotations per minute (RPM) at idle.")]
         [SerializeField] private float idleRPM = 800f;
+        [Tooltip("The RPM of the engine at maximum torque.")]
         [SerializeField] private float peakTorqueRPM = 5000f;
+        [Tooltip("The maximum RPM the engine \ncan achieve (i.e engine creep).")]
         [SerializeField] private float maxRPM = 6800f;
+        [Tooltip("The maximum amount of torque \nthe engine can produce.")]
         [SerializeField] private float peakTorqueInNewtonMeters = 344f;
+        [Tooltip("The ratio of toqure between \npeak output and idle.")]
         [SerializeField] private float idleTorqueMultiplier = 0.70f;
+        [Tooltip("The ratio of toqure between \npeak output and maximum RPM.")]
         [SerializeField] private float maxTorqueMultiplier = 0.82f;
+        [Tooltip("The curve produced by the above \nfields where x is RPM and y is torque.")]
         [SerializeField] private AnimationCurve torqueCurve;
         [Header("Friction Curve")]
+        [Tooltip("The minimum friction produced by \nthe engine (i.e. engine braking)")]
         [SerializeField] private float minFrictionInNewtonMeters = 15f;
+        [Tooltip("The friction produced by the \nengine at maximum torque.")]
         [SerializeField] private float peakTorqueFrictionInNewtonMeters = 30f;
+        [Tooltip("The friction produced by the \nengine at maximum RPM.")]
         [SerializeField] private float maxRPMFrictionInNewtonMeters = 42f;
+        [Tooltip("The curve produced by the above fields \nwhere x is RPM and y is friction.")]
         [SerializeField] private AnimationCurve frictionCurve;
 
         public float GetTorque(float currentRPM)

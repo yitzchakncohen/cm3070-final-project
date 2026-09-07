@@ -6,11 +6,13 @@ using ModularVehicleSimulator.Vehicle;
 using ModularVehicleSimulator.Vehicle.Data;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace ModularVehicleSimulator.UI.VehicleSettings
 {
     public class VehicleSettingsMenu : MonoBehaviour
     {
+        private const float TOOL_TIP_SCREEN_BUFFER = 20f;
         public event Action OnUpdateField;
         [SerializeField] private VehicleConfiguration vehicleConfiguration;
         [SerializeField] private VehicleSettingsGroup groupPrefab;
@@ -19,10 +21,14 @@ namespace ModularVehicleSimulator.UI.VehicleSettings
         [SerializeField] private Transform columnsContainer;
         [SerializeField] private TMP_Text subtitle;
         [SerializeField] private int columnRowMax = 8;
-        
+        [SerializeField] private RectTransform toolTip;
+        private TMP_Text toolTipText;
+        private Dictionary<VehicleSetting, FieldInfo> globalSettingsList = new Dictionary<VehicleSetting, FieldInfo>();
         private void Awake()
         {
             GenerateUI();
+            toolTipText = toolTip.GetComponentInChildren<TMP_Text>();
+            HideTooltip();
         }
 
         public void UpdateVehicle(VehicleConfiguration newVehicleConfiguration)
@@ -31,9 +37,25 @@ namespace ModularVehicleSimulator.UI.VehicleSettings
             GenerateUI();
         }
 
+        private void OnDestroy()
+        {
+            foreach (VehicleSetting setting in globalSettingsList.Keys)
+            {
+                setting.OnEnter -= VehicleSetting_OnEnter;
+                setting.OnExit -= VehicleSetting_OnExit;
+            }
+        }
+
         [ContextMenu("Generate UI")]
         public void GenerateUI()
         {
+            foreach (VehicleSetting setting in globalSettingsList.Keys)
+            {
+                setting.OnEnter -= VehicleSetting_OnEnter;
+                setting.OnExit -= VehicleSetting_OnExit;
+            }
+            globalSettingsList.Clear(); 
+
             subtitle.text = vehicleConfiguration.Name;
             for (int i = 0; i < columnsContainer.childCount; i++)
             {
@@ -70,6 +92,7 @@ namespace ModularVehicleSimulator.UI.VehicleSettings
                     VehicleSetting vehicleSetting = Instantiate(settingPrefab);
                     vehicleSetting.Init(CamelCaseToName(setting.Key.Name), setting.Value, UpdateField(group.Value.ScriptableObject, setting, OnUpdateField));
                     settingsList.Add(vehicleSetting);
+                    AddToGlobalList(setting.Key, vehicleSetting);
                     columnRowCount++;
                 }
                 foreach (KeyValuePair<FieldInfo, bool> setting in group.Value.BoolSettings)
@@ -77,6 +100,7 @@ namespace ModularVehicleSimulator.UI.VehicleSettings
                     VehicleSetting vehicleSetting = Instantiate(settingPrefab);
                     vehicleSetting.Init(CamelCaseToName(setting.Key.Name), setting.Value, UpdateField(group.Value.ScriptableObject, setting, OnUpdateField));
                     settingsList.Add(vehicleSetting);
+                    AddToGlobalList(setting.Key, vehicleSetting);
                     columnRowCount++;
                 }
                 foreach (KeyValuePair<FieldInfo, EngineType> setting in group.Value.EngineTypeSettings)
@@ -84,6 +108,7 @@ namespace ModularVehicleSimulator.UI.VehicleSettings
                     VehicleSetting vehicleSetting = Instantiate(settingPrefab);
                     vehicleSetting.Init(CamelCaseToName(setting.Key.Name), setting.Value, UpdateEnumField<EngineType>(group.Value.ScriptableObject, setting.Key, OnUpdateField));
                     settingsList.Add(vehicleSetting);
+                    AddToGlobalList(setting.Key, vehicleSetting);
                     columnRowCount++;
                 }
                 foreach (KeyValuePair<FieldInfo, List<GearRatio>> setting in group.Value.GearRatioSettings)
@@ -91,6 +116,7 @@ namespace ModularVehicleSimulator.UI.VehicleSettings
                     VehicleSetting vehicleSetting = Instantiate(settingPrefab);
                     vehicleSetting.Init(CamelCaseToName(setting.Key.Name), setting.Value, UpdateField(group.Value.ScriptableObject, setting, OnUpdateField));
                     settingsList.Add(vehicleSetting);
+                    AddToGlobalList(setting.Key, vehicleSetting);
                     columnRowCount++;
                 }
                 foreach (KeyValuePair<FieldInfo, Vector3> setting in group.Value.Vector3Settings)
@@ -98,10 +124,18 @@ namespace ModularVehicleSimulator.UI.VehicleSettings
                     VehicleSetting vehicleSetting = Instantiate(settingPrefab);
                     vehicleSetting.Init(CamelCaseToName(setting.Key.Name), setting.Value, UpdateField(group.Value.ScriptableObject, setting, OnUpdateField));
                     settingsList.Add(vehicleSetting);
+                    AddToGlobalList(setting.Key, vehicleSetting);
                     columnRowCount++;
                 }
-                vehicleSettingsGroup.Init(CamelCaseToName(group.Key) ,settingsList);
+                vehicleSettingsGroup.Init(CamelCaseToName(group.Key), settingsList);
             }
+        }
+
+        private void AddToGlobalList(FieldInfo fieldInfo, VehicleSetting vehicleSetting)
+        {
+            vehicleSetting.OnEnter += VehicleSetting_OnEnter;
+            vehicleSetting.OnExit += VehicleSetting_OnExit;
+            globalSettingsList.Add(vehicleSetting, fieldInfo);
         }
 
         private static Action<T> UpdateField<T>(ScriptableObject scriptableObject, KeyValuePair<FieldInfo, T> setting, Action updateFieldevent)
@@ -134,7 +168,6 @@ namespace ModularVehicleSimulator.UI.VehicleSettings
             // Insert space between lowercase/digit and uppercase
             result = Regex.Replace(result, @"(?<=[a-z0-9])(?=[A-Z])", " ");
 
-
             // Capitalize the first character
             return char.ToUpper(result[0]) + result.Substring(1);
         }
@@ -149,6 +182,59 @@ namespace ModularVehicleSimulator.UI.VehicleSettings
             text = text.Replace("PerMeter", " per m");
             text = text.Replace("InDegreesPerSecond", " [deg/s]");
             return text;
+        }
+
+        private void HideTooltip()
+        {
+            if (toolTip != null) toolTip.gameObject.SetActive(false);
+        }
+
+        private void ShowTooltip(string text, RectTransform rectTransform)
+        {
+            toolTip.pivot = new Vector2(0f, 0f);
+            toolTip.anchorMin = new Vector2(0f, 0f);
+            toolTip.anchorMax = new Vector2(0f, 0f);
+            toolTipText.text = text;
+            toolTip.gameObject.SetActive(true);
+            LayoutRebuilder.ForceRebuildLayoutImmediate(toolTip);
+            ClampToScreen(toolTip, rectTransform);
+        }
+
+        private void VehicleSetting_OnEnter(VehicleSetting setting)
+        {
+            if(globalSettingsList.ContainsKey(setting))
+            {
+                TooltipAttribute tooltipAttribute = globalSettingsList[setting].GetCustomAttribute<TooltipAttribute>();
+                if(tooltipAttribute != null)
+                {
+                    ShowTooltip(tooltipAttribute.tooltip, setting.GetComponent<RectTransform>());                                    
+                }
+            }
+        }
+
+        private void VehicleSetting_OnExit(VehicleSetting setting)
+        {
+            HideTooltip();
+        }
+
+        private void ClampToScreen(RectTransform rectTransform, RectTransform targetRectTransform)
+        {
+            // Vertically based on setting position. 
+            Vector3 currentPos = targetRectTransform.position;
+            float yOffset = targetRectTransform.rect.height * targetRectTransform.lossyScale.y;
+            currentPos.y += yOffset;
+
+            // Horizontally within the screen space.
+            float tooltipWidth = rectTransform.rect.width * rectTransform.lossyScale.x;
+            float xOffset = tooltipWidth / 2f;
+            currentPos.x -= xOffset;
+            // With pivot at (0,0), currentPos.x is the left edge of the tooltip
+            float minX = TOOL_TIP_SCREEN_BUFFER;
+            float maxX = Screen.width - tooltipWidth - TOOL_TIP_SCREEN_BUFFER;
+
+            currentPos.x = Mathf.Clamp(currentPos.x, minX, maxX);
+
+            rectTransform.position = currentPos;
         }
     }
 }
