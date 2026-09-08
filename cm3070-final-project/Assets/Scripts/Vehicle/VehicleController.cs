@@ -26,6 +26,7 @@ namespace ModularVehicleSimulator.Vehicle
         [SerializeField] private Rigidbody chassisRigidBody;
         [SerializeField] private Transform chassisModel;
         [SerializeField] private CameraController cameraController;
+        [SerializeField] private LayerMask groundLayerMask;
         private Wheel[] wheels;
         private Engine engine;
         private Brake brake;
@@ -51,7 +52,8 @@ namespace ModularVehicleSimulator.Vehicle
                         vehicleConfiguration.Suspension,
                         vehicleConfiguration.Chassis,
                         vehicleConfiguration.DriveTrain,
-                        chassisRigidBody
+                        chassisRigidBody,
+                        groundLayerMask
                     );
             }
             engine = GetComponent<Engine>();

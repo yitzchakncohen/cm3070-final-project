@@ -40,11 +40,11 @@ namespace ModularVehicleSimulator.Vehicle
 
             foreach (Wheel wheel in wheels)
             {
-                if(wheel.IsLeft && wheel.IsGrounded())
+                if(wheel.IsLeft && wheel.IsGrounded)
                 {
                     chassisRigidBody.AddForceAtPosition(wheel.transform.up * -antiRollForce, wheel.transform.position);
                 }
-                else if(wheel.IsRight && wheel.IsGrounded())
+                else if(wheel.IsRight && wheel.IsGrounded)
                 {
                     chassisRigidBody.AddForceAtPosition(wheel.transform.up * antiRollForce, wheel.transform.position);
                 }

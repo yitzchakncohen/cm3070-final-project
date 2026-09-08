@@ -202,6 +202,9 @@ MonoBehaviour:
   chassisRigidBody: {fileID: 1611960791474144282}
   chassisModel: {fileID: 163573672587749733}
   cameraController: {fileID: 2636226642717632943}
+  groundLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
 --- !u!114 &184680343560197519
 MonoBehaviour:
   m_ObjectHideFlags: 0

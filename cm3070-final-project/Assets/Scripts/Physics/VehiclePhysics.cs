@@ -44,16 +44,16 @@ namespace ModularVehicleSimulator.Physics
             return verticalForce / stiffness;
         }
 
-        public static float GetSidewaysFriction(WheelFrictionCurve curve, float slip, ref WheelHit hit)
+        public static float GetSidewaysFriction(WheelFrictionCurve curve, float slip, float normalLoad)
         {
             float sidewaysFrictionCoefficient = EvaluateFrictionCurve(curve, slip);
-            return sidewaysFrictionCoefficient * hit.force * Mathf.Sign(hit.sidewaysSlip);
+            return sidewaysFrictionCoefficient * normalLoad * Mathf.Sign(slip);
         }
 
-        public static float GetForwardFriction(WheelFrictionCurve curve, float slip, ref WheelHit hit)
+        public static float GetForwardFriction(WheelFrictionCurve curve, float slip, float normalLoad)
         {
             float forwardFrictionCoefficient = EvaluateFrictionCurve(curve, slip);
-            return forwardFrictionCoefficient * hit.force * Mathf.Sign(hit.forwardSlip);
+            return forwardFrictionCoefficient * normalLoad * Mathf.Sign(slip);
         }
 
         private static float EvaluateFrictionCurve(WheelFrictionCurve curve, float slip)
@@ -80,6 +80,17 @@ namespace ModularVehicleSimulator.Physics
             {
                 return curve.asymptoteValue;
             }
+        }
+
+        public static float GetSpringDamperForce(Vector3 wheelVelocity, Vector3 springDirection, float springDelta, JointSpring jointSpring)
+        {
+            // Hook's Law Fs = -kx
+            // Damping Force Fd = -bv
+            float springForce = -jointSpring.spring * springDelta;
+            float springVelocity = Vector3.Dot(springDirection, wheelVelocity);
+            float dampingForce = springVelocity * jointSpring.damper;
+            float totalForce = Mathf.Max(0, springForce - dampingForce);
+            return totalForce;
         }
         #endregion
 

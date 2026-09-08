@@ -18,7 +18,7 @@ namespace ModularVehicleSimulator.Vehicle.Data
         [Tooltip("The damping value of the suspension hydraulic damping.")]
         [SerializeField] private float damper = 3000f;
         
-        public JointSpring GetFrontSuspectionSpring(float targetPosition)
+        public JointSpring GetFrontSuspensionSpring(float targetPosition)
         {
             return new JointSpring
             {
@@ -28,7 +28,7 @@ namespace ModularVehicleSimulator.Vehicle.Data
             };
         }
 
-        public JointSpring GetBackSuspectionSpring(float targetPosition)
+        public JointSpring GetRearSuspensionSpring(float targetPosition)
         {
             return new JointSpring
             {
