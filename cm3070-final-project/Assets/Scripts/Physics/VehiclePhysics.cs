@@ -86,7 +86,7 @@ namespace ModularVehicleSimulator.Physics
         {
             // Hook's Law Fs = -kx
             // Damping Force Fd = -bv
-            float springForce = -jointSpring.spring * springDelta;
+            float springForce = jointSpring.spring * springDelta;
             float springVelocity = Vector3.Dot(springDirection, wheelVelocity);
             float dampingForce = springVelocity * jointSpring.damper;
             float totalForce = Mathf.Max(0, springForce - dampingForce);

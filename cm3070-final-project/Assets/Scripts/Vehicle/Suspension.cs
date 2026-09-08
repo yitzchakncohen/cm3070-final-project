@@ -33,18 +33,21 @@ namespace ModularVehicleSimulator.Vehicle
         public void ApplySpringDamperForce(RaycastHit raycastHit)
         {
             Vector3 wheelVelocity = chassisRigidBody.GetPointVelocity(transform.position);
-            float currentSpringLength = raycastHit.distance - wheelConfiguration.Radius;
+            float currentSpringLength = raycastHit.distance;
             springDelta = suspensionConfiguration.Distance - currentSpringLength;
             float normalizedSpringDelta = Mathf.Clamp01(springDelta / suspensionConfiguration.Distance);
 
-            JointSpring jointSpring = isFront ? suspensionConfiguration.GetFrontSuspensionSpring(0) : suspensionConfiguration.GetRearSuspensionSpring(0);
-            float suspensionForce = VehiclePhysics.GetSpringDamperForce(wheelVelocity, transform.up, springDelta, jointSpring);
-            float alignmentAngle  = Mathf.Clamp01(Vector3.Dot(transform.up, raycastHit.normal));
-            normalLoad = suspensionForce * alignmentAngle;
+            if(springDelta > 0)
+            {
+                JointSpring jointSpring = isFront ? suspensionConfiguration.GetFrontSuspensionSpring(0) : suspensionConfiguration.GetRearSuspensionSpring(0);
+                float suspensionForce = VehiclePhysics.GetSpringDamperForce(wheelVelocity, transform.up, springDelta, jointSpring);
+                float alignmentAngle  = Mathf.Clamp01(Vector3.Dot(transform.up, raycastHit.normal));
+                normalLoad = suspensionForce * alignmentAngle;
 
-            // Apply force from suspension
-            Vector3 forcePosition = transform.position - (transform.up * GetForceAppPointDistance());
-            chassisRigidBody.AddForceAtPosition(transform.up * suspensionForce, forcePosition);
+                // Apply force from suspension
+                Vector3 forcePosition = transform.position - (transform.up * GetForceAppPointDistance());
+                chassisRigidBody.AddForceAtPosition(transform.up * suspensionForce, forcePosition);     
+            }
         }
 
         private float GetForceAppPointDistance()

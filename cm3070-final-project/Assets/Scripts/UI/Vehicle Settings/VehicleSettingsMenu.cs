@@ -196,10 +196,8 @@ namespace ModularVehicleSimulator.UI.VehicleSettings
             ref int groupsPerGroup, 
             string baseGroupName)
         {
-            Debug.Log(baseGroupName + " | columnRowCount: " + columnRowCount);
             if (columnRowCount >= columnRowMax)
             {
-                Debug.Log(groupSettingsList.Count);
                 if (groupSettingsList.Count > 0)
                 {
                     string title = groupsPerGroup > 1 ? $"{baseGroupName} {groupsPerGroup}" : baseGroupName;

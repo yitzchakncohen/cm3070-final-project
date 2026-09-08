@@ -187,11 +187,10 @@ namespace ModularVehicleSimulator.Vehicle
 
         private void UpdateWheelAngles()
         {
-            Quaternion rotation = Quaternion.identity;
             float targetAngle = IsLeft ? leftSteeringAngle : rightSteeringAngle;
             steerAngle = targetAngle;
             wheelModel.position = transform.position - suspension.Offset * transform.up;
-            wheelModel.rotation = rotation;
+            wheelModel.localRotation = Quaternion.Euler(0f, steerAngle, 0f);
         }
 
         private void ApplyDeflection()
@@ -254,27 +253,52 @@ namespace ModularVehicleSimulator.Vehicle
 
         private RaycastHit CheckIsGrounded()
         {
-            float maxDistance = suspensionConfiguration.Distance + wheelConfiguration.Radius;
+            // Offset the origin upwards to keep the cast start point above ground level
+            float raycastOffset = wheelConfiguration.Radius * 2.0f; // e.g., offset by wheel diameter
+            Vector3 origin = transform.position + (transform.up * raycastOffset);
+            float maxDistance = suspensionConfiguration.Distance + raycastOffset;
+
             isGrounded = UnityEngine.Physics.SphereCast(
-                transform.position,
+                origin,
                 wheelConfiguration.Radius,
                 -transform.up,
                 out RaycastHit hit,
                 maxDistance,
                 groundLayerMask
             );
-            Debug.Log(isGrounded);
+
+            if (isGrounded)
+            {
+                // Correct distance to account for the raised origin
+                hit.distance = Mathf.Max(0f, hit.distance - raycastOffset);
+                Debug.Log($"isGrounded {hit.collider.name}");
+            }
+
             return hit;
         }
 
 
         private void OnDrawGizmos()
         {
-            if(wheelConfiguration != null)
-            {
-                Gizmos.color = Color.aquamarine;
-                Gizmos.DrawWireSphere(transform.position, wheelConfiguration.Radius);                
-            }
+            if (wheelConfiguration == null || suspensionConfiguration == null) return;
+
+            Gizmos.color = isGrounded ? Color.aquamarine : Color.orangeRed;
+
+            float radius = wheelConfiguration.Radius;
+            float maxDistance = suspensionConfiguration.Distance;
+
+            // Start point of sphere
+            Vector3 startCenter = transform.position;
+            // End point of sphere at full suspension extension
+            Vector3 endCenter = transform.position - (transform.up * maxDistance);
+
+            // Draw top and bottom spheres of the sweep
+            Gizmos.DrawWireSphere(startCenter, radius);
+            Gizmos.DrawWireSphere(endCenter, radius);
+
+            // Connect them with lines to show the cast trajectory
+            Gizmos.DrawLine(startCenter + transform.right * radius, endCenter + transform.right * radius);
+            Gizmos.DrawLine(startCenter - transform.right * radius, endCenter - transform.right * radius);
         }
     }
 }
