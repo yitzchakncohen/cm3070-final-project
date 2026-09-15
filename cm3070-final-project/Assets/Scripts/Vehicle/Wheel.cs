@@ -13,7 +13,7 @@ namespace ModularVehicleSimulator.Vehicle
         public const float EFFECTIVE_SLIP_THRESHHOLD = 0.15f;
         public const float SPEEDOMETER_SLIP_THRESHHOLD_MULTIPLIER = .50f;
         public const float FX_SLIP_THRESHHOLD_MULTIPLIER = 7.5f;
-        public const string TIRES_LAYER = "Tag";
+        public const string TIRES_LAYER = "Tires";
         public Vector3 WheelFriction => GetWheelFrictionVector();
         public Vector3 WheelContactPoint => GetWheelContactPoint();
         public float SteerAngle => steerAngle;
@@ -44,6 +44,7 @@ namespace ModularVehicleSimulator.Vehicle
         private float rightSteeringAngle = 0f;
         private float leftSteeringAngle = 0f;
         private float steerAngle = 0f;
+        private float drivingAngle = 0f;
         private float currentDeflection = 0f;
         private float nominalDeflection = 0.02f;
         private float brakeTorque = 0f;
@@ -87,15 +88,12 @@ namespace ModularVehicleSimulator.Vehicle
         private void FixedUpdate()
         {
             lastGroundHit = CheckIsGrounded();
-            if(isGrounded)
-            {
-                suspension.ApplySpringDamperForce(lastGroundHit);               
-                surfaceMaterial = lastGroundHit.collider.sharedMaterial;
-            }
+            UpdateSurfaceMaterial();
             ApplyDeflection();
             UpdateWheelAngles();
+            Vector3 forceAppPoint = transform.position - (transform.up * GetForceAppPointDistance());
             tire.UpdateFriction(currentDeflection, nominalDeflection, surfaceMaterial ? surfaceMaterial.dynamicFriction : 1.0f);
-            tire.ApplyFriction(lastGroundHit, SteerAngle, motorTorque, brakeTorque, suspension.NormalLoad); 
+            tire.ApplyFriction(lastGroundHit, forceAppPoint, SteerAngle, motorTorque, brakeTorque, suspension.NormalLoad);
         }
 
         public void Steer(float leftSteeringAngle, float rightSteeringAngle)
@@ -104,9 +102,8 @@ namespace ModularVehicleSimulator.Vehicle
             this.leftSteeringAngle = leftSteeringAngle;
         }
 
-        public void Accelerate(float motorTorque, float brakeTorque = 0f)
+        public void Accelerate(float motorTorque)
         {
-            this.brakeTorque = brakeTorque;
             this.motorTorque = motorTorque;    
         }
 
@@ -135,15 +132,7 @@ namespace ModularVehicleSimulator.Vehicle
 
         public float GetAverageForwardSlip()
         {
-            float slip = 0f;
-            int colliders = 0;
-            float colliderSlip = GetForwardSlip();
-            if(colliderSlip < Mathf.Infinity)
-            {
-                colliders++;
-                slip += colliderSlip;
-            }
-            return slip / colliders;
+            return tire.ForwardSlip < Mathf.Infinity ? tire.ForwardSlip : 0f;
         }
 
         public float GetTravel()
@@ -161,36 +150,36 @@ namespace ModularVehicleSimulator.Vehicle
 
         private float GetRPM(float slipThreshhold)
         {
-            float vehicleForwardSlip = GetForwardSlip();
-            if (Mathf.Abs(vehicleForwardSlip) < slipThreshhold)
+            if (Mathf.Abs(tire.ForwardSlip) < slipThreshhold)
             {
                 return tire.RPM;
             }
             return 0f;
         }
 
-        private float GetForwardSlip()
+        private void UpdateSurfaceMaterial()
         {
-            float steerAngleRad = steerAngle * Mathf.Deg2Rad;
-            float vehicleForwardSlip = tire.ForwardSlip * Mathf.Cos(steerAngleRad) - tire.SidewaysSlip * Mathf.Sin(steerAngleRad);
-
-            return vehicleForwardSlip;
-        }
-
-        private float GetSidewaysSlip()
-        {
-            float steerAngleRad = steerAngle * Mathf.Deg2Rad;
-            float vehicleSidewaysSlip = tire.SidewaysSlip * Mathf.Cos(steerAngleRad) + tire.ForwardSlip * Mathf.Sin(steerAngleRad);
-
-            return vehicleSidewaysSlip;
+            if (isGrounded)
+            {
+                float forceAppPointDistance = GetForceAppPointDistance();
+                suspension.ApplySpringDamperForce(lastGroundHit,forceAppPointDistance);
+                surfaceMaterial = lastGroundHit.collider.sharedMaterial;
+            }
+            else
+            {
+                surfaceMaterial = null;
+            }
         }
 
         private void UpdateWheelAngles()
         {
             float targetAngle = IsLeft ? leftSteeringAngle : rightSteeringAngle;
             steerAngle = targetAngle;
+            // Convert RPM to degrees per second.
+            drivingAngle = (drivingAngle + RPM * (360f / 60f) * Time.fixedDeltaTime) % 360f;
             wheelModel.position = transform.position - suspension.Offset * transform.up;
-            wheelModel.localRotation = Quaternion.Euler(0f, steerAngle, 0f);
+            // Use quaternions to ensure rotations do not effect each other.
+            wheelModel.localRotation = Quaternion.Euler(0f, steerAngle, 0f) * Quaternion.Euler(drivingAngle, 0f, 0f);
         }
 
         private void ApplyDeflection()
@@ -251,10 +240,20 @@ namespace ModularVehicleSimulator.Vehicle
             return contactPoint;
         }
 
+        private float GetForceAppPointDistance()
+        {
+            if(chassisConfiguration == null || chassisRigidBody == null) return 0f;
+            Vector3 wheelLocalPosition = chassisRigidBody.transform.InverseTransformPoint(transform.position);
+            float wheelOffsetFromGround = wheelConfiguration.Radius;
+            float offsetFromGroundToCenterOfMass = chassisConfiguration.CenterOfMass.y - wheelLocalPosition.y + wheelOffsetFromGround;
+            float offsetDistance = offsetFromGroundToCenterOfMass - suspensionConfiguration.ForceAppPointOffset;
+            return Mathf.Max(0f, offsetDistance);
+        }
+
         private RaycastHit CheckIsGrounded()
         {
             // Offset the origin upwards to keep the cast start point above ground level
-            float raycastOffset = wheelConfiguration.Radius * 2.0f; // e.g., offset by wheel diameter
+            float raycastOffset = wheelConfiguration.Radius * 2.0f;
             Vector3 origin = transform.position + (transform.up * raycastOffset);
             float maxDistance = suspensionConfiguration.Distance + raycastOffset;
 
@@ -271,34 +270,9 @@ namespace ModularVehicleSimulator.Vehicle
             {
                 // Correct distance to account for the raised origin
                 hit.distance = Mathf.Max(0f, hit.distance - raycastOffset);
-                Debug.Log($"isGrounded {hit.collider.name}");
             }
 
             return hit;
-        }
-
-
-        private void OnDrawGizmos()
-        {
-            if (wheelConfiguration == null || suspensionConfiguration == null) return;
-
-            Gizmos.color = isGrounded ? Color.aquamarine : Color.orangeRed;
-
-            float radius = wheelConfiguration.Radius;
-            float maxDistance = suspensionConfiguration.Distance;
-
-            // Start point of sphere
-            Vector3 startCenter = transform.position;
-            // End point of sphere at full suspension extension
-            Vector3 endCenter = transform.position - (transform.up * maxDistance);
-
-            // Draw top and bottom spheres of the sweep
-            Gizmos.DrawWireSphere(startCenter, radius);
-            Gizmos.DrawWireSphere(endCenter, radius);
-
-            // Connect them with lines to show the cast trajectory
-            Gizmos.DrawLine(startCenter + transform.right * radius, endCenter + transform.right * radius);
-            Gizmos.DrawLine(startCenter - transform.right * radius, endCenter - transform.right * radius);
         }
     }
 }

@@ -78,15 +78,6 @@ namespace ModularVehicleSimulator.Vehicle
             UpdateTransmission();
         }
 
-        private void FixedUpdate()
-        {
-            // Parking Break
-            if(currentGear == (int)Gear.Park)
-            {
-                Brake(1f, 0f);
-            }
-        }
-
         public void Reset()
         {
             engine.Reset();
@@ -118,6 +109,11 @@ namespace ModularVehicleSimulator.Vehicle
 
         public void Brake(float brakeInput, float accelerationInput)
         {
+            // Parking Break
+            if(currentGear == (int)Gear.Park)
+            {
+                brakeInput = 1f;
+            }
             brake.ApplyForce(brakeInput, accelerationInput, currentTargetSteeringAngle);
         }
 

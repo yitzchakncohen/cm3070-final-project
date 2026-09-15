@@ -79,7 +79,7 @@ namespace ModularVehicleSimulator.Vehicle
             float effectiveRigidity = driveTrain.Rigidity * Mathf.Abs(driveTrain.GetRatioForGear(gear));
             float torqueFromWheels = rpmDelta * effectiveRigidity * Time.fixedDeltaTime / RAD_SEC_TO_RPM;
 
-            // Calcultae Engine Momentum
+            // Calculate Engine Momentum
             float netTorque = netEngineTorque - torqueFromWheels;
             float angularAcceleration = netTorque / engineConfiguration.Inertia;
 

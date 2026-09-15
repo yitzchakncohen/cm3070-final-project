@@ -11,6 +11,7 @@ namespace ModularVehicleSimulator.Physics
         public const float RPM_TO_METERS_PER_SECOND = (2f * Mathf.PI) / 60f;
         public const float METERS_PER_SECOND_TO_KM_PER_HOUR = 3.6f;
         public const int SPHERE_SEGMENTS = 24;
+        public const float STOPPED_VELOCITY = 0.05f;
         // Shared buffers to avoid GC allocations during runtime
         private static readonly List<Vector2> boundingPointsBuffer = new List<Vector2>();
         private static readonly List<Vector2> convexHullBuffer = new List<Vector2>();
@@ -56,30 +57,39 @@ namespace ModularVehicleSimulator.Physics
             return forwardFrictionCoefficient * normalLoad * Mathf.Sign(slip);
         }
 
-        private static float EvaluateFrictionCurve(WheelFrictionCurve curve, float slip)
+        public static float EvaluateFrictionCurve(WheelFrictionCurve curve, float slip)
         {
-            float absSlip = Mathf.Abs(slip);
+            return EvaluatePacejkaApproximation(curve, slip);
+        }
 
-            // 1. First spline section: from 0 to Extremum
+        // Same curved as used by Unity with piecewise linear approximation.
+        // https://docs.unity3d.com/6000.6/Documentation/Manual/class-WheelCollider.html  
+        private static float EvaluatePacejkaApproximation(WheelFrictionCurve curve, float slip)
+        {
+            // Smoothstep interpolation (3t^2 - 2t^3) between pieces of function
+            float absSlip = Mathf.Abs(slip);
+            float frictionCoefficent;
+
+            // First section of curve from zero to extremum.
             if (absSlip < curve.extremumSlip)
             {
                 float t = absSlip / curve.extremumSlip;
-                // Cubic spline interpolation with zero tangent at origin and extremum
-                return Mathf.SmoothStep(0f, curve.extremumValue, t);
+                float smoothT = t * t * (3f - 2f * t);
+                frictionCoefficent = smoothT * curve.extremumValue;
             }
-            // 2. Second spline section: from Extremum to Asymptote
+            // Second section of curve from extremum to asymptote. 
             else if (absSlip < curve.asymptoteSlip)
             {
-                float range = curve.asymptoteSlip - curve.extremumSlip;
-                float t = (absSlip - curve.extremumSlip) / range;
-                // Cubic spline interpolation between Extremum Value and Asymptote Value
-                return Mathf.SmoothStep(curve.extremumValue, curve.asymptoteValue, t);
+                float t = (absSlip - curve.extremumSlip) / (curve.asymptoteSlip - curve.extremumSlip);
+                float smoothT = t * t * (3f - 2f * t);
+                frictionCoefficent = Mathf.Lerp(curve.extremumValue, curve.asymptoteValue, smoothT);
             }
-            // 3. Beyond Asymptote: returns the constant Asymptote Value
             else
             {
-                return curve.asymptoteValue;
+                frictionCoefficent = curve.asymptoteValue;
             }
+
+            return frictionCoefficent * curve.stiffness;
         }
 
         public static float GetSpringDamperForce(Vector3 wheelVelocity, Vector3 springDirection, float springDelta, JointSpring jointSpring)
@@ -87,7 +97,7 @@ namespace ModularVehicleSimulator.Physics
             // Hook's Law Fs = -kx
             // Damping Force Fd = -bv
             float springForce = jointSpring.spring * springDelta;
-            float springVelocity = Vector3.Dot(springDirection, wheelVelocity);
+            float springVelocity = Vector3.Dot(springDirection, wheelVelocity); // Velocity of wheel along the up axis of the spring. 
             float dampingForce = springVelocity * jointSpring.damper;
             float totalForce = Mathf.Max(0, springForce - dampingForce);
             return totalForce;

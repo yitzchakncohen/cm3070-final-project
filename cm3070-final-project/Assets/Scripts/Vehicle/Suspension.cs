@@ -30,12 +30,11 @@ namespace ModularVehicleSimulator.Vehicle
             this.isFront = isFront;
         }
 
-        public void ApplySpringDamperForce(RaycastHit raycastHit)
+        public void ApplySpringDamperForce(RaycastHit raycastHit, float forceAppPointDistance)
         {
-            Vector3 wheelVelocity = chassisRigidBody.GetPointVelocity(transform.position);
+            Vector3 wheelVelocity = chassisRigidBody.GetPointVelocity(raycastHit.point);
             float currentSpringLength = raycastHit.distance;
             springDelta = suspensionConfiguration.Distance - currentSpringLength;
-            float normalizedSpringDelta = Mathf.Clamp01(springDelta / suspensionConfiguration.Distance);
 
             if(springDelta > 0)
             {
@@ -45,18 +44,9 @@ namespace ModularVehicleSimulator.Vehicle
                 normalLoad = suspensionForce * alignmentAngle;
 
                 // Apply force from suspension
-                Vector3 forcePosition = transform.position - (transform.up * GetForceAppPointDistance());
-                chassisRigidBody.AddForceAtPosition(transform.up * suspensionForce, forcePosition);     
+                Vector3 forcePosition = transform.position - (transform.up * forceAppPointDistance);
+                chassisRigidBody.AddForceAtPosition(raycastHit.normal * suspensionForce, forcePosition);     
             }
-        }
-
-        private float GetForceAppPointDistance()
-        {
-            Vector3 wheelLocalPosition = chassisRigidBody.transform.InverseTransformPoint(transform.position);
-            float wheelOffsetFromGround = wheelConfiguration.Radius;
-            float offsetFromGroundToCenterOfMass = chassisConfiguration.CenterOfMass.y - wheelLocalPosition.y + wheelOffsetFromGround;
-            float offsetDistance = offsetFromGroundToCenterOfMass - suspensionConfiguration.ForceAppPointOffset;
-            return Mathf.Max(0f, offsetDistance);
         }
     }    
 }
