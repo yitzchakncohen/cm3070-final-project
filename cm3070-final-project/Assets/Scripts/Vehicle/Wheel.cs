@@ -93,7 +93,7 @@ namespace ModularVehicleSimulator.Vehicle
             UpdateWheelAngles();
             Vector3 forceAppPoint = transform.position - (transform.up * GetForceAppPointDistance());
             tire.UpdateFriction(currentDeflection, nominalDeflection, surfaceMaterial ? surfaceMaterial.dynamicFriction : 1.0f);
-            tire.ApplyFriction(lastGroundHit, forceAppPoint, SteerAngle, motorTorque, brakeTorque, suspension.NormalLoad);
+            tire.ApplyFriction(lastGroundHit, forceAppPoint, SteerAngle, motorTorque, brakeTorque, suspension.NormalLoad, isGrounded);
         }
 
         public void Steer(float leftSteeringAngle, float rightSteeringAngle)
@@ -162,7 +162,7 @@ namespace ModularVehicleSimulator.Vehicle
             if (isGrounded)
             {
                 float forceAppPointDistance = GetForceAppPointDistance();
-                suspension.ApplySpringDamperForce(lastGroundHit,forceAppPointDistance);
+                suspension.ApplySpringDamperForce(lastGroundHit, forceAppPointDistance);
                 surfaceMaterial = lastGroundHit.collider.sharedMaterial;
             }
             else

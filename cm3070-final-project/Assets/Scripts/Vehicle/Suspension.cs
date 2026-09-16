@@ -6,6 +6,7 @@ namespace ModularVehicleSimulator.Vehicle
 {
     public class Suspension : MonoBehaviour
     {
+        private const float SMOOTHING_RATE = 60f;
         public float NormalLoad => normalLoad;
         public float Offset => springDelta;
         private bool isFront;
@@ -41,7 +42,7 @@ namespace ModularVehicleSimulator.Vehicle
                 JointSpring jointSpring = isFront ? suspensionConfiguration.GetFrontSuspensionSpring(0) : suspensionConfiguration.GetRearSuspensionSpring(0);
                 float suspensionForce = VehiclePhysics.GetSpringDamperForce(wheelVelocity, transform.up, springDelta, jointSpring);
                 float alignmentAngle  = Mathf.Clamp01(Vector3.Dot(transform.up, raycastHit.normal));
-                normalLoad = suspensionForce * alignmentAngle;
+                normalLoad = Mathf.Lerp(normalLoad, suspensionForce * alignmentAngle, 1f - Mathf.Exp(-SMOOTHING_RATE * Time.fixedDeltaTime));
 
                 // Apply force from suspension
                 Vector3 forcePosition = transform.position - (transform.up * forceAppPointDistance);
