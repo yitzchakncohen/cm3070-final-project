@@ -103,12 +103,12 @@ namespace ModularVehicleSimulator.Vehicle
             bool isLowVelocity = forwardVelocity < DYNAMIC_SPEED_THRESHOLD;
             float lateralVelocity = Vector3.Dot(groundRight, wheelVelocity);
             bool isRolling = Mathf.Abs(angularVelocity * radius - forwardVelocity) < 0.5f;
+            
             if (isLowVelocity && isRolling && Mathf.Abs(motorTorque) < staticFrictionTorqueLimit && brakeTorque < TORQUE_STOP_THRESHOLD)
             {
                 angularVelocity = forwardVelocity / radius;
                 currentRPM = angularVelocity * Mathf.Rad2Deg / 6f;
                 UpdateSidewaysSlip(forwardVelocity, lateralVelocity);
-                Debug.Log($"Kinematic: angularVelocity {angularVelocity}, forwardVelocity {forwardVelocity}, forwardSlip {forwardSlip}");
                 return;
             }
 
@@ -140,7 +140,6 @@ namespace ModularVehicleSimulator.Vehicle
                 angularVelocity = Mathf.Lerp(forwardVelocity / radius, angularVelocity, t);
             }
 
-            Debug.Log($"Dynamic: angularVelocity {angularVelocity}, forwardVelocity {forwardVelocity}, forwardSlip {forwardSlip}");
             currentRPM = angularVelocity * Mathf.Rad2Deg / 6f;
             UpdateSidewaysSlip(forwardVelocity, lateralVelocity);
         }
@@ -231,7 +230,9 @@ namespace ModularVehicleSimulator.Vehicle
         {
             float chassisSpeed = chassisRigidbody.linearVelocity.magnitude;
             float forwardVelocity = Vector3.Dot(groundForward, wheelVelocity);
+            float sidewaysVelocity = Vector3.Dot(groundRight, wheelVelocity);
             float staticFrictionTorqueLimit = normalLoad * wheelConfiguration.Radius * forwardFrictionCurve.extremumValue;
+            Debug.Log($"angularVelocity {angularVelocity}, forwardVelocity {forwardVelocity}, forwardSlip {forwardSlip}");
 
             // If the car is moving slowly, friction of the tires should hold it there. 
             if(chassisSpeed < VehiclePhysics.STOPPED_VELOCITY && Mathf.Abs(motorTorque) < TORQUE_STOP_THRESHOLD)
@@ -266,9 +267,9 @@ namespace ModularVehicleSimulator.Vehicle
                 float longitudinalForce = engineForce - (actualBrakeForce * Mathf.Sign(forwardVelocity));
                 float maxStaticForce = staticFrictionTorqueLimit / wheelConfiguration.Radius;
                 longitudinalForce = Mathf.Clamp(longitudinalForce, -maxStaticForce, maxStaticForce);
-
-                // 6. Combine with lateral static friction
-                Vector3 lateralFriction = Vector3.Dot(totalFriction, groundRight) * groundRight;
+                float maxStaticSidewaysForce = sidewaysFrictionCurve.extremumValue * normalLoad;
+                float requiredLateralStoppingForce = -(drivenMass * sidewaysVelocity) / dt;
+                Vector3 lateralFriction = Mathf.Clamp(requiredLateralStoppingForce, -maxStaticSidewaysForce, maxStaticSidewaysForce)* groundRight;
                 Vector3 staticFriction = (longitudinalForce * groundForward) + lateralFriction;
 
                 float t = Mathf.InverseLerp(KINEMATIC_SPEED_THRESHOLD, DYNAMIC_SPEED_THRESHOLD, absForwardVelocity);
