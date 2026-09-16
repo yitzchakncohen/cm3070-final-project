@@ -79,7 +79,7 @@ namespace ModularVehicleSimulator.Vehicle
             if(isGrounded)
             {
                 Vector3 totalFrictionForce = CalculateTotalFrictionForce(normalLoad, groundForward, groundRight);
-                ApplyTireForce(raycastHit, forceAppPoint, totalFrictionForce, groundForward, groundRight, wheelVelocity, normalLoad, motorTorque, brakeTorque);                
+                ApplyTireForce(raycastHit, forceAppPoint, totalFrictionForce, groundForward, groundRight, wheelVelocity, normalLoad, motorTorque, brakeTorque, isGrounded);                
             }
         }
 
@@ -226,13 +226,14 @@ namespace ModularVehicleSimulator.Vehicle
             Vector3 wheelVelocity, 
             float normalLoad, 
             float motorTorque, 
-            float brakeTorque)
+            float brakeTorque,
+            bool isGrounded)
         {
             float chassisSpeed = chassisRigidbody.linearVelocity.magnitude;
             float forwardVelocity = Vector3.Dot(groundForward, wheelVelocity);
             float sidewaysVelocity = Vector3.Dot(groundRight, wheelVelocity);
             float staticFrictionTorqueLimit = normalLoad * wheelConfiguration.Radius * forwardFrictionCurve.extremumValue;
-            Debug.Log($"angularVelocity {angularVelocity}, forwardVelocity {forwardVelocity}, forwardSlip {forwardSlip}");
+            // Debug.Log($"motorTorque {motorTorque}, staticFrictionTorqueLimit {staticFrictionTorqueLimit}, angularVelocity {angularVelocity}, forwardVelocity {forwardVelocity}, forwardSlip {forwardSlip}");
 
             // If the car is moving slowly, friction of the tires should hold it there. 
             if(chassisSpeed < VehiclePhysics.STOPPED_VELOCITY && Mathf.Abs(motorTorque) < TORQUE_STOP_THRESHOLD)
@@ -275,10 +276,12 @@ namespace ModularVehicleSimulator.Vehicle
                 float t = Mathf.InverseLerp(KINEMATIC_SPEED_THRESHOLD, DYNAMIC_SPEED_THRESHOLD, absForwardVelocity);
                 Vector3 appliedForce = Vector3.Lerp(staticFriction, totalFriction, t);
 
+                Debug.Log($"isGrounded {isGrounded}, appliedForce {appliedForce}");
                 chassisRigidbody.AddForceAtPosition(appliedForce, forceAppPoint);
                 return;
             }
             
+            Debug.Log($"isGrounded {isGrounded}, appliedForce {totalFriction}");
             chassisRigidbody.AddForceAtPosition(totalFriction, forceAppPoint);
         }
 
