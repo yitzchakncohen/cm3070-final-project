@@ -39,7 +39,6 @@ namespace ModularVehicleSimulator.Vehicle
         {
             lastEngineRPM = motorizedWheels.Average(wheel => wheel.GetEffectiveRPM()) * driveTrain.GetRatioForGear(gear);
             float totalTorque = GetWheelTorque(gear, accelerationInput, lastEngineRPM);
-            // float totalRMP = motorizedWheels.Sum(wheel => wheel.GetEffectiveRPM());
 
             // Apply the engine torque or braking to the wheels
             foreach (Wheel wheel in motorizedWheels)
@@ -90,10 +89,9 @@ namespace ModularVehicleSimulator.Vehicle
             // Output engine torque through the drive train to the wheels
             // Still simulated for an EV
             bool idleEngineCreep = currentEngineRPM > Mathf.Abs(engineInputRPM);
-            if (input > 0.01f || idleEngineCreep)
+            if (engineConfiguration.Type == EngineType.Electric || input > 0.01f || idleEngineCreep)
             {
                 // Combustion or idle momentum applies force to the wheels
-                // Debug.Log($"Net Engine Torque {netEngineTorque}, driveTrain.GetRatioForGear(gear) {driveTrain.GetRatioForGear(gear)}, driveTrain.Loss {driveTrain.Loss}");
                 return netEngineTorque * driveTrain.GetRatioForGear(gear) * driveTrain.Loss;
             }
             else
