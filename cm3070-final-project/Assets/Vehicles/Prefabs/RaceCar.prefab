@@ -182,7 +182,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::InputManager
   accelerationRampRate: 1
   brakingRampRate: 1
-  steeringRampRate: 2
+  steeringRampRate: 1
   accelerationReleaseRate: 8
   brakingReleaseRate: 10
   steeringReleaseRate: 6
@@ -679,7 +679,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1064517047891178425, guid: fc1e359a90d4e6542b4d8022c50429ce, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.246
+      value: -0.36
       objectReference: {fileID: 0}
     - target: {fileID: 1064517047891178425, guid: fc1e359a90d4e6542b4d8022c50429ce, type: 3}
       propertyPath: m_LocalPosition.z
@@ -765,11 +765,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1755173606253276430, guid: 3c3749485ff308f4d9fc36334361709d, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -2.77
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1755173606253276430, guid: 3c3749485ff308f4d9fc36334361709d, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 4.67
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 6061578443036537848, guid: 3c3749485ff308f4d9fc36334361709d, type: 3}
       propertyPath: m_LocalPosition.x

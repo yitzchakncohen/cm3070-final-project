@@ -78,8 +78,8 @@ namespace ModularVehicleSimulator.Vehicle
             );
             UpdateWheelPositions();
             UpdateTireVisuals(wheelConfiguration.Radius, wheelConfiguration.Width);
-            suspension.Init(chassisRigidBody, suspensionConfiguration, wheelConfiguration, chassisConfiguration, IsFront);
-            tire.Init(chassisRigidBody, wheelConfiguration);
+            suspension.Init(chassisRigidBody, suspensionConfiguration, IsFront);
+            tire.Init(chassisRigidBody, wheelConfiguration, suspension);
         }
 
         private void FixedUpdate()
@@ -88,9 +88,9 @@ namespace ModularVehicleSimulator.Vehicle
             UpdateSurfaceMaterial();
             ApplyDeflection();
             UpdateWheelAngles();
-            Vector3 forceAppPoint = transform.position - (transform.up * GetForceAppPointDistance());
+            float forceAppPointDistance = GetForceAppPointDistance();
             tire.UpdateFriction(currentDeflection, nominalDeflection, surfaceMaterial ? surfaceMaterial.dynamicFriction : 1.0f);
-            tire.ApplyFriction(lastGroundHit, forceAppPoint, SteerAngle, motorTorque, brakeTorque, suspension.NormalLoad, isGrounded);
+            tire.ApplyFriction(lastGroundHit, forceAppPointDistance, SteerAngle, motorTorque, brakeTorque, isGrounded);
         }
 
         public void Steer(float leftSteeringAngle, float rightSteeringAngle)
@@ -158,8 +158,6 @@ namespace ModularVehicleSimulator.Vehicle
         {
             if (isGrounded)
             {
-                float forceAppPointDistance = GetForceAppPointDistance();
-                suspension.ApplySpringDamperForce(lastGroundHit, forceAppPointDistance);
                 surfaceMaterial = lastGroundHit.collider.sharedMaterial;
             }
             else
@@ -181,8 +179,8 @@ namespace ModularVehicleSimulator.Vehicle
 
         private void ApplyDeflection()
         {
-            float targetDeflection = VehiclePhysics.GetTireDeflection(suspension.NormalLoad, wheelConfiguration.RadialTireStiffness);
-            float bulge = VehiclePhysics.GetTireDeflection(suspension.NormalLoad, wheelConfiguration.LateralTireStiffness);
+            float targetDeflection = VehiclePhysics.GetTireDeflection(suspension.GetNormalLoad(isGrounded), wheelConfiguration.RadialTireStiffness);
+            float bulge = VehiclePhysics.GetTireDeflection(suspension.GetNormalLoad(isGrounded), wheelConfiguration.LateralTireStiffness);
             currentDeflection = Mathf.MoveTowards(currentDeflection, targetDeflection, DEFLECTION_SMOOTH_STEP * Time.fixedDeltaTime);
             float currentWheelRadius = wheelConfiguration.Radius - currentDeflection;
             radius = currentWheelRadius;
@@ -223,8 +221,8 @@ namespace ModularVehicleSimulator.Vehicle
             Vector3 frictionVector = Vector3.zero;
             if(isGrounded)
             {
-                float forwardFriction = VehiclePhysics.GetForwardFriction(tire.ForwardFriction, tire.ForwardSlip, suspension.NormalLoad);
-                float sidewaysFriction = VehiclePhysics.GetSidewaysFriction(tire.SidewaysFriction, tire.SidewaysSlip, suspension.NormalLoad);
+                float forwardFriction = VehiclePhysics.GetForwardFriction(tire.ForwardFriction, tire.ForwardSlip, suspension.GetNormalLoad(isGrounded));
+                float sidewaysFriction = VehiclePhysics.GetSidewaysFriction(tire.SidewaysFriction, tire.SidewaysSlip, suspension.GetNormalLoad(isGrounded));
                 frictionVector += (lastGroundHit.transform.forward * forwardFriction) + (lastGroundHit.transform.right * sidewaysFriction);                
             }
             return frictionVector;

@@ -12,6 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3225edcbff7de9e4e9b23ccc1cb02c8e, type: 3}
   m_Name: AllSeasonTires
   m_EditorClassIdentifier: Assembly-CSharp::ModularVehicleSimulator.Vehicle.Data.WheelConfiguration
+  radiusInMeters: 0.3284
+  widthInMeters: 0.225
+  weightInKG: 20
   forwardExtremeSlip: 0.125
   forwardExtremeValue: 1.15
   forwardAsymptoteSlip: 0.7
@@ -21,7 +24,7 @@ MonoBehaviour:
   sidewaysExtremeValue: 1.1
   sidewaysAsymptoteSlip: 0.7
   sidewaysAsymptoteValue: 0.85
-  sidewaysStiffness: 1.5
+  sidewaysStiffness: 1
   pressureMultiplier: 2500
   carcassBaseStiffness: 145000
   tirePressureInPSI: 35

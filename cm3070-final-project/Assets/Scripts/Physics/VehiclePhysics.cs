@@ -92,14 +92,15 @@ namespace ModularVehicleSimulator.Physics
             return frictionCoefficent * curve.stiffness;
         }
 
-        public static float GetSpringDamperForce(Vector3 wheelVelocity, Vector3 springDirection, float springDelta, JointSpring jointSpring)
+        public static float GetSpringDamperForce(Vector3 wheelVelocity, Vector3 springDirection, float springDelta, JointSpring jointSpring, ref float estimatedDistance, float maxDistance, float stepTime)
         {
             // Hook's Law Fs = -kx
             // Damping Force Fd = -bv
             float springForce = jointSpring.spring * springDelta;
-            float springVelocity = Vector3.Dot(springDirection, wheelVelocity); // Velocity of wheel along the up axis of the spring. 
+            float springVelocity = Vector3.Dot(springDirection, wheelVelocity); // Velocity of wheel along the up axis of the spring.
             float dampingForce = springVelocity * jointSpring.damper;
             float totalForce = Mathf.Max(0, springForce - dampingForce);
+            estimatedDistance = Mathf.Clamp(estimatedDistance - springVelocity * stepTime, 0.01f, maxDistance); 
             return totalForce;
         }
         #endregion
