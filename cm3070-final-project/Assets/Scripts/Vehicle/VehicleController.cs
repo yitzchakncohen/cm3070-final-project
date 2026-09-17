@@ -51,7 +51,6 @@ namespace ModularVehicleSimulator.Vehicle
                         vehicleConfiguration.Steering, 
                         vehicleConfiguration.Suspension,
                         vehicleConfiguration.Chassis,
-                        vehicleConfiguration.DriveTrain,
                         chassisRigidBody,
                         groundLayerMask
                     );

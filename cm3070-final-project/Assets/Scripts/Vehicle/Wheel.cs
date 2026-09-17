@@ -36,7 +36,6 @@ namespace ModularVehicleSimulator.Vehicle
         private SteeringConfiguration steeringConfiguration;
         private SuspensionConfiguration suspensionConfiguration;
         private ChassisConfiguration chassisConfiguration;
-        private DriveTrain driveTrain;
         private Rigidbody chassisRigidBody;
         private LayerMask groundLayerMask;
         private PhysicsMaterial surfaceMaterial;
@@ -64,7 +63,6 @@ namespace ModularVehicleSimulator.Vehicle
                         SteeringConfiguration steeringConfiguration, 
                         SuspensionConfiguration suspensionConfiguration,
                         ChassisConfiguration chassisConfiguration,
-                        DriveTrain driveTrain,
                         Rigidbody chassisRigidBody,
                         LayerMask groundLayerMask)
         {
@@ -72,7 +70,6 @@ namespace ModularVehicleSimulator.Vehicle
             this.steeringConfiguration = steeringConfiguration;
             this.suspensionConfiguration = suspensionConfiguration;
             this.chassisConfiguration = chassisConfiguration;
-            this.driveTrain = driveTrain;
             this.groundLayerMask = groundLayerMask;
             nominalDeflection = VehiclePhysics.GetNominalTireDeflection(
                 chassisConfiguration.Mass, 

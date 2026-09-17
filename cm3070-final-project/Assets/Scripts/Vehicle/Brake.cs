@@ -8,6 +8,7 @@ namespace ModularVehicleSimulator.Vehicle
     public class Brake : MonoBehaviour
     {
         private const float REGENERATIVE_BRAKING_CUTOFF_KMH = 5f;
+        private const float ABS_CUTOFF_KMH = 5f;
         private const float BRAKE_TORQUE_VECTORING_BLEND_WINDOW = 0.2f;
         private BrakesConfiguration brakesConfiguration;
         private EngineType engineType;
@@ -72,6 +73,8 @@ namespace ModularVehicleSimulator.Vehicle
 
         private float ApplyABS(Wheel wheel, float brakeTorque)
         {
+            float speed = chassisRigidBody.linearVelocity.magnitude;
+            if (speed < ABS_CUTOFF_KMH / VehiclePhysics.METERS_PER_SECOND_TO_KM_PER_HOUR) return brakeTorque;
             if (brakesConfiguration.ABSEnabled)
             {
                 float vehicleForwardSlip = wheel.GetAverageForwardSlip();
