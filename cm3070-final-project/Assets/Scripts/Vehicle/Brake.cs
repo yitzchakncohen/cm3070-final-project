@@ -42,11 +42,9 @@ namespace ModularVehicleSimulator.Vehicle
                 {
                     if(wheel.IsMotorized)
                     {
+                        float speed = VehiclePhysics.GetVehicleSpeed(wheels, wheelConfiguration.Radius);
                         float regenerativeBrakeTorque = 
-                            Mathf.Clamp01(wheel.GetSpeedometerRPM() 
-                                * VehiclePhysics.RPM_TO_METERS_PER_SECOND 
-                                * VehiclePhysics.METERS_PER_SECOND_TO_KM_PER_HOUR 
-                                / REGENERATIVE_BRAKING_CUTOFF_KMH ) 
+                            Mathf.Clamp01(speed / REGENERATIVE_BRAKING_CUTOFF_KMH ) 
                             * brakesConfiguration.RegenerativeBrakeTorque / motorizedWheelCount;
                         float brakeTorque = ApplyBrakeTorqueVectoring(wheel, targetSteeringAngle, regenerativeBrakeTorque, forwardSpeed);
                         brakeTorque = ApplyABS(wheel, brakeTorque);
@@ -73,7 +71,7 @@ namespace ModularVehicleSimulator.Vehicle
 
         private float ApplyABS(Wheel wheel, float brakeTorque)
         {
-            float speed = chassisRigidBody.linearVelocity.magnitude;
+            float speed = VehiclePhysics.GetVehicleSpeed(wheels, wheelConfiguration.Radius);
             if (speed < ABS_CUTOFF_KMH / VehiclePhysics.METERS_PER_SECOND_TO_KM_PER_HOUR) return brakeTorque;
             if (brakesConfiguration.ABSEnabled)
             {

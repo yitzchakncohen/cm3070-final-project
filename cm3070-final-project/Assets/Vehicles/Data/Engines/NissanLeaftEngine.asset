@@ -16,7 +16,7 @@ MonoBehaviour:
   isAutomaticTransmision: 1
   minAutomaticTransmissionShiftTime: 1
   inertiaInKgSquareMeters: 0.2
-  idleRPM: 300
+  idleRPM: 600
   peakTorqueRPM: 0
   maxRPM: 0
   peakTorqueInNewtonMeters: 280
@@ -35,7 +35,7 @@ MonoBehaviour:
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
-      time: 300
+      time: 600
       value: 0
       inSlope: 0
       outSlope: 0
@@ -62,7 +62,7 @@ MonoBehaviour:
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
-      time: 300
+      time: 600
       value: 15
       inSlope: 0
       outSlope: 0

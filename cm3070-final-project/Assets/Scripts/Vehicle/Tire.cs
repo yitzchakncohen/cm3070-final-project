@@ -196,6 +196,8 @@ namespace ModularVehicleSimulator.Vehicle
                 {
                     angularVelocity = 0f;
                     forwardVelocity += estimatedChassisAcceleration * dt;
+                    forwardSlip = 0f;
+                    sidewaysSlip = 0f;
                     return true; // Stop remaining sub-steps for this frame
                 }
             }
@@ -257,6 +259,14 @@ namespace ModularVehicleSimulator.Vehicle
                 {
                     totalFriction = Vector3.zero;
                 }
+            }
+            else if(chassisSpeed < VehiclePhysics.STOPPED_VELOCITY && brakeTorque > TORQUE_STOP_THRESHOLD)
+            {
+                // Clamp the brakes
+                forwardSlip = 0f;
+                sidewaysSlip = 0f;
+                angularVelocity = 0f;
+                totalFriction = Vector3.zero;
             }
             else if(forwardVelocity < DYNAMIC_SPEED_THRESHOLD && Mathf.Abs(motorTorque) < staticFrictionTorqueLimit) // Slow velocity with no slip
             {

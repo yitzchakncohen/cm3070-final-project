@@ -66,7 +66,7 @@ namespace ModularVehicleSimulator.Input
         {
             vehicleController.Steer(currentSteering);
             vehicleController.Brake(currentBraking, currentAcceleration);
-            vehicleController.Accelerate(currentAcceleration);            
+            vehicleController.Accelerate(currentAcceleration, currentBraking);            
         }
 
         public void OnAccelerate(InputAction.CallbackContext context)

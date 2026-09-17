@@ -101,9 +101,9 @@ namespace ModularVehicleSimulator.Vehicle
             }
         }
 
-        public void Accelerate(float accelerationInput)
+        public void Accelerate(float accelerationInput, float brakeInput)
         {
-            engine.Accelerate(Gear, accelerationInput);
+            engine.Accelerate(Gear, accelerationInput, brakeInput);
         }
 
         public void Brake(float brakeInput, float accelerationInput)

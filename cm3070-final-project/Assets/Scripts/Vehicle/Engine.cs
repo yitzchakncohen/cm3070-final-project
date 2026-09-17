@@ -35,10 +35,10 @@ namespace ModularVehicleSimulator.Vehicle
             currentEngineRPM = engineConfiguration.IdleRPM;
         }
 
-        public void Accelerate(Gear gear, float accelerationInput)
+        public void Accelerate(Gear gear, float accelerationInput, float brakeInput)
         {
             lastEngineRPM = motorizedWheels.Average(wheel => wheel.GetEffectiveRPM()) * driveTrain.GetRatioForGear(gear);
-            float totalTorque = GetWheelTorque(gear, accelerationInput, lastEngineRPM);
+            float totalTorque = GetWheelTorque(gear, accelerationInput, brakeInput, lastEngineRPM);
 
             // Apply the engine torque or braking to the wheels
             foreach (Wheel wheel in motorizedWheels)
@@ -53,7 +53,7 @@ namespace ModularVehicleSimulator.Vehicle
             return inputTorque / numberOfWheels;
         }
 
-        private float GetWheelTorque(Gear gear, float input, float engineInputRPM)
+        private float GetWheelTorque(Gear gear, float throttleInput, float brakeInput, float engineInputRPM)
         {
             if(gear == Gear.Park || gear == Gear.Neutral) return 0f;
 
@@ -61,7 +61,7 @@ namespace ModularVehicleSimulator.Vehicle
             float netEngineTorque = 0f;
             float idleDelta = Mathf.Max(engineConfiguration.IdleRPM - currentEngineRPM, 0f);
             float idleCompensation = Mathf.Min(idleDelta / engineConfiguration.IdleRPM, IDLE_COMPENSATION_MAX);
-            float effectiveInput = Mathf.Max(idleCompensation, input);
+            float effectiveInput = Mathf.Max(idleCompensation, throttleInput);
             float engineTorque = engineConfiguration.GetTorque(currentEngineRPM) * effectiveInput;
             if(engineConfiguration.Type == EngineType.Gas)
             {
@@ -89,7 +89,8 @@ namespace ModularVehicleSimulator.Vehicle
             // Output engine torque through the drive train to the wheels
             // Still simulated for an EV
             bool idleEngineCreep = currentEngineRPM > Mathf.Abs(engineInputRPM);
-            if (engineConfiguration.Type == EngineType.Electric || input > 0.01f || idleEngineCreep)
+            bool isIdleEV = engineConfiguration.Type == EngineType.Electric && brakeInput < 0.01f;
+            if (isIdleEV || throttleInput > 0.01f || idleEngineCreep)
             {
                 // Combustion or idle momentum applies force to the wheels
                 return netEngineTorque * driveTrain.GetRatioForGear(gear) * driveTrain.Loss;
