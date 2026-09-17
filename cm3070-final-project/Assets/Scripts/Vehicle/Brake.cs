@@ -37,7 +37,7 @@ namespace ModularVehicleSimulator.Vehicle
             float forwardSpeed = VehiclePhysics.GetVehicleSpeed(wheels, wheelConfiguration.Radius);
             foreach (Wheel wheel in wheels)
             {
-                if(engineType == EngineType.Electric && brakesConfiguration.RegenerativeBrakingEnabled && brakeInput < 0.01f && throttleInput < 0.01f)
+                if(engineType == EngineType.Electric && brakesConfiguration.RegenerativeBrakingEnabled && brakeInput < 0.01f && throttleInput < 0.01f) // TODO, Hybrid?
                 {
                     if(wheel.IsMotorized)
                     {

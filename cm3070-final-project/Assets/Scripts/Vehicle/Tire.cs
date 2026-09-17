@@ -6,6 +6,7 @@ namespace ModularVehicleSimulator.Vehicle
 {
     public class Tire : MonoBehaviour
     {
+        private const float KINEMATIC_SMOOTHING = 50f;
         private const float VELOCITY_FLOOR = 0.1f;
         private const float SMOOTHING_TIME_STEPS = 15f;
         private const float TORQUE_STOP_THRESHOLD = 1f;
@@ -79,7 +80,7 @@ namespace ModularVehicleSimulator.Vehicle
             if(isGrounded)
             {
                 Vector3 totalFrictionForce = CalculateTotalFrictionForce(normalLoad, groundForward, groundRight);
-                ApplyTireForce(raycastHit, forceAppPoint, totalFrictionForce, groundForward, groundRight, wheelVelocity, normalLoad, motorTorque, brakeTorque, isGrounded);                
+                ApplyTireForce(raycastHit, forceAppPoint, totalFrictionForce, groundForward, groundRight, wheelVelocity, normalLoad, motorTorque, brakeTorque);                
             }
         }
 
@@ -106,7 +107,8 @@ namespace ModularVehicleSimulator.Vehicle
             
             if (isLowVelocity && isRolling && Mathf.Abs(motorTorque) < staticFrictionTorqueLimit && brakeTorque < TORQUE_STOP_THRESHOLD)
             {
-                angularVelocity = forwardVelocity / radius;
+                float targetAngularVelocity = forwardVelocity / radius;
+                angularVelocity = Mathf.MoveTowards(angularVelocity, targetAngularVelocity, KINEMATIC_SMOOTHING * Time.fixedDeltaTime);
                 currentRPM = angularVelocity * Mathf.Rad2Deg / 6f;
                 UpdateSidewaysSlip(forwardVelocity, lateralVelocity);
                 return;
@@ -226,8 +228,8 @@ namespace ModularVehicleSimulator.Vehicle
             Vector3 wheelVelocity, 
             float normalLoad, 
             float motorTorque, 
-            float brakeTorque,
-            bool isGrounded)
+            float brakeTorque
+            )
         {
             float chassisSpeed = chassisRigidbody.linearVelocity.magnitude;
             float forwardVelocity = Vector3.Dot(groundForward, wheelVelocity);
@@ -240,6 +242,8 @@ namespace ModularVehicleSimulator.Vehicle
             {
                 angularVelocity = 0f; // Kill wheel rotational chatter when parked
                 currentRPM = 0f;
+                forwardSlip = 0f;
+                sidewaysSlip = 0f;
 
                 if (brakeTorque > TORQUE_STOP_THRESHOLD)
                 {
@@ -276,12 +280,12 @@ namespace ModularVehicleSimulator.Vehicle
                 float t = Mathf.InverseLerp(KINEMATIC_SPEED_THRESHOLD, DYNAMIC_SPEED_THRESHOLD, absForwardVelocity);
                 Vector3 appliedForce = Vector3.Lerp(staticFriction, totalFriction, t);
 
-                Debug.Log($"isGrounded {isGrounded}, appliedForce {appliedForce}");
+                Debug.Log($"{gameObject.name}: forwardSlip: {forwardSlip} | sidewaysSlip: {sidewaysSlip} | appliedForce: {appliedForce} | angularVelocity {angularVelocity} | motorTorque {motorTorque} | brakeTorque {brakeTorque}");
                 chassisRigidbody.AddForceAtPosition(appliedForce, forceAppPoint);
                 return;
             }
             
-            Debug.Log($"isGrounded {isGrounded}, appliedForce {totalFriction}");
+            Debug.Log($"{gameObject.name}: forwardSlip: {forwardSlip} | sidewaysSlip: {sidewaysSlip} | totalFriction: {totalFriction} | angularVelocity {angularVelocity} | motorTorque {motorTorque} | brakeTorque {brakeTorque}");
             chassisRigidbody.AddForceAtPosition(totalFriction, forceAppPoint);
         }
 
