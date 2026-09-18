@@ -103,12 +103,11 @@ namespace ModularVehicleSimulator.Vehicle
             float radius = wheelConfiguration.Radius;
             float forwardVelocity = Vector3.Dot(groundForward, wheelVelocity);
             float staticFrictionTorqueLimit = suspension.GetNormalLoad(isGrounded) * radius * forwardFrictionCurve.extremumValue;
-            bool isLowVelocity = forwardVelocity < DYNAMIC_SPEED_THRESHOLD;
+            bool isLowVelocity = Mathf.Abs(forwardVelocity) < KINEMATIC_SPEED_THRESHOLD;
             float lateralVelocity = Vector3.Dot(groundRight, wheelVelocity);
             bool isRolling = Mathf.Abs(angularVelocity * radius - forwardVelocity) < 0.5f;
             float estimatedDistance = hit.distance;
-            Debug.Log($"{gameObject.name}: isLowVelocity: {isLowVelocity} | isRolling: {isRolling} | Mathf.Abs(motorTorque) < staticFrictionTorqueLimit: {Mathf.Abs(motorTorque) < staticFrictionTorqueLimit} | brakeTorque < TORQUE_STOP_THRESHOLD {brakeTorque < TORQUE_STOP_THRESHOLD}");
-
+            Debug.Log($"{gameObject.name}: forwardVelocity: {forwardVelocity} | isLowVelocity: {isLowVelocity} | isRolling: {isRolling} | Mathf.Abs(motorTorque) < staticFrictionTorqueLimit: {Mathf.Abs(motorTorque) < staticFrictionTorqueLimit} | brakeTorque < TORQUE_STOP_THRESHOLD {brakeTorque < TORQUE_STOP_THRESHOLD}");
             
             if (isLowVelocity && isRolling && Mathf.Abs(motorTorque) < staticFrictionTorqueLimit && brakeTorque < TORQUE_STOP_THRESHOLD)
             {
