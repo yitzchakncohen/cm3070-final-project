@@ -45,11 +45,6 @@ namespace ModularVehicleSimulator.Vehicle
             }
         }
 
-        public void IsFree(float stepTime)
-        {
-            normalLoad = Mathf.Lerp(normalLoad, 0f, 10f * stepTime);
-        }
-
         public float GetNormalLoad(bool isGrounded)
         {
             if(isGrounded) return normalLoad;

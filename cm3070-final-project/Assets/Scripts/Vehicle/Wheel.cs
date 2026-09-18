@@ -25,6 +25,8 @@ namespace ModularVehicleSimulator.Vehicle
         public bool IsRight => transform.localPosition.x > 0f;
         public float RPM => tire.RPM;
         public float Radius => wheelConfiguration.Radius;
+        public Vector3 NormalForce => suspension.GetNormalLoad(isGrounded) * lastGroundHit.normal;
+
         [SerializeField] private bool isMotorized = true;
         [SerializeField] private bool isSteerable = true;
         [SerializeField] private bool isFront = true;
@@ -71,6 +73,7 @@ namespace ModularVehicleSimulator.Vehicle
             this.suspensionConfiguration = suspensionConfiguration;
             this.chassisConfiguration = chassisConfiguration;
             this.groundLayerMask = groundLayerMask;
+            this.chassisRigidBody = chassisRigidBody;
             nominalDeflection = VehiclePhysics.GetNominalTireDeflection(
                 chassisConfiguration.Mass, 
                 chassisConfiguration.NumberOfWheels, 
@@ -237,7 +240,7 @@ namespace ModularVehicleSimulator.Vehicle
 
         private float GetForceAppPointDistance()
         {
-            if(chassisConfiguration == null || chassisRigidBody == null) return 0f;
+            if (chassisConfiguration == null || chassisRigidBody == null) return 0f;
             Vector3 wheelLocalPosition = chassisRigidBody.transform.InverseTransformPoint(transform.position);
             float wheelOffsetFromGround = wheelConfiguration.Radius;
             float offsetFromGroundToCenterOfMass = chassisConfiguration.CenterOfMass.y - wheelLocalPosition.y + wheelOffsetFromGround;
@@ -265,6 +268,7 @@ namespace ModularVehicleSimulator.Vehicle
             {
                 // Correct distance to account for the raised origin
                 hit.distance = Mathf.Max(0f, hit.distance - raycastOffset);
+                // Debug.Log($"hit.distance {hit.distance}, raycastOffset, {raycastOffset}");
             }
 
             return hit;

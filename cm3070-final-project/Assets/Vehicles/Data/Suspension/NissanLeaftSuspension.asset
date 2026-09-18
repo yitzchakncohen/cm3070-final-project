@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: NissanLeaftSuspension
   m_EditorClassIdentifier: Assembly-CSharp::ModularVehicleSimulator.Vehicle.Data.SuspensionConfiguration
   suspensionDistanceInMeters: 0.3
+  forceAppPointOffsetInMeters: 0.3
   frontSpringConstant: 30000
   backSpringConstant: 20000
   damper: 3000

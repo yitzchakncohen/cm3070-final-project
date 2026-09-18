@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 7970761858409370905}
   - component: {fileID: 1796651613285553039}
   - component: {fileID: 6006678978194297378}
+  - component: {fileID: 2713816046026196356}
   m_Layer: 0
   m_Name: NissanLeaf
   m_TagString: Untagged
@@ -269,6 +270,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ModularVehicleSimulator.Debugging.AirResistanceGizmo
   debugColor: {r: 0.5803922, g: 0, b: 0.8274511, a: 1}
   debuggingMode: 8
+--- !u!114 &2713816046026196356
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 803433713257916642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4d30acc6acc00f4aab5c7575b23a997, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ModularVehicleSimulator.Debugging.SuspensionGizmo
+  debugColor: {r: 1, g: 0.45336083, b: 0, a: 1}
+  debuggingMode: 16
 --- !u!1 &1701272198427087013
 GameObject:
   m_ObjectHideFlags: 0

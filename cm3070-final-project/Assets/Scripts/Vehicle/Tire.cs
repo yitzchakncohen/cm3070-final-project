@@ -107,17 +107,12 @@ namespace ModularVehicleSimulator.Vehicle
             float lateralVelocity = Vector3.Dot(groundRight, wheelVelocity);
             bool isRolling = Mathf.Abs(angularVelocity * radius - forwardVelocity) < 0.5f;
             float estimatedDistance = hit.distance;
+            Debug.Log($"{gameObject.name}: isLowVelocity: {isLowVelocity} | isRolling: {isRolling} | Mathf.Abs(motorTorque) < staticFrictionTorqueLimit: {Mathf.Abs(motorTorque) < staticFrictionTorqueLimit} | brakeTorque < TORQUE_STOP_THRESHOLD {brakeTorque < TORQUE_STOP_THRESHOLD}");
+
             
             if (isLowVelocity && isRolling && Mathf.Abs(motorTorque) < staticFrictionTorqueLimit && brakeTorque < TORQUE_STOP_THRESHOLD)
             {
-                if(isGrounded)
-                {
-                    suspension.ApplySpringDamperForce(hit, forceAppPointDistance, Time.fixedDeltaTime, wheelVelocity, ref estimatedDistance);                    
-                }
-                else
-                {
-                    suspension.IsFree(Time.fixedDeltaTime);
-                }
+                suspension.ApplySpringDamperForce(hit, forceAppPointDistance, Time.fixedDeltaTime, wheelVelocity, ref estimatedDistance);                    
                 float targetAngularVelocity = forwardVelocity / radius;
                 angularVelocity = Mathf.MoveTowards(angularVelocity, targetAngularVelocity, KINEMATIC_SMOOTHING * Time.fixedDeltaTime);
                 currentRPM = angularVelocity * Mathf.Rad2Deg / 6f;
@@ -132,14 +127,10 @@ namespace ModularVehicleSimulator.Vehicle
 
             for (int i = 0; i < HIGHVELOCITY_SUB_STEPS; i++)
             {
-                if(isGrounded)
-                {
-                    suspension.ApplySpringDamperForce(hit, forceAppPointDistance, stepTime, wheelVelocity, ref estimatedDistance, HIGHVELOCITY_SUB_STEPS);
-                }
-                else
-                {
-                    suspension.IsFree(stepTime);
-                }
+                suspension.ApplySpringDamperForce(hit, forceAppPointDistance, stepTime, wheelVelocity, ref estimatedDistance, HIGHVELOCITY_SUB_STEPS);
+            }
+            for (int i = 0; i < HIGHVELOCITY_SUB_STEPS; i++)
+            {
                 bool breakLock = AngularVelocitySubStep(
                     motorTorque,
                     brakeTorque,
@@ -271,7 +262,8 @@ namespace ModularVehicleSimulator.Vehicle
                 if (brakeTorque > TORQUE_STOP_THRESHOLD)
                 {
                     Vector3 contactVelocity = chassisRigidbody.GetPointVelocity(raycastHit.point);
-                    Vector3 holdingForce = -contactVelocity * (chassisRigidbody.mass * 10f);
+                    Vector3 normalContactVelocity = Vector3.ProjectOnPlane(contactVelocity, raycastHit.normal);
+                    Vector3 holdingForce = -normalContactVelocity * (chassisRigidbody.mass * 10f);
                     
                     float staticFrictionForce = forwardFrictionCurve.extremumValue * suspension.GetNormalLoad(isGrounded);
                     totalFriction = Vector3.ClampMagnitude(holdingForce, staticFrictionForce);
@@ -311,12 +303,12 @@ namespace ModularVehicleSimulator.Vehicle
                 float t = Mathf.InverseLerp(KINEMATIC_SPEED_THRESHOLD, DYNAMIC_SPEED_THRESHOLD, absForwardVelocity);
                 Vector3 appliedForce = Vector3.Lerp(staticFriction, totalFriction, t);
 
-                Debug.Log($"{gameObject.name}: forwardSlip: {forwardSlip} | sidewaysSlip: {sidewaysSlip} | appliedForce: {appliedForce} | angularVelocity {angularVelocity} | motorTorque {motorTorque} | brakeTorque {brakeTorque} | suspension.GetNormalLoad(isGrounded) {suspension.GetNormalLoad(isGrounded)}");
+                // Debug.Log($"{gameObject.name}: forwardSlip: {forwardSlip} | sidewaysSlip: {sidewaysSlip} | appliedForce: {appliedForce} | angularVelocity {angularVelocity} | motorTorque {motorTorque} | brakeTorque {brakeTorque} | groundRight {groundRight} | groundForward {groundForward}");
                 chassisRigidbody.AddForceAtPosition(appliedForce, forceAppPoint);
                 return;
             }
             
-            Debug.Log($"{gameObject.name}: forwardSlip: {forwardSlip} | sidewaysSlip: {sidewaysSlip} | totalFriction: {totalFriction} | angularVelocity {angularVelocity} | motorTorque {motorTorque} | brakeTorque {brakeTorque} | suspension.GetNormalLoad(isGrounded) {suspension.GetNormalLoad(isGrounded)}");
+            // Debug.Log($"{gameObject.name}: forwardSlip: {forwardSlip} | sidewaysSlip: {sidewaysSlip} | totalFriction: {totalFriction} | angularVelocity {angularVelocity} | motorTorque {motorTorque} | brakeTorque {brakeTorque} | groundRight {groundRight} | groundForward {groundForward} ");
             chassisRigidbody.AddForceAtPosition(totalFriction, forceAppPoint);
         }
 
