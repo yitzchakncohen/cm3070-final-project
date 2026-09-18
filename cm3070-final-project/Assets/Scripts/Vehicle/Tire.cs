@@ -8,7 +8,7 @@ namespace ModularVehicleSimulator.Vehicle
     {
         private const float KINEMATIC_SMOOTHING = 50f;
         private const float VELOCITY_FLOOR = 0.1f;
-        private const float SMOOTHING_TIME_STEPS = 15f;
+        private const float SMOOTHING_TIME_STEPS = 30f;
         private const float TORQUE_STOP_THRESHOLD = 1f;
         private const float KINEMATIC_SPEED_THRESHOLD = 2f;
         private const float DYNAMIC_SPEED_THRESHOLD = 5f;
@@ -107,7 +107,7 @@ namespace ModularVehicleSimulator.Vehicle
             float lateralVelocity = Vector3.Dot(groundRight, wheelVelocity);
             bool isRolling = Mathf.Abs(angularVelocity * radius - forwardVelocity) < 0.5f;
             float estimatedDistance = hit.distance;
-            Debug.Log($"{gameObject.name}: forwardVelocity: {forwardVelocity} | isLowVelocity: {isLowVelocity} | isRolling: {isRolling} | Mathf.Abs(motorTorque) < staticFrictionTorqueLimit: {Mathf.Abs(motorTorque) < staticFrictionTorqueLimit} | brakeTorque < TORQUE_STOP_THRESHOLD {brakeTorque < TORQUE_STOP_THRESHOLD}");
+            // Debug.Log($"{gameObject.name}: forwardVelocity: {forwardVelocity} | isLowVelocity: {isLowVelocity} | isRolling: {isRolling} | Mathf.Abs(motorTorque) < staticFrictionTorqueLimit: {Mathf.Abs(motorTorque) < staticFrictionTorqueLimit} | brakeTorque < TORQUE_STOP_THRESHOLD {brakeTorque < TORQUE_STOP_THRESHOLD}");
             
             if (isLowVelocity && isRolling && Mathf.Abs(motorTorque) < staticFrictionTorqueLimit && brakeTorque < TORQUE_STOP_THRESHOLD)
             {
@@ -161,7 +161,7 @@ namespace ModularVehicleSimulator.Vehicle
             float maxSlipAngle = wheelConfiguration.GetDefaultSidewaysFrictionCurve().asymptoteSlip; 
             rawSidewaysSlip = Mathf.Clamp(rawSidewaysSlip, -maxSlipAngle, maxSlipAngle);
             // Dynamic smoothing to simulate tire carcass elasticity
-            sidewaysSlip = Mathf.MoveTowards(sidewaysSlip, rawSidewaysSlip, SMOOTHING_TIME_STEPS * Time.fixedDeltaTime);
+            sidewaysSlip = rawSidewaysSlip;
         }
 
         private bool AngularVelocitySubStep(
@@ -220,11 +220,12 @@ namespace ModularVehicleSimulator.Vehicle
 
         private Vector3 CalculateTotalFrictionForce(Vector3 groundForward, Vector3 groundRight, bool isGrounded)
         {
-
             Vector3 longitudinalForce = CalculateTireForce(groundForward, forwardSlip, forwardFrictionCurve, isGrounded);
             Vector3 lateralForce = CalculateTireForce(groundRight, sidewaysSlip, sidewaysFrictionCurve, isGrounded);
             Vector3 totalFrictionForce = longitudinalForce + lateralForce;
-            float maxFrictionForce = forwardFrictionCurve.extremumValue * suspension.GetNormalLoad(isGrounded);
+            float maxLongitudinal = forwardFrictionCurve.extremumValue;
+            float maxLateral = sidewaysFrictionCurve.extremumValue;
+            float maxFrictionForce = Mathf.Max(maxLongitudinal, maxLateral) * suspension.GetNormalLoad(isGrounded);
             if(totalFrictionForce.sqrMagnitude > maxFrictionForce * maxFrictionForce)
             {
                 totalFrictionForce = totalFrictionForce.normalized * maxFrictionForce;
@@ -280,7 +281,7 @@ namespace ModularVehicleSimulator.Vehicle
                 angularVelocity = 0f;
                 totalFriction = Vector3.zero;
             }
-            else if(forwardVelocity < DYNAMIC_SPEED_THRESHOLD && Mathf.Abs(motorTorque) < staticFrictionTorqueLimit) // Slow velocity with no slip
+            else if(Mathf.Abs(forwardVelocity) < DYNAMIC_SPEED_THRESHOLD && Mathf.Abs(motorTorque) < staticFrictionTorqueLimit) // Slow velocity with no slip
             {
                 float drivenMass = Mathf.Max(wheelConfiguration.Weight, suspension.GetNormalLoad(isGrounded) / Mathf.Abs(UnityEngine.Physics.gravity.y));
                 float dt = Time.fixedDeltaTime;

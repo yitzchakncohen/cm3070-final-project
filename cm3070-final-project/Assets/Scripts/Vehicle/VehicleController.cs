@@ -45,6 +45,19 @@ namespace ModularVehicleSimulator.Vehicle
         private void Start()
         {
             wheels = GetComponentsInChildren<Wheel>();
+            engine = GetComponent<Engine>();
+            brake = GetComponent<Brake>();
+            foreach (Collider collider in GetComponentsInChildren<Collider>())
+            {
+                if(collider as WheelCollider) continue;
+                collider.material = Chassis.Material;
+            }
+            Init();
+        }
+
+        private void Init()
+        {
+            chassisRigidBody.centerOfMass = vehicleConfiguration.Chassis.CenterOfMass;
             foreach (Wheel wheel in wheels)
             {
                 wheel.Init(vehicleConfiguration.Wheels, 
@@ -55,19 +68,11 @@ namespace ModularVehicleSimulator.Vehicle
                         groundLayerMask
                     );
             }
-            engine = GetComponent<Engine>();
             engine.Init(vehicleConfiguration.Engine, vehicleConfiguration.DriveTrain, wheels);
-            chassisRigidBody.centerOfMass = vehicleConfiguration.Chassis.CenterOfMass;
-            brake = GetComponent<Brake>();
             brake.Init(wheels, vehicleConfiguration.Brakes, vehicleConfiguration.Engine.Type, vehicleConfiguration.Chassis, chassisRigidBody, vehicleConfiguration.Wheels);
             foreach (AntiRollBar antiRollBar in GetComponentsInChildren<AntiRollBar>())
             {
                 antiRollBar.Init(chassisRigidBody, Steering);                
-            }
-            foreach (Collider collider in GetComponentsInChildren<Collider>())
-            {
-                if(collider as WheelCollider) continue;
-                collider.material = Chassis.Material;
             }
         }
 
@@ -79,7 +84,7 @@ namespace ModularVehicleSimulator.Vehicle
 
         public void Reset()
         {
-            engine.Reset();
+            Init();
         }
 
         public void Steer(float steeringInput)

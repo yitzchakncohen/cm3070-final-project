@@ -30,11 +30,6 @@ namespace ModularVehicleSimulator.Vehicle
             currentEngineRPM = engineConfiguration.IdleRPM;
         }
 
-        public void Reset()
-        {
-            currentEngineRPM = engineConfiguration.IdleRPM;
-        }
-
         public void Accelerate(Gear gear, float accelerationInput, float brakeInput)
         {
             lastEngineRPM = motorizedWheels.Average(wheel => wheel.GetEffectiveRPM()) * driveTrain.GetRatioForGear(gear);
