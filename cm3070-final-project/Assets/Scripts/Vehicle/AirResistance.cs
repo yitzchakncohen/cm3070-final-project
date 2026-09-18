@@ -81,6 +81,8 @@ namespace ModularVehicleSimulator.Vehicle
                 frontPosition = vehicleController.ChassisRigidBody.centerOfMass + chassisConfiguration.WheelBase * 0.5f * Vector3.forward;
                 backPosition = vehicleController.ChassisRigidBody.centerOfMass + chassisConfiguration.WheelBase * 0.5f * Vector3.forward;
             }
+            // Debug.Log($"lift front: {lift * -vehicleController.ChassisRigidBody.transform.up * chassisConfiguration.FrontLiftRatio}");
+            // Debug.Log($"lift back: {lift * -vehicleController.ChassisRigidBody.transform.up * (1-chassisConfiguration.FrontLiftRatio)}");
             vehicleController.ChassisRigidBody.AddForceAtPosition(lift * -vehicleController.ChassisRigidBody.transform.up * chassisConfiguration.FrontLiftRatio, frontPosition);
             vehicleController.ChassisRigidBody.AddForceAtPosition(lift * -vehicleController.ChassisRigidBody.transform.up * (1-chassisConfiguration.FrontLiftRatio), backPosition);
         }

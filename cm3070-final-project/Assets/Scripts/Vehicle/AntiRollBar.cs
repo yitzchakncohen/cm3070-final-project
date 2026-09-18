@@ -42,10 +42,12 @@ namespace ModularVehicleSimulator.Vehicle
             {
                 if(wheel.IsLeft && wheel.IsGrounded)
                 {
+                    // Debug.Log($"wheel.transform.up * -antiRollForce {wheel.transform.up * -antiRollForce}");
                     chassisRigidBody.AddForceAtPosition(wheel.transform.up * -antiRollForce, wheel.transform.position);
                 }
                 else if(wheel.IsRight && wheel.IsGrounded)
                 {
+                    // Debug.Log($"wheel.transform.up * antiRollForce {wheel.transform.up * antiRollForce}");
                     chassisRigidBody.AddForceAtPosition(wheel.transform.up * antiRollForce, wheel.transform.position);
                 }
             }

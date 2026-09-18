@@ -8,7 +8,6 @@ namespace ModularVehicleSimulator.Vehicle
     {
         private const float KINEMATIC_SMOOTHING = 50f;
         private const float VELOCITY_FLOOR = 0.1f;
-        private const float SMOOTHING_TIME_STEPS = 30f;
         private const float TORQUE_STOP_THRESHOLD = 1f;
         private const float KINEMATIC_SPEED_THRESHOLD = 2f;
         private const float DYNAMIC_SPEED_THRESHOLD = 5f;
@@ -58,7 +57,7 @@ namespace ModularVehicleSimulator.Vehicle
         }
 
         public void ApplyFriction(
-            RaycastHit raycastHit, 
+            WheelContactData raycastHit, 
             float forceAppPointDistance,
             float steerAngle, 
             float motorTorque, 
@@ -84,7 +83,7 @@ namespace ModularVehicleSimulator.Vehicle
             }
         }
 
-        private void CalculateSlip(float motorTorque, float brakeTorque, bool isGrounded, RaycastHit raycastHit, Vector3 wheelVelocity, Vector3 groundForward, Vector3 groundRight, float forceAppPointDistance)
+        private void CalculateSlip(float motorTorque, float brakeTorque, bool isGrounded, WheelContactData raycastHit, Vector3 wheelVelocity, Vector3 groundForward, Vector3 groundRight, float forceAppPointDistance)
         {
             UpdateAngularVelocity(motorTorque, brakeTorque, forceAppPointDistance, isGrounded, raycastHit, wheelVelocity, groundForward, groundRight);
         }
@@ -94,7 +93,7 @@ namespace ModularVehicleSimulator.Vehicle
             float brakeTorque,
             float forceAppPointDistance,
             bool isGrounded, 
-            RaycastHit hit,
+            WheelContactData hit,
             Vector3 wheelVelocity,
             Vector3 groundForward, 
             Vector3 groundRight)
@@ -106,7 +105,7 @@ namespace ModularVehicleSimulator.Vehicle
             bool isLowVelocity = Mathf.Abs(forwardVelocity) < KINEMATIC_SPEED_THRESHOLD;
             float lateralVelocity = Vector3.Dot(groundRight, wheelVelocity);
             bool isRolling = Mathf.Abs(angularVelocity * radius - forwardVelocity) < 0.5f;
-            float estimatedDistance = hit.distance;
+            float estimatedDistance = hit.distance - wheelConfiguration.Radius;
             // Debug.Log($"{gameObject.name}: forwardVelocity: {forwardVelocity} | isLowVelocity: {isLowVelocity} | isRolling: {isRolling} | Mathf.Abs(motorTorque) < staticFrictionTorqueLimit: {Mathf.Abs(motorTorque) < staticFrictionTorqueLimit} | brakeTorque < TORQUE_STOP_THRESHOLD {brakeTorque < TORQUE_STOP_THRESHOLD}");
             
             if (isLowVelocity && isRolling && Mathf.Abs(motorTorque) < staticFrictionTorqueLimit && brakeTorque < TORQUE_STOP_THRESHOLD)
@@ -126,6 +125,7 @@ namespace ModularVehicleSimulator.Vehicle
 
             for (int i = 0; i < HIGHVELOCITY_SUB_STEPS; i++)
             {
+                // Debug.Log($"Step {i+1}/{HIGHVELOCITY_SUB_STEPS}");
                 suspension.ApplySpringDamperForce(hit, forceAppPointDistance, stepTime, wheelVelocity, ref estimatedDistance, HIGHVELOCITY_SUB_STEPS);
             }
             for (int i = 0; i < HIGHVELOCITY_SUB_STEPS; i++)
@@ -234,7 +234,7 @@ namespace ModularVehicleSimulator.Vehicle
         }
 
         private void ApplyTireForce(
-            RaycastHit raycastHit, 
+            WheelContactData raycastHit, 
             Vector3 forceAppPoint, 
             Vector3 totalFriction, 
             Vector3 groundForward, 

@@ -8,30 +8,33 @@ namespace ModularVehicleSimulator.Vehicle
     {
         private const float SMOOTHING_RATE = 60f;
         private const float SUSPENSION_DISTANCE_BUFFER = 1.5f;
-        private const int SUB_STEPS = 5;
         public float Offset => springDelta;
         private bool isFront;
         private Rigidbody chassisRigidBody;
         private SuspensionConfiguration suspensionConfiguration;
+        private WheelConfiguration wheelConfiguration;
         private float springDelta;
         private float normalLoad = 0f;
 
         public void Init(
             Rigidbody chassisRigidBody, 
             SuspensionConfiguration suspensionConfiguration, 
+            WheelConfiguration wheelConfiguration,
             bool isFront)
         {
             this.chassisRigidBody = chassisRigidBody;
             this.suspensionConfiguration = suspensionConfiguration;
+            this.wheelConfiguration = wheelConfiguration;
             this.isFront = isFront;
         }
 
-        public void ApplySpringDamperForce(RaycastHit raycastHit, float forceAppPointDistance, float stepTime, Vector3 estimatedVelocity, ref float estimatedDistance, int subSteps = 1)
+        public void ApplySpringDamperForce(WheelContactData raycastHit, float forceAppPointDistance, float stepTime, Vector3 estimatedVelocity, ref float estimatedDistance, int subSteps = 1)
         {
             float currentSpringLength = estimatedDistance;
-            float maxDistance = suspensionConfiguration.Distance * SUSPENSION_DISTANCE_BUFFER;
+            float maxDistance = (suspensionConfiguration.Distance  + wheelConfiguration.Radius) * SUSPENSION_DISTANCE_BUFFER;
             springDelta = suspensionConfiguration.Distance - currentSpringLength;
 
+            // Debug.Log($"springDelta {springDelta}");
             if(springDelta > 0)
             {
                 JointSpring jointSpring = isFront ? suspensionConfiguration.GetFrontSuspensionSpring(0) : suspensionConfiguration.GetRearSuspensionSpring(0);
@@ -40,6 +43,7 @@ namespace ModularVehicleSimulator.Vehicle
                 normalLoad = Mathf.Lerp(normalLoad, suspensionForce * alignmentAngle, 1f - Mathf.Exp(-SMOOTHING_RATE * stepTime));
 
                 // Apply force from suspension
+                // Debug.Log($"raycastHit.normal * suspensionForce / subSteps {raycastHit.normal * suspensionForce / subSteps}");
                 Vector3 forcePosition = transform.position - (transform.up * forceAppPointDistance);
                 chassisRigidBody.AddForceAtPosition(raycastHit.normal * suspensionForce / subSteps, forcePosition);     
             }

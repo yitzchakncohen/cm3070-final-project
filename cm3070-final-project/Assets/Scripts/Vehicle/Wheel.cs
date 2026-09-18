@@ -13,6 +13,7 @@ namespace ModularVehicleSimulator.Vehicle
         public const float EFFECTIVE_SLIP_THRESHHOLD = 0.15f;
         public const float SPEEDOMETER_SLIP_THRESHHOLD_MULTIPLIER = .50f;
         public const float FX_SLIP_THRESHHOLD_MULTIPLIER = 7.5f;
+        public const float GROUND_SMOOTH_TIME = 10f;
         public const string TIRES_LAYER = "Tires";
         public Vector3 WheelFriction => GetWheelFrictionVector();
         public Vector3 WheelContactPoint => GetWheelContactPoint();
@@ -25,7 +26,7 @@ namespace ModularVehicleSimulator.Vehicle
         public bool IsRight => transform.localPosition.x > 0f;
         public float RPM => tire.RPM;
         public float Radius => wheelConfiguration.Radius;
-        public Vector3 NormalForce => suspension.GetNormalLoad(isGrounded) * lastGroundHit.normal;
+        public Vector3 NormalForce => isGrounded ? suspension.GetNormalLoad(isGrounded) * lastGroundHit.normal : Vector3.zero;
 
         [SerializeField] private bool isMotorized = true;
         [SerializeField] private bool isSteerable = true;
@@ -41,7 +42,7 @@ namespace ModularVehicleSimulator.Vehicle
         private Rigidbody chassisRigidBody;
         private LayerMask groundLayerMask;
         private PhysicsMaterial surfaceMaterial;
-        private RaycastHit lastGroundHit;
+        private WheelContactData lastGroundHit;
         private float rightSteeringAngle = 0f;
         private float leftSteeringAngle = 0f;
         private float steerAngle = 0f;
@@ -81,7 +82,7 @@ namespace ModularVehicleSimulator.Vehicle
             );
             UpdateWheelPositions();
             UpdateTireVisuals(wheelConfiguration.Radius, wheelConfiguration.Width);
-            suspension.Init(chassisRigidBody, suspensionConfiguration, IsFront);
+            suspension.Init(chassisRigidBody, suspensionConfiguration, wheelConfiguration, IsFront);
             tire.Init(chassisRigidBody, wheelConfiguration, suspension);
         }
 
@@ -248,30 +249,119 @@ namespace ModularVehicleSimulator.Vehicle
             return Mathf.Max(0f, offsetDistance);
         }
 
-        private RaycastHit CheckIsGrounded()
+        private WheelContactData CheckIsGrounded()
         {
-            // Offset the origin upwards to keep the cast start point above ground level
+            float halfLength = wheelConfiguration.Radius * 0.5f;
+            float halfWidth = wheelConfiguration.Width * 0.5f;
             float raycastOffset = wheelConfiguration.Radius * 2.0f;
-            Vector3 origin = transform.position + (transform.up * raycastOffset);
-            float maxDistance = suspensionConfiguration.Distance + raycastOffset;
+            Vector3 origin = transform.position + (raycastOffset * transform.up);
 
-            isGrounded = UnityEngine.Physics.SphereCast(
-                origin,
-                wheelConfiguration.Radius,
-                -transform.up,
-                out RaycastHit hit,
-                maxDistance,
-                groundLayerMask
-            );
-
-            if (isGrounded)
+            Vector3[] rayOrigins = new Vector3[]
             {
-                // Correct distance to account for the raised origin
-                hit.distance = Mathf.Max(0f, hit.distance - raycastOffset);
-                // Debug.Log($"hit.distance {hit.distance}, raycastOffset, {raycastOffset}");
+                origin + (transform.forward * halfLength) + (transform.right * halfWidth),   // Front-transform.right
+                origin + (transform.forward * halfLength) - (transform.right * halfWidth),   // Front-Left
+                origin - (transform.forward * halfLength) + (transform.right * halfWidth),   // Rear-transform.right
+                origin - (transform.forward * halfLength) - (transform.right * halfWidth)    // Rear-Left
+            };
+
+            float maxDistance = suspensionConfiguration.Distance + wheelConfiguration.Radius + raycastOffset;
+            int hitCount = 0;
+            float totalDistance = 0f;
+            Vector3 totalNormal = Vector3.zero;
+            Vector3 totalPoint = Vector3.zero;
+            Collider collider = null;
+            Transform hitTransform = null;
+            float minDistance = float.MaxValue;
+
+            // Average four raycasts;
+            for (int i = 0; i < 4; i++)
+            {
+                if(UnityEngine.Physics.Raycast(rayOrigins[i], -transform.up, out RaycastHit hit, maxDistance, groundLayerMask))
+                {
+                    hitCount++;
+                    totalDistance += Mathf.Max(-wheelConfiguration.Radius, hit.distance - raycastOffset);
+                    totalNormal += hit.normal;
+                    totalPoint += hit.point;
+                    if(hit.distance < minDistance)
+                    {
+                        minDistance = hit.distance;    
+                        collider = hit.collider;
+                        hitTransform = hit.transform;
+                    }
+                }
             }
 
-            return hit;
+            if(hitCount > 0)
+            {
+                // Debug.Log($"Point {totalPoint/hitCount}");
+                Vector3 smoothedNormal = (totalNormal/hitCount).normalized;
+                if(lastGroundHit.hitCount > 0)
+                {
+                    smoothedNormal = Vector3.Slerp(lastGroundHit.normal, (totalNormal/hitCount).normalized, GROUND_SMOOTH_TIME * Time.fixedDeltaTime);
+                }
+                isGrounded = true;
+                return new WheelContactData()
+                {
+                    hitCount = hitCount,
+                    distance = totalDistance/hitCount - 0.0116f,
+                    normal = smoothedNormal,
+                    point = totalPoint/hitCount,
+                    collider = collider,
+                    transform = hitTransform,
+                };
+            }
+            else
+            {
+                isGrounded = false;           
+                return new WheelContactData()
+                {
+                    hitCount = 0,
+                    distance = maxDistance - raycastOffset,
+                    normal = transform.up,
+                    point = transform.position,
+                    collider = null,
+                    transform = null,
+                };      
+            }
+        }
+
+        private void OnDrawGizmos()
+        {
+
+            if (wheelConfiguration == null || suspensionConfiguration == null) return;
+
+            float halfLength = wheelConfiguration.Radius * 0.5f;
+            float halfWidth = wheelConfiguration.Width * 0.5f;
+            Vector3 origin = transform.position;
+
+            Vector3[] rayOrigins = new Vector3[]
+            {
+                origin + (transform.forward * halfLength) + (transform.right * halfWidth),   // Front-Right
+                origin + (transform.forward * halfLength) - (transform.right * halfWidth),   // Front-Left
+                origin - (transform.forward * halfLength) + (transform.right * halfWidth),   // Rear-Right
+                origin - (transform.forward * halfLength) - (transform.right * halfWidth)    // Rear-Left
+            };
+
+            // Use suspensionConfiguration distance if available, otherwise fallback to a safe default length
+            float maxDistance = suspensionConfiguration.Distance;
+
+            for (int i = 0; i < rayOrigins.Length; i++)
+            {
+                Vector3 start = rayOrigins[i];
+                Vector3 direction = -transform.up;
+
+                if (isGrounded)
+                {
+                    Gizmos.color = Color.greenYellow;
+                    Gizmos.DrawLine(start, start + direction * lastGroundHit.distance);
+                    Gizmos.DrawSphere(lastGroundHit.point, 0.02f);
+                }
+                else
+                {
+                    Gizmos.color = Color.red;
+                    Gizmos.DrawRay(start, direction * maxDistance);
+                }
+            }
         }
     }
 }

@@ -19,8 +19,8 @@ MonoBehaviour:
   enableABS: 1
   aBSSlipThresholdMultiplier: 1.1
   aBSOscillationSpeed: 20
-  enableBrakeTorqueVectoring: 1
-  vectoringBrakeTorqueInNewtonMeters: 400
+  enableBrakeTorqueVectoring: 0
+  vectoringBrakeTorqueInNewtonMeters: 200
   understeerThresholdInDegreesPerSecond: 4.5
   understeerSpeedMinInMetersPerSecond: 5
   understeerSpeedMaxInMetersPerSecond: 40
