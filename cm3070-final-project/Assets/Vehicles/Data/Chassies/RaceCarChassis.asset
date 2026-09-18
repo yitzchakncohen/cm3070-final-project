@@ -15,7 +15,7 @@ MonoBehaviour:
   massInKG: 1180
   wheelBaseInMeters: 2.45
   trackInMeters: 1.698
-  centerOfMassOffsetInMeters: {x: 0, y: 0.25, z: 0.05}
+  centerOfMassOffsetInMeters: {x: 0, y: 0, z: 0.05}
   numberOfWheels: 4
   groundClearance: 0.06
   dragCoefficient: 0.42

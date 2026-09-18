@@ -7,7 +7,7 @@ namespace ModularVehicleSimulator.Vehicle.Data
     {
         public float Torque => brakeTorqueInNewtonMeters;
         public float RegenerativeBrakeTorque => regenerativeBrakeTorqueInNewtonMeters;
-        public float FrontBias => fontBrakeBias;
+        public float FrontBias => frontBrakeBias;
         public bool ABSEnabled => enableABS;
         public bool RegenerativeBrakingEnabled => enableRegenerativeBraking;
         public float ABSSlipThreshholdMultiplier => aBSSlipThresholdMultiplier;
@@ -23,7 +23,7 @@ namespace ModularVehicleSimulator.Vehicle.Data
         [Tooltip("Braking force applied when there is no \ngas or brake input on electric vehicle.")]
         [SerializeField] private float regenerativeBrakeTorqueInNewtonMeters = 600f;
         [Tooltip("The ratio of the braking force \napplied to the front wheels.")]
-        [SerializeField] private float fontBrakeBias = 0.7f;
+        [SerializeField] private float frontBrakeBias = 0.7f;
         [Tooltip("Does the EV use regenerative \nbraking to charge the battery?")]
         [SerializeField] private bool enableRegenerativeBraking = true;
         [Header("ABS")]

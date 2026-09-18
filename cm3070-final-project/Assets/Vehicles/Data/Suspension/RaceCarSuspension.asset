@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e34d223a4050714196a207e846292ca, type: 3}
   m_Name: RaceCarSuspension
   m_EditorClassIdentifier: Assembly-CSharp::ModularVehicleSimulator.Vehicle.Data.SuspensionConfiguration
-  suspensionDistanceInMeters: 0.12
-  forceAppPointOffsetInMeters: 0.05
-  frontSpringConstant: 65000
-  backSpringConstant: 55000
-  damper: 8500
+  suspensionDistanceInMeters: 0.2
+  forceAppPointOffsetInMeters: 0.2
+  frontSpringConstant: 40000
+  backSpringConstant: 30000
+  damper: 4000

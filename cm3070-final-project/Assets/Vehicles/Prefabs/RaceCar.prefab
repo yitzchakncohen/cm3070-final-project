@@ -669,8 +669,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ModularVehicleSimulator.Vehicle.AntiRollBar
   wheels:
-  - {fileID: 3373721193600527650}
   - {fileID: 4900216752931978825}
+  - {fileID: 3373721193600527650}
   isFront: 0
 --- !u!1001 &1490594721083737990
 PrefabInstance:

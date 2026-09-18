@@ -35,8 +35,8 @@ namespace ModularVehicleSimulator.Vehicle
             colliders = GetComponentsInChildren<Collider>();
             VehiclePhysics.GetCollidersCrossSectionPolygon(colliders, velocity.normalized, vehicleController.ChassisRigidBody.transform.up, vehicleController.ChassisRigidBody.worldCenterOfMass, crossSection);
             VehiclePhysics.GetCollidersCrossSectionPolygon(colliders, Vector3.up, velocity.normalized, vehicleController.ChassisRigidBody.worldCenterOfMass, topDownCrossSection);
-            frontPosition = vehicleController.ChassisRigidBody.centerOfMass + chassisConfiguration.WheelBase * 0.5f * Vector3.forward;
-            backPosition = vehicleController.ChassisRigidBody.centerOfMass + chassisConfiguration.WheelBase * 0.5f * Vector3.forward;
+            frontPosition = vehicleController.ChassisRigidBody.centerOfMass + chassisConfiguration.WheelBase * 0.5f * vehicleController.ChassisRigidBody.transform.forward;
+            backPosition = vehicleController.ChassisRigidBody.centerOfMass - chassisConfiguration.WheelBase * 0.5f * vehicleController.ChassisRigidBody.transform.forward;
         }
 
         private void FixedUpdate()
@@ -78,13 +78,13 @@ namespace ModularVehicleSimulator.Vehicle
                 VehiclePhysics.GetCollidersCrossSectionPolygon(colliders, Vector3.up, velocity.normalized, vehicleController.ChassisRigidBody.worldCenterOfMass, topDownCrossSection);
                 topDownArea = VehiclePhysics.GetAreaOfConvexHull(topDownCrossSection);
                 lift = chassisConfiguration.LiftCoefficient * AIR_DENSITY * (velocity.sqrMagnitude / 2f) * topDownArea;
-                frontPosition = vehicleController.ChassisRigidBody.centerOfMass + chassisConfiguration.WheelBase * 0.5f * Vector3.forward;
-                backPosition = vehicleController.ChassisRigidBody.centerOfMass + chassisConfiguration.WheelBase * 0.5f * Vector3.forward;
+                frontPosition = vehicleController.ChassisRigidBody.centerOfMass + chassisConfiguration.WheelBase * 0.5f * vehicleController.ChassisRigidBody.transform.forward;
+                backPosition = vehicleController.ChassisRigidBody.centerOfMass - chassisConfiguration.WheelBase * 0.5f * vehicleController.ChassisRigidBody.transform.forward;
             }
             // Debug.Log($"lift front: {lift * -vehicleController.ChassisRigidBody.transform.up * chassisConfiguration.FrontLiftRatio}");
             // Debug.Log($"lift back: {lift * -vehicleController.ChassisRigidBody.transform.up * (1-chassisConfiguration.FrontLiftRatio)}");
-            vehicleController.ChassisRigidBody.AddForceAtPosition(lift * -vehicleController.ChassisRigidBody.transform.up * chassisConfiguration.FrontLiftRatio, frontPosition);
-            vehicleController.ChassisRigidBody.AddForceAtPosition(lift * -vehicleController.ChassisRigidBody.transform.up * (1-chassisConfiguration.FrontLiftRatio), backPosition);
+            vehicleController.ChassisRigidBody.AddForceAtPosition(lift * vehicleController.ChassisRigidBody.transform.up * chassisConfiguration.FrontLiftRatio, frontPosition);
+            vehicleController.ChassisRigidBody.AddForceAtPosition(lift * vehicleController.ChassisRigidBody.transform.up * (1-chassisConfiguration.FrontLiftRatio), backPosition);
         }
     }    
 }
