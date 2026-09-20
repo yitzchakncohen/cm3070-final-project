@@ -12,8 +12,8 @@ namespace ModularVehicleSimulator.Vehicle
         private const string CHASSIS_LAYER = "Chassis";
         public event Action OnGearChanged;
         public string Name => vehicleConfiguration.Name;
-        public bool IsABSActive => brake.IsABSActive;
-        public bool IsTVBActive => brake.IsTVBActive;
+        public bool IsABSActive => brake != null? brake.IsABSActive : false;
+        public bool IsTVBActive => brake != null ? brake.IsTVBActive : false;
         public float Speed => speed;
         public float RPM => engineRPM;
         public float CurrentSteeringAngle => currentTargetSteeringAngle;

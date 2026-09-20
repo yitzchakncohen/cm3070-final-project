@@ -44,22 +44,7 @@ namespace ModularVehicleSimulator.Vehicle
             {
                 if(engineType == EngineType.Electric && brakesConfiguration.RegenerativeBrakingEnabled && brakeInput < 0.01f && throttleInput < 0.01f) // TODO, Hybrid?
                 {
-                    if(wheel.IsMotorized)
-                    {
-                        float speed = VehiclePhysics.GetVehicleSpeed(wheels, wheelConfiguration.Radius);
-                        float regenerativeBrakeTorque = 
-                            Mathf.Clamp01(speed / REGENERATIVE_BRAKING_CUTOFF_KMH ) 
-                            * brakesConfiguration.RegenerativeBrakeTorque / motorizedWheelCount;
-                        float brakeTorque = ApplyBrakeTorqueVectoring(wheel, targetSteeringAngle, regenerativeBrakeTorque, forwardSpeed);
-                        brakeTorque = ApplyABS(wheel, brakeTorque);
-                        wheel.Brake(brakeTorque);
-                    }
-                    else
-                    {
-                        float brakeTorque = ApplyBrakeTorqueVectoring(wheel, targetSteeringAngle, 0f, forwardSpeed);  
-                        brakeTorque = ApplyABS(wheel, brakeTorque);
-                        wheel.Brake(brakeTorque);
-                    }
+                    ApplyRegenerativeBraking(targetSteeringAngle, forwardSpeed, wheel);
                 }
                 else
                 {
@@ -70,6 +55,26 @@ namespace ModularVehicleSimulator.Vehicle
                     brakeTorque = ApplyABS(wheel, brakeTorque);
                     wheel.Brake(brakeTorque);     
                 }
+            }
+        }
+
+        private void ApplyRegenerativeBraking(float targetSteeringAngle, float forwardSpeed, Wheel wheel)
+        {
+            if (wheel.IsMotorized)
+            {
+                float speed = VehiclePhysics.GetVehicleSpeed(wheels, wheelConfiguration.Radius);
+                float regenerativeBrakeTorque =
+                    Mathf.Clamp01(speed / REGENERATIVE_BRAKING_CUTOFF_KMH)
+                    * brakesConfiguration.RegenerativeBrakeTorque / motorizedWheelCount;
+                float brakeTorque = ApplyBrakeTorqueVectoring(wheel, targetSteeringAngle, regenerativeBrakeTorque, forwardSpeed);
+                brakeTorque = ApplyABS(wheel, brakeTorque);
+                wheel.Brake(brakeTorque);
+            }
+            else
+            {
+                float brakeTorque = ApplyBrakeTorqueVectoring(wheel, targetSteeringAngle, 0f, forwardSpeed);
+                brakeTorque = ApplyABS(wheel, brakeTorque);
+                wheel.Brake(brakeTorque);
             }
         }
 

@@ -14,6 +14,7 @@ namespace ModularVehicleSimulator.Vehicle
         private const float RAD_SEC_TO_RPM = 60f / (2f * Mathf.PI);
         private const float IDLE_COMPENSATION_MAX = 0.3f;
         private const float IDLE_FLOOR_FACTOR = 0.8f;
+        private const float EV_CREEP_TORQUE_THROTTLE = 0.04f;
         private EngineConfiguration engineConfiguration;
         private DriveTrain driveTrain;
         private Wheel[] wheels;
@@ -84,8 +85,13 @@ namespace ModularVehicleSimulator.Vehicle
             // Output engine torque through the drive train to the wheels
             // Still simulated for an EV
             bool idleEngineCreep = currentEngineRPM > Mathf.Abs(engineInputRPM);
-            bool isIdleEV = engineConfiguration.Type == EngineType.Electric && brakeInput < 0.01f;
-            if (isIdleEV || throttleInput > 0.01f || idleEngineCreep)
+            bool isIdleEV = engineConfiguration.Type == EngineType.Electric && brakeInput < 0.01f && throttleInput < 0.01f;
+            if(isIdleEV)
+            {
+                // Manually simulate engine creep on an EV.
+                return engineConfiguration.GetTorque(engineConfiguration.IdleRPM) * EV_CREEP_TORQUE_THROTTLE;
+            }
+            else if (throttleInput > 0.01f || idleEngineCreep)
             {
                 // Combustion or idle momentum applies force to the wheels
                 return netEngineTorque * driveTrain.GetRatioForGear(gear) * driveTrain.Loss;
