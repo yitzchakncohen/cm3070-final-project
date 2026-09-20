@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using ModularVehicleSimulator.Physics;
 using ModularVehicleSimulator.Vehicle;
 using UnityEngine;
 
@@ -7,7 +8,6 @@ namespace ModularVehicleSimulator.Debugging
 {
     public class TireFrictionGizmo : DebuggingTool
     {
-        private const float NEWTON_TO_METER_SCALING = 1000f;
         private Wheel[] wheels = null;
 
         private void Start()
@@ -24,7 +24,7 @@ namespace ModularVehicleSimulator.Debugging
 
             foreach (Wheel wheel in wheels)
             {
-                Gizmos.DrawLine(wheel.WheelContactPoint, wheel.WheelContactPoint + (wheel.WheelFriction / NEWTON_TO_METER_SCALING));
+                Gizmos.DrawLine(wheel.WheelContactPoint, wheel.WheelContactPoint + (wheel.WheelFriction / VehiclePhysics.NEWTON_TO_METER_SCALING));
             }
         }
 

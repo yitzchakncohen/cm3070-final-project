@@ -12,6 +12,8 @@ namespace ModularVehicleSimulator.Physics
         public const float METERS_PER_SECOND_TO_KM_PER_HOUR = 3.6f;
         public const int SPHERE_SEGMENTS = 24;
         public const float STOPPED_VELOCITY = 0.05f;
+        public const float NEWTON_TO_METER_SCALING = 1000f;
+
         // Shared buffers to avoid GC allocations during runtime
         private static readonly List<Vector2> boundingPointsBuffer = new List<Vector2>();
         private static readonly List<Vector2> convexHullBuffer = new List<Vector2>();

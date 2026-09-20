@@ -46,6 +46,10 @@ namespace ModularVehicleSimulator.Debugging
                 Gizmos.DrawLine(worldP1, worldP2);
                 Gizmos.DrawSphere(worldP1, VERTEX_RADIUS);
             }
+
+            Gizmos.DrawLine(airResistance.FrontPosition, airResistance.FrontPosition + airResistance.LiftFrontForce / VehiclePhysics.NEWTON_TO_METER_SCALING);
+            Gizmos.DrawLine(airResistance.BackPosition, airResistance.BackPosition + airResistance.LiftBackForce / VehiclePhysics.NEWTON_TO_METER_SCALING);
+            Gizmos.DrawLine(center, center + airResistance.DragVector / VehiclePhysics.NEWTON_TO_METER_SCALING);
         }
 
         public override Dictionary<string, string> GetDebugValues()
