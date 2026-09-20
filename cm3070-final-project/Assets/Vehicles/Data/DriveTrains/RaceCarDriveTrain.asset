@@ -31,4 +31,5 @@ MonoBehaviour:
     Ratio: 1
   loss: 0.92
   finalDriveRatio: 3.73
-  damping: 1.2
+  damping: 2.5
+  rigidity: 80

@@ -17,6 +17,7 @@ namespace ModularVehicleSimulator.Vehicle
         public float RPM => currentRPM;
         public float ForwardSlip => forwardSlip;
         public float SidewaysSlip => sidewaysSlip;
+        public float RPMAcceleration => angularAcceleration * Mathf.Rad2Deg / 6f;
         
         private Rigidbody chassisRigidbody;
         private Suspension suspension;
@@ -25,6 +26,7 @@ namespace ModularVehicleSimulator.Vehicle
         private WheelFrictionCurve sidewaysFrictionCurve;
         private float currentRPM = 0f;
         private float angularVelocity = 0f;
+        private float angularAcceleration = 0f;
         private float forwardSlip = 0f;
         private float sidewaysSlip = 0f;
 
@@ -203,7 +205,7 @@ namespace ModularVehicleSimulator.Vehicle
             }
 
             // Sub-step Euler Integration
-            float angularAcceleration = netTorque / tireInertia;
+            angularAcceleration = netTorque / tireInertia;
             float nextAngularVelocity = angularVelocity + (angularAcceleration * dt);
             float estimatedChassisAcceleration = longitudinalForceN / drivenMass;
 

@@ -19,7 +19,7 @@ namespace ModularVehicleSimulator.Vehicle.Data
         [Tooltip("Minimum time between \nautomatic gear shifting.")]
         [SerializeField] private float minAutomaticTransmissionShiftTime = 1.0f;
         [Tooltip("Momemntum of the rotating engine \ncomponents (or simulated intertia in an EV)")]
-        [SerializeField] private float inertiaInKgSquareMeters = 0.2f;
+        [SerializeField] private float inertiaInKgSquareMeters = 0.45f;
         [Header("Torque Curve")]
         [Tooltip("The engines rotations per minute (RPM) at idle.")]
         [SerializeField] private float idleRPM = 800f;

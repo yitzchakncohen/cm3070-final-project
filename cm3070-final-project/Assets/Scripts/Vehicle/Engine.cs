@@ -15,12 +15,15 @@ namespace ModularVehicleSimulator.Vehicle
         private const float IDLE_COMPENSATION_MAX = 0.3f;
         private const float IDLE_FLOOR_FACTOR = 0.8f;
         private const float EV_CREEP_TORQUE_THROTTLE = 0.04f;
+        private const float MAX_TORQUE_FROM_WHEELS_DELTA = 1000f; // [N*m]
+        private const int ENGINE_SUBSTEPS = 10;
         private EngineConfiguration engineConfiguration;
         private DriveTrain driveTrain;
         private Wheel[] wheels;
         private List<Wheel> motorizedWheels;
         private float currentEngineRPM = 0f;
         private float lastEngineRPM = 0f;
+        private float torqueFromWheels = 0f;
 
         public void Init(EngineConfiguration engineConfiguration, DriveTrain driveTrain, Wheel[] wheels)
         {
@@ -33,8 +36,17 @@ namespace ModularVehicleSimulator.Vehicle
 
         public void Accelerate(Gear gear, float accelerationInput, float brakeInput)
         {
+            float substepDT = Time.fixedDeltaTime / ENGINE_SUBSTEPS;
+            float totalTorque = 0f;
             lastEngineRPM = motorizedWheels.Average(wheel => wheel.GetEffectiveRPM()) * driveTrain.GetRatioForGear(gear);
-            float totalTorque = GetWheelTorque(gear, accelerationInput, brakeInput, lastEngineRPM);
+            float averageWheelAcceleration = motorizedWheels.Average(wheel => wheel.RPMAcceleration); 
+
+            for (int i = 0; i < ENGINE_SUBSTEPS; i++)
+            {
+                float substepTime = (Time.fixedDeltaTime / ENGINE_SUBSTEPS) * i;
+                float estimatedEngineRPM = lastEngineRPM + (averageWheelAcceleration * driveTrain.GetRatioForGear(gear) * substepTime);
+                totalTorque = GetWheelTorque(gear, accelerationInput, brakeInput, estimatedEngineRPM, substepDT);           
+            }
 
             // Apply the engine torque or braking to the wheels
             foreach (Wheel wheel in motorizedWheels)
@@ -42,6 +54,7 @@ namespace ModularVehicleSimulator.Vehicle
                 float wheelTorque = ApplyOpenDifferential(totalTorque, motorizedWheels.Count);
                 wheel.Accelerate(wheelTorque);
             }                
+
         }
 
         private float ApplyOpenDifferential(float inputTorque, int numberOfWheels)
@@ -49,7 +62,7 @@ namespace ModularVehicleSimulator.Vehicle
             return inputTorque / numberOfWheels;
         }
 
-        private float GetWheelTorque(Gear gear, float throttleInput, float brakeInput, float engineInputRPM)
+        private float GetWheelTorque(Gear gear, float throttleInput, float brakeInput, float engineInputRPM, float substepDT)
         {
             if(gear == Gear.Park || gear == Gear.Neutral) return 0f;
 
@@ -72,14 +85,16 @@ namespace ModularVehicleSimulator.Vehicle
             // Calculate Wheel Torque 
             float rpmDelta = currentEngineRPM - (engineInputRPM * Mathf.Sign(driveTrain.GetRatioForGear(gear)));
             float effectiveRigidity = driveTrain.Rigidity * Mathf.Abs(driveTrain.GetRatioForGear(gear));
-            float torqueFromWheels = rpmDelta * effectiveRigidity * Time.fixedDeltaTime / RAD_SEC_TO_RPM;
+            torqueFromWheels = Mathf.MoveTowards(torqueFromWheels, rpmDelta * effectiveRigidity / RAD_SEC_TO_RPM, MAX_TORQUE_FROM_WHEELS_DELTA * substepDT);
+            float driveTrainDampingForce = Mathf.Abs(rpmDelta * driveTrain.Damping) * Mathf.Sign(driveTrain.GetRatioForGear(gear));
+            Debug.Log("currentEngineRPM: " + currentEngineRPM + " | engineInputRPM " + engineInputRPM * Mathf.Sign(driveTrain.GetRatioForGear(gear)));
 
             // Calculate Engine Momentum
-            float netTorque = netEngineTorque - torqueFromWheels;
+            float netTorque = netEngineTorque - torqueFromWheels - driveTrainDampingForce;
             float angularAcceleration = netTorque / engineConfiguration.Inertia;
 
             // Update the engine RPM
-            currentEngineRPM += angularAcceleration * Time.fixedDeltaTime * RAD_SEC_TO_RPM;
+            currentEngineRPM += angularAcceleration * substepDT * RAD_SEC_TO_RPM;
             currentEngineRPM = Mathf.Clamp(currentEngineRPM, engineConfiguration.IdleRPM * IDLE_FLOOR_FACTOR, engineConfiguration.MaxRPM);
 
             // Output engine torque through the drive train to the wheels
