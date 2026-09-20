@@ -22,6 +22,8 @@ namespace ModularVehicleSimulator.UI
         [SerializeField] private VehicleSelectionMenu vehicleSelectionMenu;
         [SerializeField] private VehicleSettingsMenu vehicleSettingsMenu;
         [SerializeField] private CameraUI cameraUI;
+        [SerializeField] private GameObject ABSIndicator;
+        [SerializeField] private GameObject TVBIndicator;
         private VehicleController vehicleController;
         private SteeringConfiguration steeringConfiguration;
         private InputManager inputManager;
@@ -67,6 +69,8 @@ namespace ModularVehicleSimulator.UI
             UpdateSteeringWheel();
             speedomdeter.UpdateNeedle(vehicleController.Speed * 3.6f);
             tachometer.UpdateNeedle(vehicleController.RPM / 1000f);
+            ABSIndicator.SetActive(vehicleController.IsABSActive);
+            TVBIndicator.SetActive(vehicleController.IsTVBActive);
         }
 
         private void UpdateSteeringWheel()

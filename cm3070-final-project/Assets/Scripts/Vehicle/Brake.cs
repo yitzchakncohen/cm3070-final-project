@@ -7,6 +7,10 @@ namespace ModularVehicleSimulator.Vehicle
 {
     public class Brake : MonoBehaviour
     {
+        public bool IsABSActive => isABSActive;
+        public bool IsTVBActive => isTVBActive;
+        private bool isABSActive = false;
+        private bool isTVBActive = false;
         private const float REGENERATIVE_BRAKING_CUTOFF_KMH = 5f;
         private const float ABS_CUTOFF_KMH = 5f;
         private const float BRAKE_TORQUE_VECTORING_BLEND_WINDOW = 0.2f;
@@ -69,8 +73,10 @@ namespace ModularVehicleSimulator.Vehicle
             }
         }
 
+        // Anti-lock Brake Sustem (ABS)
         private float ApplyABS(Wheel wheel, float brakeTorque)
         {
+            isABSActive = false;
             float speed = VehiclePhysics.GetVehicleSpeed(wheels, wheelConfiguration.Radius);
             if (speed < ABS_CUTOFF_KMH / VehiclePhysics.METERS_PER_SECOND_TO_KM_PER_HOUR) return brakeTorque;
             if (brakesConfiguration.ABSEnabled)
@@ -78,14 +84,17 @@ namespace ModularVehicleSimulator.Vehicle
                 float vehicleForwardSlip = wheel.GetAverageForwardSlip();
                 if (Mathf.Abs(vehicleForwardSlip) > wheel.GetSlipThreshold(brakesConfiguration.ABSSlipThreshholdMultiplier))
                 {
+                    isABSActive = true;
                     brakeTorque = VehiclePhysics.ABSStepFunction(brakeTorque, brakesConfiguration.ABSOscillationSpeed);
                 }
             }
             return brakeTorque;
         }
 
+        // TVB - Torque Vecotring by Braking
         private float ApplyBrakeTorqueVectoring(Wheel wheel, float targetSteeringAngle, float brakeTorque, float forwardSpeed)
         {
+            isTVBActive = false;
             if(!brakesConfiguration.IsBrakeTorqueVectoringEnabled) return brakeTorque;
 
             // Speed Thresholds
@@ -102,6 +111,7 @@ namespace ModularVehicleSimulator.Vehicle
             
             if(understeeringError > brakesConfiguration.UndersteerThreshold)
             {
+                isTVBActive= true;
                 float severity = Mathf.Clamp01((understeeringError - brakesConfiguration.UndersteerThreshold) / BRAKE_TORQUE_VECTORING_BLEND_WINDOW );
                 float brakeTorqueAdjustment = brakesConfiguration.VectoringBrakeTorque * severity;
                 if(targetAngleRad > 0) // Turning right
