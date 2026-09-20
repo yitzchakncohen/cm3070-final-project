@@ -59,5 +59,6 @@ namespace ModularVehicleSimulator.Debugging
         TurningRadius    = 1 << 2,
         AirResistance    = 1 << 3,
         Suspension    = 1 << 4,
+        Wheels    = 1 << 5,
     }
 }
