@@ -58,12 +58,12 @@ namespace ModularVehicleSimulator.Vehicle.Audio
                 float slipThreshhold = wheel.GetSlipThreshold(Wheel.FX_SLIP_THRESHHOLD_MULTIPLIER);
                 if (wheel.IsGrounded && slip > slipThreshhold)
                 {
+                    float slipPercent = (slip + slipThreshhold) / (slipThreshhold * 20f);
+                    wheelsAudioSource.volume = Mathf.Lerp(0f, 1f, slipPercent);
                     if(!wheelsAudioSource.isPlaying)
                     {
                         wheelsAudioSource.Play();
-                        float slipPercent = (slip + slipThreshhold) / (slipThreshhold * 2f);
-                        wheelsAudioSource.volume = Mathf.Lerp(0f, 1f, slipPercent);
-                        return;
+                        return; 
                     }
                 }
             }
