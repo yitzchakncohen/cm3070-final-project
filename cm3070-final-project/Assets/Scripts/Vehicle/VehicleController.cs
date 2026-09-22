@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using ModularVehicleSimulator.Physics;
 using ModularVehicleSimulator.Vehicle.Data;
 using UnityEngine;
@@ -47,9 +46,18 @@ namespace ModularVehicleSimulator.Vehicle
         private void Start()
         {
             wheels = GetComponentsInChildren<Wheel>();
+            if(wheels.Length == 0)
+            {
+                Debug.LogException(new Exception("[VehicleController] No wheels found in vehicle."));
+            }
             engine = GetComponent<Engine>();
             brake = GetComponent<Brake>();
-            foreach (Collider collider in GetComponentsInChildren<Collider>())
+            Collider[] colliders = GetComponentsInChildren<Collider>();
+            if(colliders.Length == 0)
+            {
+                Debug.LogException(new Exception("[VehicleController] No colliders found on vehicle."));
+            }
+            foreach (Collider collider in colliders)
             {
                 if(collider as WheelCollider) continue;
                 collider.material = Chassis.Material;
@@ -59,22 +67,30 @@ namespace ModularVehicleSimulator.Vehicle
 
         private void Init()
         {
-            chassisRigidBody.centerOfMass = vehicleConfiguration.Chassis.CenterOfMass;
-            foreach (Wheel wheel in wheels)
+            try
             {
-                wheel.Init(vehicleConfiguration.Wheels, 
-                        vehicleConfiguration.Steering, 
-                        vehicleConfiguration.Suspension,
-                        vehicleConfiguration.Chassis,
-                        chassisRigidBody,
-                        groundLayerMask
-                    );
+                chassisRigidBody.centerOfMass = vehicleConfiguration.Chassis.CenterOfMass;
+                foreach (Wheel wheel in wheels)
+                {
+                    wheel.Init(vehicleConfiguration.Wheels, 
+                            vehicleConfiguration.Steering, 
+                            vehicleConfiguration.Suspension,
+                            vehicleConfiguration.Chassis,
+                            chassisRigidBody,
+                            groundLayerMask
+                        );
+                }
+                engine.Init(vehicleConfiguration.Engine, vehicleConfiguration.DriveTrain, wheels);
+                brake.Init(wheels, vehicleConfiguration.Brakes, vehicleConfiguration.Engine.Type, vehicleConfiguration.Chassis, chassisRigidBody, vehicleConfiguration.Wheels);
+                foreach (AntiRollBar antiRollBar in GetComponentsInChildren<AntiRollBar>())
+                {
+                    antiRollBar.Init(chassisRigidBody, Steering);                
+                }                
             }
-            engine.Init(vehicleConfiguration.Engine, vehicleConfiguration.DriveTrain, wheels);
-            brake.Init(wheels, vehicleConfiguration.Brakes, vehicleConfiguration.Engine.Type, vehicleConfiguration.Chassis, chassisRigidBody, vehicleConfiguration.Wheels);
-            foreach (AntiRollBar antiRollBar in GetComponentsInChildren<AntiRollBar>())
+            catch (System.Exception e)
             {
-                antiRollBar.Init(chassisRigidBody, Steering);                
+                Debug.LogException(new Exception("[VehicleController] Unable to initialize vehicle: " + e.Message));
+                throw;
             }
         }
 

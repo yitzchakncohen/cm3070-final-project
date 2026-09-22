@@ -46,7 +46,8 @@ namespace ModularVehicleSimulator.Vehicle
 
         private void FixedUpdate()
         {
-            velocity = vehicleController.ChassisRigidBody.linearVelocity - Weather.Instance.WindVelocity;
+            Vector3 windVelocity = Weather.Instance != null ? Weather.Instance.WindVelocity : Vector3.zero;
+            velocity = vehicleController.ChassisRigidBody.linearVelocity - windVelocity;
 
             if (velocity.sqrMagnitude > 0.01f)
             {

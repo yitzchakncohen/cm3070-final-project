@@ -1,3 +1,4 @@
+using System;
 using ModularVehicleSimulator.Vehicle.Data;
 using UnityEngine;
 
@@ -14,10 +15,18 @@ namespace ModularVehicleSimulator.Vehicle
         {
             this.chassisRigidBody = chassisRigidBody;
             this.steeringConfiguration = steeringConfiguration;
+            if (wheels.Length <= 1)
+            {
+                Debug.LogException(new Exception("[Anti-Roll Bar] Not enough wheels on anti-roll bar: " + gameObject.name));
+            }
         }
 
         private void FixedUpdate()
         {
+            if (wheels.Length <= 1)
+            {
+                return;
+            }
             float travelLeft = 0f;
             float travelRight = 0f;
             int leftWheels = 0;

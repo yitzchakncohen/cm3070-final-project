@@ -127,6 +127,10 @@ namespace ModularVehicleSimulator.Physics
             }
 
             float tanOfTargetAngle = Mathf.Tan(Mathf.Abs(targetAngle) * Mathf.Deg2Rad);
+            if(tanOfTargetAngle == 0)
+            {
+                Debug.LogException(new Exception("[Vehicle Physics] Target steering angle is not valid."));
+            }
             if(targetAngle > 0) // Turning Right
             {
                 rightSteeringAngle = Mathf.Rad2Deg * Mathf.Atan(wheelBase / ((wheelBase / tanOfTargetAngle) + (track/2))) * Mathf.Sign(targetAngle);

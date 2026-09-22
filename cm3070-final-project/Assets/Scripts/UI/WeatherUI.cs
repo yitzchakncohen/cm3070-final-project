@@ -29,6 +29,11 @@ namespace ModularVehicleSimulator.UI
 
         private void Init()
         {
+            if(weather == null)
+            {
+                Debug.LogWarning("[WeatherUI] No weather instance is available.");
+                return;
+            }
             precipitation.Init("Precipitiation", weather.Precipitation, UpdatePrecipitation);
             roadSurfaceCondition.Init("Road Surface Condition", weather.RoadSurfaceCondition, UpdateRoadSurfaceCondition);
             windVelocity.Init("Wind Velocity", weather.WindVelocity, UpdateWindVelocity);

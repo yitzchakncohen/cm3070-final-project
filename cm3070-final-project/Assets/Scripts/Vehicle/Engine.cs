@@ -30,6 +30,10 @@ namespace ModularVehicleSimulator.Vehicle
             this.engineConfiguration = engineConfiguration;
             this.driveTrain = driveTrain;
             this.wheels = wheels;
+            if(wheels.Length == 0)
+            {
+                Debug.LogException(new Exception("[Brake] No wheels found"));
+            }
             motorizedWheels = wheels.Where(wheel => wheel.IsMotorized).ToList();
             currentEngineRPM = engineConfiguration.IdleRPM;
         }
@@ -87,7 +91,6 @@ namespace ModularVehicleSimulator.Vehicle
             float effectiveRigidity = driveTrain.Rigidity * Mathf.Abs(driveTrain.GetRatioForGear(gear));
             torqueFromWheels = Mathf.MoveTowards(torqueFromWheels, rpmDelta * effectiveRigidity / RAD_SEC_TO_RPM, MAX_TORQUE_FROM_WHEELS_DELTA * substepDT);
             float driveTrainDampingForce = Mathf.Abs(rpmDelta * driveTrain.Damping) * Mathf.Sign(driveTrain.GetRatioForGear(gear));
-            Debug.Log("currentEngineRPM: " + currentEngineRPM + " | engineInputRPM " + engineInputRPM * Mathf.Sign(driveTrain.GetRatioForGear(gear)));
 
             // Calculate Engine Momentum
             float netTorque = netEngineTorque - torqueFromWheels - driveTrainDampingForce;

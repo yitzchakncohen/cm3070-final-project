@@ -27,7 +27,8 @@ namespace ModularVehicleSimulator.Debugging
             if(airResistance.CrossSection != null && airResistance.CrossSection.Count < 3) return;
             if(vehicleController.ChassisRigidBody.linearVelocity.sqrMagnitude < 0.01f) return;
 
-            Vector3 direction = (vehicleController.ChassisRigidBody.linearVelocity - Weather.Instance.WindVelocity).normalized;
+            Vector3 windVelocity = Weather.Instance != null ? Weather.Instance.WindVelocity : Vector3.zero;
+            Vector3 direction = (vehicleController.ChassisRigidBody.linearVelocity - windVelocity).normalized;
             Vector3 center = vehicleController.ChassisRigidBody.worldCenterOfMass;
 
             (Vector3 u, Vector3 v) = VehiclePhysics.Get2DBasisPlane(direction, vehicleController.ChassisRigidBody.transform.up);
