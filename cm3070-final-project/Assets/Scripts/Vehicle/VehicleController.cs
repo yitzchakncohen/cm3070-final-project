@@ -160,12 +160,11 @@ namespace ModularVehicleSimulator.Vehicle
 
         private void CalculateCurrentSpeed()
         {
-            speed = VehiclePhysics.GetVehicleSpeed(wheels, vehicleConfiguration.Wheels.Radius);
-            if (speed == 0f)
-            {
+            // speed = VehiclePhysics.GetVehicleSpeed(wheels, vehicleConfiguration.Wheels.Radius);
+            // if (speed == 0f)
+            // {
                 speed = chassisRigidBody.linearVelocity.magnitude;
-            }
-            // Debug.Log($"Speed[m/s]: {speed} [km/h] {speed * 3.6f} velocity {chassisRigidBody.linearVelocity.magnitude * 3.6f}");
+            // }
         }
 
         private void UpdateCurrentSteeringAngle(float steeringInput)

@@ -26,8 +26,6 @@ namespace ModularVehicleSimulator.Vehicle
         public bool IsRight => transform.localPosition.x > 0f;
         public float SteerAngle => steerAngle;
         public float RPM => tire.RPM;
-        public float RPMAcceleration => tire.RPMAcceleration;
-        public float Radius => wheelConfiguration.Radius;
         public float SuspensionDistance => suspensionConfiguration.Distance;
         public Vector3 NormalForce => isGrounded ? suspension.GetNormalLoad(isGrounded) * lastGroundHit.normal : Vector3.zero;
 

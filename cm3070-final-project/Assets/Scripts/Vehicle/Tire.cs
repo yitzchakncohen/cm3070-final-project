@@ -11,6 +11,7 @@ namespace ModularVehicleSimulator.Vehicle
         private const float TORQUE_STOP_THRESHOLD = 1f;
         private const float KINEMATIC_SPEED_THRESHOLD = 2f;
         private const float DYNAMIC_SPEED_THRESHOLD = 5f;
+        private const float MAX_FORCE_DELTA_PER_SECOND = 20000f;
         private const int HIGHVELOCITY_SUB_STEPS = 10;
         public WheelFrictionCurve ForwardFriction => forwardFrictionCurve;
         public WheelFrictionCurve SidewaysFriction => sidewaysFrictionCurve;
@@ -24,6 +25,7 @@ namespace ModularVehicleSimulator.Vehicle
         private WheelConfiguration wheelConfiguration;
         private WheelFrictionCurve forwardFrictionCurve;
         private WheelFrictionCurve sidewaysFrictionCurve;
+        private Vector3 lastAppliedForce = Vector3.zero;
         private float currentRPM = 0f;
         private float angularVelocity = 0f;
         private float angularAcceleration = 0f;
@@ -81,6 +83,8 @@ namespace ModularVehicleSimulator.Vehicle
                 Vector3 forceAppPoint = transform.position - (transform.up * forceAppPointDistance);
                 ApplyTireForce(raycastHit, forceAppPoint, totalFrictionForce, groundForward, groundRight, wheelVelocity, isGrounded, motorTorque, brakeTorque);                
             }
+
+            currentRPM = angularVelocity * Mathf.Rad2Deg / 6f;
         }
 
         private void UpdateAngularVelocity(
@@ -100,6 +104,28 @@ namespace ModularVehicleSimulator.Vehicle
             float lateralVelocity = Vector3.Dot(groundRight, wheelVelocity);
             bool isRolling = Mathf.Abs(angularVelocity * radius - forwardVelocity) < 0.5f;
             float estimatedDistance = hit.distance - wheelConfiguration.Radius;
+            float tireInertia = 0.5f * wheelConfiguration.Weight * (wheelConfiguration.Radius * wheelConfiguration.Radius);
+
+            if(!isGrounded)
+            {
+                float netTorque = motorTorque;
+
+                if (Mathf.Abs(angularVelocity) > 0.001f)
+                {
+                    float brakeDirection = Mathf.Sign(angularVelocity);
+                    float maxStoppingTorque = Mathf.Abs(angularVelocity) * tireInertia / Time.fixedDeltaTime;
+                    float appliedBrakeTorque = Mathf.Min(brakeTorque, maxStoppingTorque);
+                    netTorque -= brakeDirection * appliedBrakeTorque;
+                }
+
+                angularAcceleration = netTorque / tireInertia;
+                angularVelocity += angularAcceleration * Time.fixedDeltaTime;
+                
+                // Zero out slips while in the air
+                forwardSlip = 0f;
+                sidewaysSlip = 0f;
+                return;
+            }
 
             // When vehicle is rolling very slowly use kinematic values to allow acceleration.
             if (isLowVelocity && isRolling && Mathf.Abs(motorTorque) < staticFrictionTorqueLimit && brakeTorque < TORQUE_STOP_THRESHOLD)
@@ -108,7 +134,7 @@ namespace ModularVehicleSimulator.Vehicle
                 return;
             }
 
-            DynamicAngularVelocity(motorTorque, brakeTorque, forceAppPointDistance, isGrounded, hit, wheelVelocity, radius, ref forwardVelocity, ref estimatedDistance);
+            DynamicAngularVelocity(motorTorque, brakeTorque, forceAppPointDistance, isGrounded, hit, wheelVelocity, radius, tireInertia, ref forwardVelocity, ref estimatedDistance);
 
             // Blend between kinematic and dynamic values to prevent large step change in angular velocity when moving from kinematic to dynamic speeds. 
             if (Mathf.Abs(forwardVelocity) >= KINEMATIC_SPEED_THRESHOLD
@@ -119,7 +145,6 @@ namespace ModularVehicleSimulator.Vehicle
                 BlendedAngularVelocity(radius, forwardVelocity);
             }
 
-            currentRPM = angularVelocity * Mathf.Rad2Deg / 6f;
             UpdateSidewaysSlip(forwardVelocity, lateralVelocity);
         }
 
@@ -129,10 +154,20 @@ namespace ModularVehicleSimulator.Vehicle
             angularVelocity = Mathf.Lerp(forwardVelocity / radius, angularVelocity, t);
         }
 
-        private void DynamicAngularVelocity(float motorTorque, float brakeTorque, float forceAppPointDistance, bool isGrounded, WheelContactData hit, Vector3 wheelVelocity, float radius, ref float forwardVelocity, ref float estimatedDistance)
+        private void DynamicAngularVelocity(
+            float motorTorque, 
+            float brakeTorque, 
+            float forceAppPointDistance, 
+            bool isGrounded, 
+            WheelContactData hit, 
+            Vector3 wheelVelocity, 
+            float radius, 
+            float tireInertia, 
+            ref float forwardVelocity, 
+            ref float estimatedDistance
+        )
         {
             // Loop Initialization
-            float tireInertia = 0.5f * wheelConfiguration.Weight * (radius * radius);
             float stepTime = Time.fixedDeltaTime / HIGHVELOCITY_SUB_STEPS;
             float drivenMass = Mathf.Max(wheelConfiguration.Weight, suspension.GetNormalLoad(isGrounded) / Mathf.Abs(UnityEngine.Physics.gravity.y));
 
@@ -160,7 +195,6 @@ namespace ModularVehicleSimulator.Vehicle
             suspension.ApplySpringDamperForce(hit, forceAppPointDistance, Time.fixedDeltaTime, wheelVelocity, ref estimatedDistance);
             float targetAngularVelocity = forwardVelocity / radius;
             angularVelocity = Mathf.MoveTowards(angularVelocity, targetAngularVelocity, KINEMATIC_SMOOTHING * Time.fixedDeltaTime);
-            currentRPM = angularVelocity * Mathf.Rad2Deg / 6f;
             UpdateSidewaysSlip(forwardVelocity, lateralVelocity);
             return estimatedDistance;
         }
@@ -258,23 +292,15 @@ namespace ModularVehicleSimulator.Vehicle
             float forwardVelocity = Vector3.Dot(groundForward, wheelVelocity);
             float sidewaysVelocity = Vector3.Dot(groundRight, wheelVelocity);
             float staticFrictionTorqueLimit = suspension.GetNormalLoad(isGrounded) * wheelConfiguration.Radius * forwardFrictionCurve.extremumValue;
+            float drivenMass = Mathf.Max(wheelConfiguration.Weight, suspension.GetNormalLoad(isGrounded) / Mathf.Abs(UnityEngine.Physics.gravity.y));
 
             // If the car is moving slowly, friction of the tires should hold it there. 
-            if(chassisSpeed < VehiclePhysics.STOPPED_VELOCITY && Mathf.Abs(motorTorque) < TORQUE_STOP_THRESHOLD)
+            if(chassisSpeed < VehiclePhysics.STOPPED_VELOCITY && (Mathf.Abs(motorTorque) < TORQUE_STOP_THRESHOLD) || (brakeTorque > TORQUE_STOP_THRESHOLD))
             {
                 angularVelocity = 0f;
                 forwardSlip = 0f;
                 sidewaysSlip = 0f;
-                currentRPM = 0f;
-                totalFriction = GetHoldingForce(raycastHit, isGrounded, brakeTorque);
-            }
-            else if(chassisSpeed < VehiclePhysics.STOPPED_VELOCITY && brakeTorque > TORQUE_STOP_THRESHOLD)
-            {
-                // Clamp the brakes when the vehicle has stopped.
-                forwardSlip = 0f;
-                sidewaysSlip = 0f;
-                angularVelocity = 0f;
-                totalFriction = Vector3.zero;
+                totalFriction = GetHoldingForce(raycastHit, isGrounded, brakeTorque, drivenMass);
             }
             else if(Mathf.Abs(forwardVelocity) < DYNAMIC_SPEED_THRESHOLD && Mathf.Abs(motorTorque) < staticFrictionTorqueLimit)
             {
@@ -287,13 +313,16 @@ namespace ModularVehicleSimulator.Vehicle
                     brakeTorque, 
                     forwardVelocity, 
                     sidewaysVelocity, 
-                    staticFrictionTorqueLimit
+                    staticFrictionTorqueLimit,
+                    drivenMass
                 );
 
-                chassisRigidbody.AddForceAtPosition(appliedForce, forceAppPoint);
+                lastAppliedForce = Vector3.MoveTowards(lastAppliedForce, appliedForce, MAX_FORCE_DELTA_PER_SECOND * Time.fixedDeltaTime);
+                chassisRigidbody.AddForceAtPosition(lastAppliedForce, forceAppPoint);
                 return;
             }
-            chassisRigidbody.AddForceAtPosition(totalFriction, forceAppPoint);
+            lastAppliedForce = Vector3.MoveTowards(lastAppliedForce, totalFriction, MAX_FORCE_DELTA_PER_SECOND * Time.fixedDeltaTime);
+            chassisRigidbody.AddForceAtPosition(lastAppliedForce, forceAppPoint);
         }
 
         private Vector3 GetBlendedFrictionForce(
@@ -305,9 +334,9 @@ namespace ModularVehicleSimulator.Vehicle
             float brakeTorque, 
             float forwardVelocity, 
             float sidewaysVelocity, 
-            float staticFrictionTorqueLimit)
+            float staticFrictionTorqueLimit,
+            float drivenMass)
         {
-            float drivenMass = Mathf.Max(wheelConfiguration.Weight, suspension.GetNormalLoad(isGrounded) / Mathf.Abs(UnityEngine.Physics.gravity.y));
             float dt = Time.fixedDeltaTime;
             float absForwardVelocity = Mathf.Abs(forwardVelocity);
 
@@ -346,25 +375,22 @@ namespace ModularVehicleSimulator.Vehicle
             return staticFriction;
         }
 
-        private Vector3 GetHoldingForce(WheelContactData raycastHit, bool isGrounded, float brakeTorque)
+        private Vector3 GetHoldingForce(WheelContactData raycastHit, bool isGrounded, float brakeTorque, float drivenMass)
         {
-            Vector3 totalFriction;
-
-            if (brakeTorque > TORQUE_STOP_THRESHOLD)
+            if (brakeTorque <= TORQUE_STOP_THRESHOLD || !isGrounded)
             {
-                Vector3 contactVelocity = chassisRigidbody.GetPointVelocity(raycastHit.point);
-                Vector3 normalContactVelocity = Vector3.ProjectOnPlane(contactVelocity, raycastHit.normal);
-                Vector3 holdingForce = -normalContactVelocity * (chassisRigidbody.mass * 10f);
-
-                float staticFrictionForce = forwardFrictionCurve.extremumValue * suspension.GetNormalLoad(isGrounded);
-                totalFriction = Vector3.ClampMagnitude(holdingForce, staticFrictionForce);
+                return Vector3.zero;
             }
-            else
-            {
-                totalFriction = Vector3.zero;
-            }
+            Vector3 gravityOnSlope = Vector3.ProjectOnPlane(UnityEngine.Physics.gravity, raycastHit.normal);
+            Vector3 slopeHoldingForce = -gravityOnSlope * drivenMass;
 
-            return totalFriction;
+            Vector3 contactVelocity = chassisRigidbody.GetPointVelocity(raycastHit.point);
+            Vector3 normalContactVelocity = Vector3.ProjectOnPlane(contactVelocity, raycastHit.normal);
+            Vector3 velocityDampingForce = -normalContactVelocity * (drivenMass * 2f);
+
+            Vector3 totalHoldingForce = slopeHoldingForce + velocityDampingForce;
+            float staticFrictionForce = forwardFrictionCurve.extremumValue * suspension.GetNormalLoad(isGrounded);
+            return Vector3.ClampMagnitude(totalHoldingForce, staticFrictionForce);
         }
 
         private Vector3 CalculateTireForce(Vector3 groundDirection, float slip, WheelFrictionCurve frictionCurve, bool isGrounded)

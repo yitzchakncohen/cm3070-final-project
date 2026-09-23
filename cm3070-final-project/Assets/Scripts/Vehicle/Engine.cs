@@ -16,6 +16,7 @@ namespace ModularVehicleSimulator.Vehicle
         private const float IDLE_FLOOR_FACTOR = 0.8f;
         private const float EV_CREEP_TORQUE_THROTTLE = 0.04f;
         private const float MAX_TORQUE_FROM_WHEELS_DELTA = 1000f; // [N*m]
+        private const float MAX_ENGINE_RPM_DELTA_PER_SECOND = 5000f; // [RPM]
         private const int ENGINE_SUBSTEPS = 10;
         private EngineConfiguration engineConfiguration;
         private DriveTrain driveTrain;
@@ -23,6 +24,7 @@ namespace ModularVehicleSimulator.Vehicle
         private List<Wheel> motorizedWheels;
         private float currentEngineRPM = 0f;
         private float lastEngineRPM = 0f;
+        private float smoothedEngineRPM = 0f;
         private float torqueFromWheels = 0f;
 
         public void Init(EngineConfiguration engineConfiguration, DriveTrain driveTrain, Wheel[] wheels)
@@ -42,13 +44,13 @@ namespace ModularVehicleSimulator.Vehicle
         {
             float substepDT = Time.fixedDeltaTime / ENGINE_SUBSTEPS;
             float totalTorque = 0f;
-            lastEngineRPM = motorizedWheels.Average(wheel => wheel.GetEffectiveRPM()) * driveTrain.GetRatioForGear(gear);
-            float averageWheelAcceleration = motorizedWheels.Average(wheel => wheel.RPMAcceleration); 
+            float targetEngineRPM = motorizedWheels.Average(wheel => wheel.GetEffectiveRPM()) * driveTrain.GetRatioForGear(gear);
+            smoothedEngineRPM = Mathf.MoveTowards(smoothedEngineRPM, targetEngineRPM, MAX_ENGINE_RPM_DELTA_PER_SECOND * Time.fixedDeltaTime);
 
             for (int i = 0; i < ENGINE_SUBSTEPS; i++)
             {
-                float substepTime = (Time.fixedDeltaTime / ENGINE_SUBSTEPS) * i;
-                float estimatedEngineRPM = lastEngineRPM + (averageWheelAcceleration * driveTrain.GetRatioForGear(gear) * substepTime);
+                float t = (float)(i + 1) / ENGINE_SUBSTEPS;
+                float estimatedEngineRPM = Mathf.Lerp(lastEngineRPM, smoothedEngineRPM, t);
                 totalTorque = GetWheelTorque(gear, accelerationInput, brakeInput, estimatedEngineRPM, substepDT);           
             }
 
@@ -57,8 +59,9 @@ namespace ModularVehicleSimulator.Vehicle
             {
                 float wheelTorque = ApplyOpenDifferential(totalTorque, motorizedWheels.Count);
                 wheel.Accelerate(wheelTorque);
-            }                
+            }               
 
+            lastEngineRPM = smoothedEngineRPM;
         }
 
         private float ApplyOpenDifferential(float inputTorque, int numberOfWheels)
@@ -102,7 +105,7 @@ namespace ModularVehicleSimulator.Vehicle
 
             // Output engine torque through the drive train to the wheels
             // Still simulated for an EV
-            bool idleEngineCreep = currentEngineRPM > Mathf.Abs(engineInputRPM);
+            bool idleEngineCreep = currentEngineRPM > Mathf.Abs(engineInputRPM) && brakeInput < 0.01f;
             bool isIdleEV = engineConfiguration.Type == EngineType.Electric && brakeInput < 0.01f && throttleInput < 0.01f;
             if(isIdleEV)
             {
