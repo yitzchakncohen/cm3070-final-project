@@ -313,7 +313,6 @@ namespace ModularVehicleSimulator.Vehicle
                 forwardSlip = 0f;
                 sidewaysSlip = 0f;
                 totalFriction = GetHoldingForce(raycastHit, isGrounded, brakeTorque, drivenMass);
-                Debug.Log("GetHoldingForce");
             }
             else if(Mathf.Abs(forwardVelocity) < DYNAMIC_SPEED_THRESHOLD && Mathf.Abs(motorTorque) < staticFrictionTorqueLimit)
             {
@@ -332,12 +331,12 @@ namespace ModularVehicleSimulator.Vehicle
 
                 lastAppliedForce = Vector3.MoveTowards(lastAppliedForce, appliedForce, MAX_FORCE_DELTA_PER_SECOND * Time.fixedDeltaTime);
                 chassisRigidbody.AddForceAtPosition(lastAppliedForce, forceAppPoint);
-                Debug.Log($"1: lastAppliedForce {lastAppliedForce}, brakeTorque {brakeTorque}, motorTorque {motorTorque}");
+                // Debug.Log($"1: lastAppliedForce {lastAppliedForce}, brakeTorque {brakeTorque}, motorTorque {motorTorque}");
                 return;
             }
             lastAppliedForce = Vector3.MoveTowards(lastAppliedForce, totalFriction, MAX_FORCE_DELTA_PER_SECOND * Time.fixedDeltaTime);
             chassisRigidbody.AddForceAtPosition(lastAppliedForce, forceAppPoint);
-            Debug.Log($"2: lastAppliedForce {lastAppliedForce}, brakeTorque {brakeTorque}, motorTorque {motorTorque}");
+            // Debug.Log($"2: lastAppliedForce {lastAppliedForce}, brakeTorque {brakeTorque}, motorTorque {motorTorque}");
         }
 
         private Vector3 GetBlendedFrictionForce(
