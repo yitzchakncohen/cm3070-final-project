@@ -90,7 +90,7 @@ namespace ModularVehicleSimulator.Vehicle
             }
 
             // Calculate Wheel Torque 
-            float rpmDelta = currentEngineRPM - (engineInputRPM * Mathf.Sign(driveTrain.GetRatioForGear(gear)));
+            float rpmDelta = currentEngineRPM - engineInputRPM;
             float effectiveRigidity = driveTrain.Rigidity * Mathf.Abs(driveTrain.GetRatioForGear(gear));
             torqueFromWheels = Mathf.MoveTowards(torqueFromWheels, rpmDelta * effectiveRigidity / RAD_SEC_TO_RPM, MAX_TORQUE_FROM_WHEELS_DELTA * substepDT);
             float driveTrainDampingForce = Mathf.Abs(rpmDelta * driveTrain.Damping) * Mathf.Sign(driveTrain.GetRatioForGear(gear));
@@ -115,16 +115,19 @@ namespace ModularVehicleSimulator.Vehicle
             else if (throttleInput > 0.01f || idleEngineCreep)
             {
                 // Combustion or idle momentum applies force to the wheels
-                return netEngineTorque * driveTrain.GetRatioForGear(gear) * driveTrain.Loss;
+                return Mathf.Abs(netEngineTorque) * driveTrain.GetRatioForGear(gear) * driveTrain.Loss;
             }
             else
             {
-                float wheelRPMDirection = Mathf.Sign(engineInputRPM);
-                if(Mathf.Sign(torqueFromWheels) == Mathf.Sign(engineInputRPM))
-                {
-                    return 0f;
-                }
-                return -wheelRPMDirection * Mathf.Abs(torqueFromWheels * driveTrain.Loss);
+                if(gear == Gear.Neutral || gear == Gear.Park) return 0f;
+
+                // Engine Braking
+                float engineBrakingMagnitude = Mathf.Abs(torqueFromWheels * driveTrain.Loss);
+                float gearDirection = Mathf.Sign(driveTrain.GetRatioForGear(gear));
+                if(engineInputRPM * gearDirection > 0.01f) return -engineBrakingMagnitude;
+                else if(engineInputRPM * gearDirection < 0.01f) return engineBrakingMagnitude;
+                
+                return 0f;
             }
         }
     }    
