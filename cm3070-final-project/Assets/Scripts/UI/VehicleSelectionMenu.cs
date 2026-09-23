@@ -61,10 +61,10 @@ namespace ModularVehicleSimulator.UI
 
         private void UpdateCurrentVehicle(VehicleController newVehicle)
         {
-            vehicleName.text = currentVehicle.Name;
             SetVehicle(currentVehicle, false);
             SetVehicle(newVehicle, true);
             currentVehicle = newVehicle;
+            vehicleName.text = currentVehicle.Name;
             OnChangeVehicle?.Invoke(currentVehicle);
         }
 
