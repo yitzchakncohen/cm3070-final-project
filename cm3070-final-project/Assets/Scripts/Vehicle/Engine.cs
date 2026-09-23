@@ -12,9 +12,7 @@ namespace ModularVehicleSimulator.Vehicle
         public float RPMIdle => engineConfiguration.IdleRPM;
         public float RPMMax => engineConfiguration.MaxRPM;
         private const float RAD_SEC_TO_RPM = 60f / (2f * Mathf.PI);
-        private const float IDLE_COMPENSATION_MAX = 0.3f;
         private const float IDLE_FLOOR_FACTOR = 0.8f;
-        private const float EV_CREEP_TORQUE_THROTTLE = 0.04f;
         private const float MAX_TORQUE_FROM_WHEELS_DELTA = 1000f; // [N*m]
         private const float MAX_ENGINE_RPM_DELTA_PER_SECOND = 5000f; // [RPM]
         private const int ENGINE_SUBSTEPS = 10;
@@ -76,7 +74,7 @@ namespace ModularVehicleSimulator.Vehicle
             // Calculate Engine Torque
             float netEngineTorque = 0f;
             float idleDelta = Mathf.Max(engineConfiguration.IdleRPM - currentEngineRPM, 0f);
-            float idleCompensation = Mathf.Min(idleDelta / engineConfiguration.IdleRPM, IDLE_COMPENSATION_MAX);
+            float idleCompensation = Mathf.Min(idleDelta / engineConfiguration.IdleRPM, engineConfiguration.IdleCompensation);
             float effectiveInput = Mathf.Max(idleCompensation, throttleInput);
             float engineTorque = engineConfiguration.GetTorque(currentEngineRPM) * effectiveInput;
             float gearDirection = Mathf.Sign(driveTrain.GetRatioForGear(gear));
@@ -94,8 +92,8 @@ namespace ModularVehicleSimulator.Vehicle
             // Calculate Wheel Torque 
             float rpmDelta = currentEngineRPM - engineInputRPM;
             float effectiveRigidity = driveTrain.Rigidity * Mathf.Abs(driveTrain.GetRatioForGear(gear));
-            torqueFromWheels = Mathf.MoveTowards(torqueFromWheels, -gearDirection * rpmDelta * effectiveRigidity / RAD_SEC_TO_RPM, MAX_TORQUE_FROM_WHEELS_DELTA * substepDT);
-            float driveTrainDampingForce = Mathf.Abs(rpmDelta * driveTrain.Damping) * gearDirection;
+            torqueFromWheels = Mathf.MoveTowards(torqueFromWheels, rpmDelta * effectiveRigidity / RAD_SEC_TO_RPM, MAX_TORQUE_FROM_WHEELS_DELTA * substepDT);
+            float driveTrainDampingForce = Mathf.Abs(rpmDelta * driveTrain.Damping);
 
             // Calculate Engine Momentum
             float netTorque = netEngineTorque - torqueFromWheels - driveTrainDampingForce;
@@ -112,7 +110,7 @@ namespace ModularVehicleSimulator.Vehicle
             if(isIdleEV)
             {
                 // Manually simulate engine creep on an EV.
-                return engineConfiguration.GetTorque(engineConfiguration.IdleRPM) * EV_CREEP_TORQUE_THROTTLE;
+                return engineConfiguration.GetTorque(engineConfiguration.IdleRPM) * engineConfiguration.IdleCompensation;
             }
             else if (throttleInput > 0.01f || idleEngineCreep)
             {

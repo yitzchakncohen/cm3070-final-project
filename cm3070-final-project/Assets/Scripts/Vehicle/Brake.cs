@@ -11,7 +11,7 @@ namespace ModularVehicleSimulator.Vehicle
         public bool IsTVBActive => isTVBActive;
         private bool isABSActive = false;
         private bool isTVBActive = false;
-        private const float REGENERATIVE_BRAKING_CUTOFF_KMH = 5f;
+        private const float REGENERATIVE_BRAKING_CUTOFF_KMH = 10f;
         private const float ABS_CUTOFF_KMH = 5f;
         private const float BRAKE_TORQUE_VECTORING_BLEND_WINDOW = 0.2f;
         private BrakesConfiguration brakesConfiguration;
@@ -24,7 +24,7 @@ namespace ModularVehicleSimulator.Vehicle
         private int backWheelCount = 2;
         private int motorizedWheelCount = 2;
 
-        public void Init(Wheel[] wheels, BrakesConfiguration brakesConfiguration, EngineType engineType, ChassisConfiguration chassisConfiguration, Rigidbody chassisRigidBody, WheelConfiguration wheelConfiguration)
+        public void Init(Wheel[] wheels, BrakesConfiguration brakesConfiguration, EngineType engineType, ChassisConfiguration chassisConfiguration, Rigidbody chassisRigidBody, WheelConfiguration wheelConfiguration, int motorizedWheelCount)
         {
             this.wheels = wheels; 
             this.brakesConfiguration = brakesConfiguration;
@@ -34,7 +34,7 @@ namespace ModularVehicleSimulator.Vehicle
             this.wheelConfiguration = wheelConfiguration;
             frontWheelCount = wheels.Count(wheel => wheel.IsFront);
             backWheelCount = wheels.Count(wheel => !wheel.IsFront);
-            motorizedWheelCount = wheels.Count(wheel => wheel.IsMotorized);
+            this.motorizedWheelCount = motorizedWheelCount;
         }
 
         public void ApplyForce(float brakeInput, float throttleInput, float targetSteeringAngle)
@@ -62,9 +62,8 @@ namespace ModularVehicleSimulator.Vehicle
         {
             if (wheel.IsMotorized)
             {
-                float speed = VehiclePhysics.GetVehicleSpeed(wheels, wheelConfiguration.Radius);
                 float regenerativeBrakeTorque =
-                    Mathf.Clamp01(speed / REGENERATIVE_BRAKING_CUTOFF_KMH)
+                    Mathf.Clamp01(forwardSpeed / REGENERATIVE_BRAKING_CUTOFF_KMH)
                     * brakesConfiguration.RegenerativeBrakeTorque / motorizedWheelCount;
                 float brakeTorque = ApplyBrakeTorqueVectoring(wheel, targetSteeringAngle, regenerativeBrakeTorque, forwardSpeed);
                 brakeTorque = ApplyABS(wheel, brakeTorque);

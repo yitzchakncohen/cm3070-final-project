@@ -67,8 +67,10 @@ namespace ModularVehicleSimulator.Vehicle
                         SteeringConfiguration steeringConfiguration, 
                         SuspensionConfiguration suspensionConfiguration,
                         ChassisConfiguration chassisConfiguration,
+                        EngineConfiguration engineConfiguration,
                         Rigidbody chassisRigidBody,
-                        LayerMask groundLayerMask)
+                        LayerMask groundLayerMask,
+                        int motorizedWheelCount)
         {
             this.wheelConfiguration = wheelConfiguration;
             this.steeringConfiguration = steeringConfiguration;
@@ -84,7 +86,8 @@ namespace ModularVehicleSimulator.Vehicle
             UpdateWheelPositions();
             UpdateTireVisuals(wheelConfiguration.Radius, wheelConfiguration.Width);
             suspension.Init(chassisRigidBody, suspensionConfiguration, wheelConfiguration, IsFront);
-            tire.Init(chassisRigidBody, wheelConfiguration, suspension);
+            float idleMotorTorque = engineConfiguration.GetTorque(engineConfiguration.IdleRPM) * engineConfiguration.IdleCompensation/motorizedWheelCount;
+            tire.Init(chassisRigidBody, wheelConfiguration, engineConfiguration, suspension, idleMotorTorque);
         }
 
         private void FixedUpdate()

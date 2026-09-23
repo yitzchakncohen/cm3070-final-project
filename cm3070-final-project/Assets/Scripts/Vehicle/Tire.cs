@@ -23,6 +23,7 @@ namespace ModularVehicleSimulator.Vehicle
         private Rigidbody chassisRigidbody;
         private Suspension suspension;
         private WheelConfiguration wheelConfiguration;
+        private EngineConfiguration engineConfiguration;
         private WheelFrictionCurve forwardFrictionCurve;
         private WheelFrictionCurve sidewaysFrictionCurve;
         private Vector3 lastAppliedForce = Vector3.zero;
@@ -31,12 +32,15 @@ namespace ModularVehicleSimulator.Vehicle
         private float angularAcceleration = 0f;
         private float forwardSlip = 0f;
         private float sidewaysSlip = 0f;
+        private float idleMotorTorque = 0f;
 
-        public void Init(Rigidbody chassisRigidbody, WheelConfiguration wheelConfiguration, Suspension suspension)
+        public void Init(Rigidbody chassisRigidbody, WheelConfiguration wheelConfiguration, EngineConfiguration engineConfiguration, Suspension suspension, float idleMotorTorque)
         {
             this.chassisRigidbody = chassisRigidbody;
             this.wheelConfiguration = wheelConfiguration;
+            this.engineConfiguration = engineConfiguration;
             this.suspension = suspension;
+            this.idleMotorTorque = idleMotorTorque;
         }
 
         public void UpdateFriction(float deflection, float nominalDeflection, float surfaceFriction)
@@ -295,12 +299,21 @@ namespace ModularVehicleSimulator.Vehicle
             float drivenMass = Mathf.Max(wheelConfiguration.Weight, suspension.GetNormalLoad(isGrounded) / Mathf.Abs(UnityEngine.Physics.gravity.y));
 
             // If the car is moving slowly, friction of the tires should hold it there. 
-            if(chassisSpeed < VehiclePhysics.STOPPED_VELOCITY && (Mathf.Abs(motorTorque) < TORQUE_STOP_THRESHOLD) || (brakeTorque > TORQUE_STOP_THRESHOLD))
+            bool isStationaryGasVehicle = engineConfiguration.Type == EngineType.Gas 
+                                            && chassisSpeed < VehiclePhysics.STOPPED_VELOCITY 
+                                            && ((Mathf.Abs(motorTorque) < TORQUE_STOP_THRESHOLD) 
+                                            || (brakeTorque > TORQUE_STOP_THRESHOLD));
+            bool isStationaryEV = engineConfiguration.Type == EngineType.Electric 
+                                            && chassisSpeed < VehiclePhysics.STOPPED_VELOCITY 
+                                            && (Mathf.Abs(motorTorque) < TORQUE_STOP_THRESHOLD + idleMotorTorque) 
+                                            && (brakeTorque > TORQUE_STOP_THRESHOLD);
+            if(isStationaryGasVehicle || isStationaryEV)
             {
                 angularVelocity = 0f;
                 forwardSlip = 0f;
                 sidewaysSlip = 0f;
                 totalFriction = GetHoldingForce(raycastHit, isGrounded, brakeTorque, drivenMass);
+                Debug.Log("GetHoldingForce");
             }
             else if(Mathf.Abs(forwardVelocity) < DYNAMIC_SPEED_THRESHOLD && Mathf.Abs(motorTorque) < staticFrictionTorqueLimit)
             {
@@ -319,10 +332,12 @@ namespace ModularVehicleSimulator.Vehicle
 
                 lastAppliedForce = Vector3.MoveTowards(lastAppliedForce, appliedForce, MAX_FORCE_DELTA_PER_SECOND * Time.fixedDeltaTime);
                 chassisRigidbody.AddForceAtPosition(lastAppliedForce, forceAppPoint);
+                Debug.Log($"1: lastAppliedForce {lastAppliedForce}, brakeTorque {brakeTorque}, motorTorque {motorTorque}");
                 return;
             }
             lastAppliedForce = Vector3.MoveTowards(lastAppliedForce, totalFriction, MAX_FORCE_DELTA_PER_SECOND * Time.fixedDeltaTime);
             chassisRigidbody.AddForceAtPosition(lastAppliedForce, forceAppPoint);
+            Debug.Log($"2: lastAppliedForce {lastAppliedForce}, brakeTorque {brakeTorque}, motorTorque {motorTorque}");
         }
 
         private Vector3 GetBlendedFrictionForce(

@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using ModularVehicleSimulator.Physics;
 using ModularVehicleSimulator.Vehicle.Data;
 using UnityEngine;
@@ -70,18 +71,21 @@ namespace ModularVehicleSimulator.Vehicle
             try
             {
                 chassisRigidBody.centerOfMass = vehicleConfiguration.Chassis.CenterOfMass;
+                int motorizedWheelCount = wheels.Count(wheel => wheel.IsMotorized);
                 foreach (Wheel wheel in wheels)
                 {
                     wheel.Init(vehicleConfiguration.Wheels, 
                             vehicleConfiguration.Steering, 
                             vehicleConfiguration.Suspension,
                             vehicleConfiguration.Chassis,
+                            vehicleConfiguration.Engine,
                             chassisRigidBody,
-                            groundLayerMask
+                            groundLayerMask,
+                            motorizedWheelCount
                         );
                 }
                 engine.Init(vehicleConfiguration.Engine, vehicleConfiguration.DriveTrain, wheels);
-                brake.Init(wheels, vehicleConfiguration.Brakes, vehicleConfiguration.Engine.Type, vehicleConfiguration.Chassis, chassisRigidBody, vehicleConfiguration.Wheels);
+                brake.Init(wheels, vehicleConfiguration.Brakes, vehicleConfiguration.Engine.Type, vehicleConfiguration.Chassis, chassisRigidBody, vehicleConfiguration.Wheels, motorizedWheelCount);
                 foreach (AntiRollBar antiRollBar in GetComponentsInChildren<AntiRollBar>())
                 {
                     antiRollBar.Init(chassisRigidBody, Steering);                

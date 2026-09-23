@@ -11,6 +11,7 @@ namespace ModularVehicleSimulator.Vehicle.Data
         public float IdleRPM => idleRPM;
         public float MaxRPM => maxRPM;
         public float MinAutoShiftTime => minAutomaticTransmissionShiftTime;
+        public float IdleCompensation => idleCompensation;
         public bool IsAutomaticTransmision => isAutomaticTransmision;
         [Tooltip("Gas or electric vehicle (EV).")]
         [SerializeField] private EngineType engineType;
@@ -23,6 +24,8 @@ namespace ModularVehicleSimulator.Vehicle.Data
         [Header("Torque Curve")]
         [Tooltip("The engines rotations per minute (RPM) at idle.")]
         [SerializeField] private float idleRPM = 800f;
+        [Tooltip("The throttle compensation to ensure the engine remains \nabove idle rpm. (Simulates engine crawl in EVs)")]
+        [SerializeField] private float idleCompensation = 0.3f;
         [Tooltip("The RPM of the engine at maximum torque.")]
         [SerializeField] private float peakTorqueRPM = 5000f;
         [Tooltip("The maximum RPM the engine \ncan achieve (i.e engine creep).")]
