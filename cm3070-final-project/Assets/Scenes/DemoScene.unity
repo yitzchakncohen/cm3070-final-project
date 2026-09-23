@@ -482,6 +482,11 @@ MonoBehaviour:
   rainFX: {fileID: 508521187}
   snowFX: {fileID: 432697585}
   windFX: {fileID: 1797185767}
+--- !u!1 &775961675 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1967899671808297514, guid: b1aafae26284b9e439dfce1be318be61, type: 3}
+  m_PrefabInstance: {fileID: 7072911794040835729}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &785506980
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -937,7 +942,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76c392e42b5098c458856cdf6ecaaaa1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.EventSystems.EventSystem
-  m_FirstSelected: {fileID: 0}
+  m_FirstSelected: {fileID: 775961675}
   m_sendNavigationEvents: 1
   m_DragThreshold: 10
 --- !u!4 &1283461603
