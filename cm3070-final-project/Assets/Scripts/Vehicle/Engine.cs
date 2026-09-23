@@ -79,6 +79,8 @@ namespace ModularVehicleSimulator.Vehicle
             float idleCompensation = Mathf.Min(idleDelta / engineConfiguration.IdleRPM, IDLE_COMPENSATION_MAX);
             float effectiveInput = Mathf.Max(idleCompensation, throttleInput);
             float engineTorque = engineConfiguration.GetTorque(currentEngineRPM) * effectiveInput;
+            float gearDirection = Mathf.Sign(driveTrain.GetRatioForGear(gear));
+            
             if(engineConfiguration.Type == EngineType.Gas)
             {
                 float engineFriction = engineConfiguration.GetFriction(currentEngineRPM);
@@ -92,8 +94,8 @@ namespace ModularVehicleSimulator.Vehicle
             // Calculate Wheel Torque 
             float rpmDelta = currentEngineRPM - engineInputRPM;
             float effectiveRigidity = driveTrain.Rigidity * Mathf.Abs(driveTrain.GetRatioForGear(gear));
-            torqueFromWheels = Mathf.MoveTowards(torqueFromWheels, rpmDelta * effectiveRigidity / RAD_SEC_TO_RPM, MAX_TORQUE_FROM_WHEELS_DELTA * substepDT);
-            float driveTrainDampingForce = Mathf.Abs(rpmDelta * driveTrain.Damping) * Mathf.Sign(driveTrain.GetRatioForGear(gear));
+            torqueFromWheels = Mathf.MoveTowards(torqueFromWheels, -gearDirection * rpmDelta * effectiveRigidity / RAD_SEC_TO_RPM, MAX_TORQUE_FROM_WHEELS_DELTA * substepDT);
+            float driveTrainDampingForce = Mathf.Abs(rpmDelta * driveTrain.Damping) * gearDirection;
 
             // Calculate Engine Momentum
             float netTorque = netEngineTorque - torqueFromWheels - driveTrainDampingForce;
@@ -123,7 +125,6 @@ namespace ModularVehicleSimulator.Vehicle
 
                 // Engine Braking
                 float engineBrakingMagnitude = Mathf.Abs(torqueFromWheels * driveTrain.Loss);
-                float gearDirection = Mathf.Sign(driveTrain.GetRatioForGear(gear));
                 if(engineInputRPM * gearDirection > 0.01f) return -engineBrakingMagnitude;
                 else if(engineInputRPM * gearDirection < 0.01f) return engineBrakingMagnitude;
                 

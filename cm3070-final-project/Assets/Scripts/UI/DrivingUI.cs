@@ -68,7 +68,7 @@ namespace ModularVehicleSimulator.UI
             brake.fillAmount = inputManager.CurrentBraking;
             UpdateSteeringWheel();
             speedomdeter.UpdateNeedle(vehicleController.Speed * 3.6f);
-            tachometer.UpdateNeedle(vehicleController.RPM / 1000f);
+            tachometer.UpdateNeedle(Mathf.Abs(vehicleController.RPM) / 1000f);
             ABSIndicator.SetActive(vehicleController.IsABSActive);
             TVBIndicator.SetActive(vehicleController.IsTVBActive);
         }
