@@ -498,6 +498,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: JeepWrangler
       objectReference: {fileID: 0}
+    - target: {fileID: 803433713257916642, guid: 5cdec57693cfefc468d7827cada0d2bd, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1040809351288588936, guid: 5cdec57693cfefc468d7827cada0d2bd, type: 3}
       propertyPath: m_LocalPosition.x
       value: 210.52
@@ -3277,7 +3281,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 803433713257916642, guid: fe90f64ee2c4c9f4a96622c9bdf413b5, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1040809351288588936, guid: fe90f64ee2c4c9f4a96622c9bdf413b5, type: 3}
       propertyPath: m_LocalPosition.x
@@ -3325,7 +3329,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4426191097320354032, guid: fe90f64ee2c4c9f4a96622c9bdf413b5, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 5.44
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 4426191097320354032, guid: fe90f64ee2c4c9f4a96622c9bdf413b5, type: 3}
       propertyPath: m_LocalPosition.z

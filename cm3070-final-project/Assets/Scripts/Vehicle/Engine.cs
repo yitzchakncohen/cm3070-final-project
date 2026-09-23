@@ -114,13 +114,19 @@ namespace ModularVehicleSimulator.Vehicle
             }
             else if (throttleInput > 0.01f || idleEngineCreep)
             {
+                Debug.Log("Idle/Throttle");
                 // Combustion or idle momentum applies force to the wheels
                 return netEngineTorque * driveTrain.GetRatioForGear(gear) * driveTrain.Loss;
             }
             else
             {
-                // Engine braking applies force to the wheels
-                return torqueFromWheels * driveTrain.Loss;
+                Debug.Log("Engine Braking");
+                float wheelRPMDirection = Mathf.Sign(engineInputRPM);
+                if(Mathf.Sign(torqueFromWheels) == Mathf.Sign(engineInputRPM))
+                {
+                    return 0f;
+                }
+                return -wheelRPMDirection * Mathf.Abs(torqueFromWheels * driveTrain.Loss);
             }
         }
     }    
