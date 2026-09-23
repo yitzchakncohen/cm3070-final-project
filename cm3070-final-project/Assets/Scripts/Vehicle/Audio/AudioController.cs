@@ -18,6 +18,7 @@ namespace ModularVehicleSimulator.Vehicle.Audio
         private const float IDLE_ENGINE_VOLUME = 0.1f;
         private const float ENGINE_VOLUME_MIN = 0.1f;
         private const float ENGINE_VOLUME_MAX = 0.6f;
+        private const float SLIP_VOLUME_MAX = 0.6f;
 
         [SerializeField] private AudioSource engineAudioSource;
         [SerializeField] private AudioSource wheelsAudioSource;
@@ -59,7 +60,7 @@ namespace ModularVehicleSimulator.Vehicle.Audio
                 if (wheel.IsGrounded && slip > slipThreshhold)
                 {
                     float slipPercent = (slip + slipThreshhold) / (slipThreshhold * 20f);
-                    wheelsAudioSource.volume = Mathf.Lerp(0f, 1f, slipPercent);
+                    wheelsAudioSource.volume = Mathf.Lerp(0f, SLIP_VOLUME_MAX, slipPercent);
                     if(!wheelsAudioSource.isPlaying)
                     {
                         wheelsAudioSource.Play();
