@@ -13,6 +13,8 @@ namespace ModularVehicleSimulator.Physics
         public const int SPHERE_SEGMENTS = 24;
         public const float STOPPED_VELOCITY = 0.05f;
         public const float NEWTON_TO_METER_SCALING = 1000f;
+        public const float SPRING_MINIMUM_COMPRESSION = 0.15f;
+        public const float SPRING_MINIMUM_COMPRESSION_FORCE_SCALING = 10f;
 
         // Shared buffers to avoid GC allocations during runtime
         private static readonly List<Vector2> boundingPointsBuffer = new List<Vector2>();
@@ -97,10 +99,22 @@ namespace ModularVehicleSimulator.Physics
         public static float GetSpringDamperForce(Vector3 wheelVelocity, Vector3 springDirection, float springDelta, JointSpring jointSpring, ref float estimatedDistance, float maxDistance, float stepTime)
         {
             // Hook's Law Fs = -kx
-            // Damping Force Fd = -bv
             float springForce = jointSpring.spring * springDelta;
+            // Damping Force Fd = -bv
             float springVelocity = Vector3.Dot(springDirection, wheelVelocity); // Velocity of wheel along the up axis of the spring.
             float dampingForce = springVelocity * jointSpring.damper;
+            float minDistance = maxDistance * SPRING_MINIMUM_COMPRESSION; // 15% of the max distance
+
+            // Add an extra exponential force when the spring gets too compressed.
+            if(estimatedDistance < minDistance)
+            {
+                float excessiveCompressionDelta = minDistance - estimatedDistance;
+                float extraForce = Mathf.Pow(excessiveCompressionDelta * SPRING_MINIMUM_COMPRESSION_FORCE_SCALING, 3f) * jointSpring.spring; // Cubic force increase
+                float maxAllowedExtraForce = jointSpring.spring * 15f;
+                extraForce = Mathf.Min(extraForce, maxAllowedExtraForce);
+                springForce += extraForce;
+            }
+
             float totalForce = Mathf.Max(0, springForce - dampingForce);
             estimatedDistance = Mathf.Clamp(estimatedDistance - springVelocity * stepTime, 0.01f, maxDistance); 
             return totalForce;

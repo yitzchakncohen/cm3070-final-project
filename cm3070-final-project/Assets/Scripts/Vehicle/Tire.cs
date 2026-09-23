@@ -119,7 +119,7 @@ namespace ModularVehicleSimulator.Vehicle
                 }
 
                 angularAcceleration = netTorque / tireInertia;
-                angularVelocity += angularAcceleration * Time.fixedDeltaTime;
+                angularVelocity = Mathf.MoveTowards(angularVelocity, 0f, angularAcceleration * Time.fixedDeltaTime);
                 
                 // Zero out slips while in the air
                 forwardSlip = 0f;
