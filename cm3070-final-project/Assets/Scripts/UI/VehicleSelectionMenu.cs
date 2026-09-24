@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using ModularVehicleSimulator.Input;
 using ModularVehicleSimulator.Vehicle;
 using TMPro;
 using UnityEngine;
@@ -11,17 +12,25 @@ namespace ModularVehicleSimulator.UI
     public class VehicleSelectionMenu : MonoBehaviour
     {
         public event Action<VehicleController> OnChangeVehicle;
-        [SerializeField] private List<VehicleController> vehicles;
+        private List<VehicleController> vehicles;
         [SerializeField] private TMP_Text vehicleName;
         [SerializeField] private Button nextButton;
         [SerializeField] private Button previousButton;
         private VehicleController currentVehicle;
 
-        public void Init()
+        public void Init(List<VehicleController> vehicles)
         {
+            this.vehicles = vehicles;
             currentVehicle = vehicles.Find(vehicle => vehicle.gameObject.activeSelf);
             vehicleName.text = currentVehicle.Name;
             OnChangeVehicle?.Invoke(currentVehicle);
+            foreach (VehicleController vehicle in vehicles)
+            {
+                if(vehicle != currentVehicle)
+                {
+                    vehicle.GetComponent<InputManager>().OnDisable();                    
+                }
+            }
         }
 
         private void OnEnable()
@@ -40,33 +49,22 @@ namespace ModularVehicleSimulator.UI
         {
             int index = vehicles.IndexOf(currentVehicle);
             int newIndex = (index + 1) % vehicles.Count;
-            currentVehicle = vehicles[newIndex];
-            UpdateCurrentVehicle();
+            UpdateCurrentVehicle(vehicles[newIndex]);
         }
 
         private void OnPreviousButtonClick()
         {
             int index = vehicles.IndexOf(currentVehicle);
             int newIndex = (index - 1 % vehicles.Count + vehicles.Count) % vehicles.Count;
-            currentVehicle = vehicles[newIndex];
-            OnChangeVehicle?.Invoke(currentVehicle);
-            UpdateCurrentVehicle();
+            UpdateCurrentVehicle(vehicles[newIndex]);
         }
 
-        private void UpdateCurrentVehicle()
+        private void UpdateCurrentVehicle(VehicleController newVehicle)
         {
+            SetVehicle(currentVehicle, false);
+            SetVehicle(newVehicle, true);
+            currentVehicle = newVehicle;
             vehicleName.text = currentVehicle.Name;
-            foreach (VehicleController vehicle in vehicles)
-            {
-                if (vehicle != currentVehicle)
-                {
-                    SetVehicle(vehicle, false);
-                }
-                else
-                {
-                    SetVehicle(vehicle, true);
-                }
-            }
             OnChangeVehicle?.Invoke(currentVehicle);
         }
 

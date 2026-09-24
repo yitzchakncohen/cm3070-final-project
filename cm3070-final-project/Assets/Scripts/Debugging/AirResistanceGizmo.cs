@@ -24,21 +24,21 @@ namespace ModularVehicleSimulator.Debugging
             if(!isDebuggingEnabled) return;
             if(airResistance == null) return;
 
-            List<Vector2> crossSection = airResistance.CrossSection;
-            if(crossSection.Count < 3) return;
+            if(airResistance.CrossSection != null && airResistance.CrossSection.Count < 3) return;
             if(vehicleController.ChassisRigidBody.linearVelocity.sqrMagnitude < 0.01f) return;
 
-            Vector3 direction = vehicleController.ChassisRigidBody.linearVelocity.normalized;
+            Vector3 windVelocity = Weather.Instance != null ? Weather.Instance.WindVelocity : Vector3.zero;
+            Vector3 direction = (vehicleController.ChassisRigidBody.linearVelocity - windVelocity).normalized;
             Vector3 center = vehicleController.ChassisRigidBody.worldCenterOfMass;
 
-            (Vector3 u, Vector3 v) = VehiclePhysics.Get2DBasisPlane(direction);
+            (Vector3 u, Vector3 v) = VehiclePhysics.Get2DBasisPlane(direction, vehicleController.ChassisRigidBody.transform.up);
 
             Gizmos.color = debugColor;
 
-            for (int i = 0; i < crossSection.Count; i++)
+            for (int i = 0; i < airResistance.CrossSection.Count; i++)
             {
-                Vector2 p1 = crossSection[i];
-                Vector2 p2 = crossSection[(i + 1) % crossSection.Count]; // Loop around to first vertex
+                Vector2 p1 = airResistance.CrossSection[i];
+                Vector2 p2 = airResistance.CrossSection[(i + 1) % airResistance.CrossSection.Count]; // Loop around to first vertex
 
                 // Un-project 2D points back into 3D world space
                 Vector3 worldP1 = center + (u * p1.x) + (v * p1.y);
@@ -47,6 +47,10 @@ namespace ModularVehicleSimulator.Debugging
                 Gizmos.DrawLine(worldP1, worldP2);
                 Gizmos.DrawSphere(worldP1, VERTEX_RADIUS);
             }
+
+            Gizmos.DrawLine(airResistance.FrontPosition, airResistance.FrontPosition + airResistance.LiftFrontForce / VehiclePhysics.NEWTON_TO_METER_SCALING);
+            Gizmos.DrawLine(airResistance.BackPosition, airResistance.BackPosition + airResistance.LiftBackForce / VehiclePhysics.NEWTON_TO_METER_SCALING);
+            Gizmos.DrawLine(center, center + airResistance.DragVector / VehiclePhysics.NEWTON_TO_METER_SCALING);
         }
 
         public override Dictionary<string, string> GetDebugValues()

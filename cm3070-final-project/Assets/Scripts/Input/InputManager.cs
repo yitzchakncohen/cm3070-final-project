@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 
 namespace ModularVehicleSimulator.Input
 {
+    [RequireComponent(typeof(PlayerInput), typeof(VehicleController))]
     public class InputManager : MonoBehaviour
     {
         public float CurrentAcceleration => currentAcceleration;
@@ -14,7 +15,7 @@ namespace ModularVehicleSimulator.Input
         private const string KEYBOARD_SCHEME = "Keyboard";
         private const string CONTROLLER_SCHEME = "Controller";
         private PlayerInput playerInput;
-        [SerializeField] private VehicleController vehicleController;
+        private VehicleController vehicleController;
         [SerializeField] private float accelerationRampRate = 3.0f;
         [SerializeField] private float brakingRampRate = 3.0f;
         [SerializeField] private float steeringRampRate = 4.0f;
@@ -31,6 +32,7 @@ namespace ModularVehicleSimulator.Input
         private void Awake()
         {
             playerInput = GetComponent<PlayerInput>();
+            vehicleController = GetComponent<VehicleController>();
         }
 
         private void OnEnable()
@@ -38,16 +40,15 @@ namespace ModularVehicleSimulator.Input
             if (playerInput.user.valid)
             {
                 playerInput.user.UnpairDevices();
-                foreach (var device in InputSystem.devices)
-                {
-                    InputUser.PerformPairingWithDevice(device, user: playerInput.user);
-                }
+                playerInput.neverAutoSwitchControlSchemes = false;
+                playerInput.ActivateInput();
             }
             InputSystem.Update();
         }
 
-        private void OnDisable()
+        public void OnDisable()
         {
+            if(playerInput == null) playerInput = GetComponent<PlayerInput>();
             if (playerInput.user.valid)
             {
                 playerInput.user.UnpairDevices();
@@ -65,7 +66,7 @@ namespace ModularVehicleSimulator.Input
         {
             vehicleController.Steer(currentSteering);
             vehicleController.Brake(currentBraking, currentAcceleration);
-            vehicleController.Accelerate(currentAcceleration);            
+            vehicleController.Accelerate(currentAcceleration, currentBraking);            
         }
 
         public void OnAccelerate(InputAction.CallbackContext context)

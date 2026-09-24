@@ -17,7 +17,7 @@ public class VehicleSettingsGroup : MonoBehaviour
         subtitle.text = settingName;
         foreach (VehicleSetting vehicleSetting in settings)
         {
-            vehicleSetting.transform.SetParent(settingsContainer);
+            vehicleSetting.transform.SetParent(settingsContainer, false);
         }
     }
 }

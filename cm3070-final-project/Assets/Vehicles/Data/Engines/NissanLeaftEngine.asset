@@ -15,8 +15,9 @@ MonoBehaviour:
   engineType: 1
   isAutomaticTransmision: 1
   minAutomaticTransmissionShiftTime: 1
-  inertiaInKgSquareMeters: 0.2
+  inertiaInKgSquareMeters: 0.45
   idleRPM: 0
+  idleCompensation: 0.2
   peakTorqueRPM: 0
   maxRPM: 0
   peakTorqueInNewtonMeters: 280

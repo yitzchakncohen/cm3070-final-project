@@ -15,6 +15,11 @@ namespace ModularVehicleSimulator.Vehicle.Audio
         private const float ENGINE_MEDIUM_PERCENT = 0.25f;
         private const float ENGINE_HIGH_PERCENT = 0.75f;
         private const float TRANSITION_DELAY = 1.0f;
+        private const float IDLE_ENGINE_VOLUME = 0.1f;
+        private const float ENGINE_VOLUME_MIN = 0.1f;
+        private const float ENGINE_VOLUME_MAX = 0.6f;
+        private const float SLIP_VOLUME_MAX = 0.6f;
+
         [SerializeField] private AudioSource engineAudioSource;
         [SerializeField] private AudioSource wheelsAudioSource;
         [SerializeField] private AudioClip tireScreech;
@@ -50,12 +55,16 @@ namespace ModularVehicleSimulator.Vehicle.Audio
         {
             foreach (Wheel wheel in wheels)
             {
-                if (wheel.IsGrounded() && wheel.GetAverageForwardSlip() > wheel.GetSlipThreshold(Wheel.FX_SLIP_THRESHHOLD_MULTIPLIER))
+                float slip = wheel.GetAverageForwardSlip();
+                float slipThreshhold = wheel.GetSlipThreshold(Wheel.FX_SLIP_THRESHHOLD_MULTIPLIER);
+                if (wheel.IsGrounded && slip > slipThreshhold)
                 {
+                    float slipPercent = (slip + slipThreshhold) / (slipThreshhold * 20f);
+                    wheelsAudioSource.volume = Mathf.Lerp(0f, SLIP_VOLUME_MAX, slipPercent);
                     if(!wheelsAudioSource.isPlaying)
                     {
                         wheelsAudioSource.Play();
-                        return;
+                        return; 
                     }
                 }
             }
@@ -72,19 +81,26 @@ namespace ModularVehicleSimulator.Vehicle.Audio
             EnginLevel newEngineLevel;
             if (engine.RPM <= engine.RPMIdle)
             {
-                newEngineLevel = EnginLevel.Idle;             
+                newEngineLevel = EnginLevel.Idle;    
+                engineAudioSource.volume = IDLE_ENGINE_VOLUME;         
             }
             else if(currentPercent > ENGINE_HIGH_PERCENT)
             {
-                newEngineLevel = EnginLevel.High;             
+                newEngineLevel = EnginLevel.High; 
+                float highPercent = (currentPercent - ENGINE_HIGH_PERCENT) / (1.0f - ENGINE_HIGH_PERCENT);
+                engineAudioSource.volume = Mathf.Lerp(ENGINE_VOLUME_MIN, ENGINE_VOLUME_MAX, highPercent);         
             }
             else if(currentPercent > ENGINE_MEDIUM_PERCENT)
             {
                 newEngineLevel = EnginLevel.Medium;             
+                float mediumPercent = (currentPercent - ENGINE_MEDIUM_PERCENT) / (ENGINE_HIGH_PERCENT - ENGINE_MEDIUM_PERCENT);
+                engineAudioSource.volume = Mathf.Lerp(ENGINE_VOLUME_MIN, ENGINE_VOLUME_MAX, mediumPercent);         
             }
             else
             {
                 newEngineLevel = EnginLevel.Low;             
+                float lowPercent = currentPercent / ENGINE_MEDIUM_PERCENT;
+                engineAudioSource.volume = Mathf.Lerp(ENGINE_VOLUME_MIN, ENGINE_VOLUME_MAX, lowPercent);         
             }
 
             if(newEngineLevel == currentEngineLevel) return;

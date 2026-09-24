@@ -6,11 +6,14 @@ using System;
 using ModularVehicleSimulator.Vehicle;
 using System.Collections.Generic;
 using ModularVehicleSimulator.Vehicle.Data;
+using UnityEngine.EventSystems;
 
 namespace ModularVehicleSimulator.UI.VehicleSettings
 {
-    public class VehicleSetting : MonoBehaviour
+    public class VehicleSetting : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
+        public event Action<VehicleSetting> OnEnter;
+        public event Action<VehicleSetting> OnExit;
         [SerializeField] private TMP_Text settingName;
         [SerializeField] private TMP_InputField floatValueInput;
         [SerializeField] private Toggle boolValueToggle;
@@ -23,7 +26,7 @@ namespace ModularVehicleSimulator.UI.VehicleSettings
         private Action<Vector3> onVector3ValueChanged = null;
         private Action<object> onEnumValueChanged = null;
         private Action<List<GearRatio>> onGearRatioListValueChanged = null;
-        private const string NUMERICAL_REGEX_STRING = @"[^0-9.]";
+        private const string NUMERICAL_REGEX_STRING = @"[^0-9.-]";
 
         private void Start()
         {
@@ -107,7 +110,9 @@ namespace ModularVehicleSimulator.UI.VehicleSettings
             engineTypeDropDown.AddOptions(options);
             engineTypeDropDown.MultiSelect = false;
 
-            engineTypeDropDown.SetValueWithoutNotify(Convert.ToInt32(value));
+            // In case of negative enum values
+            int index = options.IndexOf(value.ToString());
+            engineTypeDropDown.SetValueWithoutNotify(index);
             onEnumValueChanged = onValueChanged;
         }
 
@@ -158,6 +163,16 @@ namespace ModularVehicleSimulator.UI.VehicleSettings
         private void GearRatioList_OnValueChanged(List<GearRatio> list)
         {
             onGearRatioListValueChanged.Invoke(list);
+        }
+
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            OnEnter?.Invoke(this);
+        }
+
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            OnExit?.Invoke(this);
         }
     }
 }

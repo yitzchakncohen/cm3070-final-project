@@ -2,14 +2,14 @@ namespace ModularVehicleSimulator.Vehicle
 {
     public enum Gear
     {
-        Park = -1,
-        Reverse = 0,
-        Neutral = 1,
-        Drive = 2,
-        Second = 3,
-        Third = 4,
-        Fourth = 5,
-        Fifth = 6
+        Park = 0,
+        Reverse = 1,
+        Neutral = 2,
+        Drive = 3,
+        Second = 4,
+        Third = 5,
+        Fourth = 6,
+        Fifth = 7
     }
 
     public static class GearExtensions

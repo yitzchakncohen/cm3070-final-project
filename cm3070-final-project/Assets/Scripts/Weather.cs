@@ -50,6 +50,11 @@ namespace ModularVehicleSimulator
 
         private void FixedUpdate()
         {
+            if(Camera.main == null)
+            {
+                Debug.LogWarning("[Weather] Weather system requires a main camera.");
+                return;
+            }
             Transform cameraTransform = Camera.main.transform;
             rainFX.transform.position = cameraTransform.position + cameraTransform.forward * FX_CAMERA_OFFSET;
             windFX.transform.position = cameraTransform.position + cameraTransform.forward * FX_CAMERA_OFFSET;

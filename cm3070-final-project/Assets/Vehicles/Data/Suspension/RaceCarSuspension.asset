@@ -10,9 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1e34d223a4050714196a207e846292ca, type: 3}
-  m_Name: NissanLeaftSuspension
+  m_Name: RaceCarSuspension
   m_EditorClassIdentifier: Assembly-CSharp::ModularVehicleSimulator.Vehicle.Data.SuspensionConfiguration
-  suspensionDistanceInMeters: 0.3
-  frontSpringConstant: 30000
-  backSpringConstant: 20000
-  damper: 3000
+  suspensionDistanceInMeters: 0.2
+  forceAppPointOffsetInMeters: 0.2
+  frontSpringConstant: 40000
+  backSpringConstant: 30000
+  damper: 4000

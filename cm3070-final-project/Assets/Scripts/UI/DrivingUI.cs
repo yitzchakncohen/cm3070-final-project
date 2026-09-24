@@ -1,5 +1,6 @@
 using System;
 using ModularVehicleSimulator.Input;
+using ModularVehicleSimulator.UI.VehicleSettings;
 using ModularVehicleSimulator.Vehicle;
 using ModularVehicleSimulator.Vehicle.Data;
 using TMPro;
@@ -15,35 +16,49 @@ namespace ModularVehicleSimulator.UI
         [SerializeField] private Image accelerator;
         [SerializeField] private Image brake;
         [SerializeField] private RectTransform steeringWheel;
-        [SerializeField] private TMP_Text gearText;
+        [SerializeField] private TMP_Text[] gearText;
         [SerializeField] private Odemeter speedomdeter;
-        [SerializeField] private Odemeter odemeter;
+        [SerializeField] private Odemeter tachometer;
         [SerializeField] private VehicleSelectionMenu vehicleSelectionMenu;
+        [SerializeField] private VehicleSettingsMenu vehicleSettingsMenu;
+        [SerializeField] private CameraUI cameraUI;
+        [SerializeField] private GameObject ABSIndicator;
+        [SerializeField] private GameObject TVBIndicator;
         private VehicleController vehicleController;
         private SteeringConfiguration steeringConfiguration;
         private InputManager inputManager;
 
-        private void Awake()
+        private void Start()
         {
-            speedomdeter.Init("km/h", 20f) ;
-            odemeter.Init("x1000r/min", 0.5f) ;
+            speedomdeter.Init("km/h", 20f);
+            tachometer.Init("x1000r/min", 0.5f);
             vehicleController = FindAnyObjectByType<VehicleController>(FindObjectsInactive.Exclude);
+            cameraUI.Init(vehicleController.CameraController);
             inputManager = vehicleController.GetComponent<InputManager>();
             steeringConfiguration = vehicleController.Steering;
             VehicleController_OnGearChanged();
+            OnEnable();
         }
 
         private void OnEnable()
         {
-            vehicleController.OnGearChanged += VehicleController_OnGearChanged;
+            if(vehicleController != null)
+            {
+                vehicleController.OnGearChanged += VehicleController_OnGearChanged;                
+            }
             vehicleSelectionMenu.OnChangeVehicle += VehicleSelectionMenu_OnChangeVehicle;
+            vehicleSettingsMenu.OnUpdateField += VehicleSettingsMenu_OnUpdateField;
             InvokeRepeating(nameof(UpdateDigitalDisplays), 0f, UPDATE_DIGITAL_INTERVAL);
         }
 
         private void OnDisable()
         {
-            vehicleController.OnGearChanged -= VehicleController_OnGearChanged;
+            if(vehicleController != null)
+            {
+                vehicleController.OnGearChanged -= VehicleController_OnGearChanged;                
+            }
             vehicleSelectionMenu.OnChangeVehicle -= VehicleSelectionMenu_OnChangeVehicle;
+            vehicleSettingsMenu.OnUpdateField -= VehicleSettingsMenu_OnUpdateField;
             CancelInvoke(nameof(UpdateDigitalDisplays));
         }
 
@@ -53,7 +68,9 @@ namespace ModularVehicleSimulator.UI
             brake.fillAmount = inputManager.CurrentBraking;
             UpdateSteeringWheel();
             speedomdeter.UpdateNeedle(vehicleController.Speed * 3.6f);
-            odemeter.UpdateNeedle(vehicleController.RPM / 1000f);
+            tachometer.UpdateNeedle(Mathf.Abs(vehicleController.RPM) / 1000f);
+            ABSIndicator.SetActive(vehicleController.IsABSActive);
+            TVBIndicator.SetActive(vehicleController.IsTVBActive);
         }
 
         private void UpdateSteeringWheel()
@@ -64,22 +81,48 @@ namespace ModularVehicleSimulator.UI
 
         private void VehicleController_OnGearChanged()
         {
-            gearText.text = vehicleController.Gear.ToLetter();
+            int currentGear = (int)vehicleController.Gear;
+            CheckGear(currentGear, -2);
+            CheckGear(currentGear, -1);
+            gearText[2].text = vehicleController.Gear.ToLetter();
+            CheckGear(currentGear, 1);
+            CheckGear(currentGear, 2);
+        }
+
+        private void CheckGear(int currentGear, int offset)
+        {
+            if (vehicleController.Config.DriveTrain.ContainsGear(currentGear + offset))
+            {
+                gearText[2 + offset].text = ((Gear)(currentGear + offset)).ToLetter();                    
+            }
+            else
+            {
+                gearText[2 + offset].text = string.Empty;
+            }
         }
 
         private void UpdateDigitalDisplays()
         {
             speedomdeter.UpdateDigital(vehicleController.Speed * 3.6f);
-            odemeter.UpdateDigital(vehicleController.RPM);
+            tachometer.UpdateDigital(vehicleController.RPM);
         }
 
         private void VehicleSelectionMenu_OnChangeVehicle(VehicleController controller)
         {
             OnDisable();
             vehicleController = controller;
+            cameraUI.Init(vehicleController.CameraController);
             steeringConfiguration = vehicleController.Steering;
             inputManager = vehicleController.GetComponent<InputManager>();
             OnEnable();
+            VehicleController_OnGearChanged();
+        }
+
+        private void VehicleSettingsMenu_OnUpdateField()
+        {
+            speedomdeter.Init("km/h", 20f);
+            tachometer.Init("x1000r/min", 0.5f);
+            VehicleController_OnGearChanged();
         }
     }
 }

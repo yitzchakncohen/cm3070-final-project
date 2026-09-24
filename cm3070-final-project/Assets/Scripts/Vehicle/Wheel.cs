@@ -6,74 +6,99 @@ using UnityEngine;
 
 namespace ModularVehicleSimulator.Vehicle
 {
+    [RequireComponent(typeof(Tire), typeof(Suspension))]
     public class Wheel : MonoBehaviour
     {
-        public const float DEFLECTION_SMOOTH_STEP = 1f;
+        public const float DEFLECTION_SMOOTH_STEP = 0.05f;
         public const float EFFECTIVE_SLIP_THRESHHOLD = 0.15f;
-        public const float SPEEDOMETER_SLIP_THRESHHOLD_MULTIPLIER = .70f;
-        public const float FX_SLIP_THRESHHOLD_MULTIPLIER = 7.0f;
+        public const float SPEEDOMETER_SLIP_THRESHHOLD_MULTIPLIER = .50f;
+        public const float FX_SLIP_THRESHHOLD_MULTIPLIER = 7.5f;
+        public const float GROUND_SMOOTH_TIME = 10f;
+        public const string TIRES_LAYER = "Tires";
+        public WheelContactData LastGroundHit => lastGroundHit;
         public Vector3 WheelFriction => GetWheelFrictionVector();
         public Vector3 WheelContactPoint => GetWheelContactPoint();
-
+        public bool IsGrounded => isGrounded;
         public bool IsMotorized => isMotorized;
         public bool IsSteerable => isSteerable;
         public bool IsFront => isFront;
         public bool IsLeft => transform.localPosition.x < 0f;
         public bool IsRight => transform.localPosition.x > 0f;
-        public float RPM => wheelColliders.Average(wheelCollider => wheelCollider.rpm);
-        private int numberOfColliders => wheelColliders.Length;
+        public float SteerAngle => steerAngle;
+        public float RPM => tire.RPM;
+        public float SuspensionDistance => suspensionConfiguration.Distance;
+        public Vector3 NormalForce => isGrounded ? suspension.GetNormalLoad(isGrounded) * lastGroundHit.normal : Vector3.zero;
+
         [SerializeField] private bool isMotorized = true;
         [SerializeField] private bool isSteerable = true;
         [SerializeField] private bool isFront = true;
         [SerializeField] private Transform wheelModel;
         [SerializeField] private Transform tireModel;
-        private WheelCollider[] wheelColliders;
+        private Tire tire;
+        private Suspension suspension;
         private WheelConfiguration wheelConfiguration;
         private SteeringConfiguration steeringConfiguration;
         private SuspensionConfiguration suspensionConfiguration;
         private ChassisConfiguration chassisConfiguration;
-        private DriveTrain driveTrain;
         private Rigidbody chassisRigidBody;
-        private Dictionary<WheelCollider, PhysicsMaterial> currentSurfaceMaterials = new Dictionary<WheelCollider, PhysicsMaterial>();
+        private LayerMask groundLayerMask;
+        private PhysicsMaterial surfaceMaterial;
+        private WheelContactData lastGroundHit;
         private float rightSteeringAngle = 0f;
         private float leftSteeringAngle = 0f;
+        private float steerAngle = 0f;
+        private float drivingAngle = 0f;
         private float currentDeflection = 0f;
         private float nominalDeflection = 0.02f;
+        private float brakeTorque = 0f;
+        private float motorTorque = 0f;
+        private float radius;
+        private bool isGrounded = false;
 
         private void Awake()
         {
-            wheelColliders = GetComponentsInChildren<WheelCollider>();
+            tire = GetComponent<Tire>();
+            suspension = GetComponent<Suspension>();
+            int layer = LayerMask.NameToLayer(TIRES_LAYER);
+            VehiclePhysics.SetChildrenLayerRecursive(transform, layer);
         }
 
-        public void Init(WheelConfiguration wheels, 
-                        SteeringConfiguration steering, 
-                        SuspensionConfiguration suspension,
-                        ChassisConfiguration chassis,
-                        DriveTrain driveTrain,
-                        Rigidbody chassisRigidBody)
+        public void Init(WheelConfiguration wheelConfiguration, 
+                        SteeringConfiguration steeringConfiguration, 
+                        SuspensionConfiguration suspensionConfiguration,
+                        ChassisConfiguration chassisConfiguration,
+                        EngineConfiguration engineConfiguration,
+                        Rigidbody chassisRigidBody,
+                        LayerMask groundLayerMask,
+                        int motorizedWheelCount)
         {
-            wheelConfiguration = wheels;
-            steeringConfiguration = steering;
-            suspensionConfiguration = suspension;
-            chassisConfiguration = chassis;
-            this.driveTrain = driveTrain;
+            this.wheelConfiguration = wheelConfiguration;
+            this.steeringConfiguration = steeringConfiguration;
+            this.suspensionConfiguration = suspensionConfiguration;
+            this.chassisConfiguration = chassisConfiguration;
+            this.groundLayerMask = groundLayerMask;
+            this.chassisRigidBody = chassisRigidBody;
             nominalDeflection = VehiclePhysics.GetNominalTireDeflection(
                 chassisConfiguration.Mass, 
                 chassisConfiguration.NumberOfWheels, 
                 wheelConfiguration.RadialTireStiffness
             );
-            this.chassisRigidBody = chassisRigidBody;
-            ApplyWheelPhysicsParamters();
             UpdateWheelPositions();
             UpdateTireVisuals(wheelConfiguration.Radius, wheelConfiguration.Width);
+            suspension.Init(chassisRigidBody, suspensionConfiguration, wheelConfiguration, IsFront);
+            float idleMotorTorque = engineConfiguration.GetTorque(engineConfiguration.IdleRPM) * engineConfiguration.IdleCompensation/motorizedWheelCount;
+            tire.Init(chassisRigidBody, wheelConfiguration, engineConfiguration, suspension, idleMotorTorque);
         }
 
         private void FixedUpdate()
         {
-            ApplyDeflection();
+            lastGroundHit = CheckIsGrounded();
             UpdateSurfaceMaterial();
-            UpdateTireFriction(currentDeflection);
+            ApplyDeflection();
             UpdateWheelAngles();
+            float forceAppPointDistance = GetForceAppPointDistance();
+            tire.UpdateFriction(currentDeflection, nominalDeflection, surfaceMaterial ? surfaceMaterial.dynamicFriction : 1.0f);
+            tire.ApplyFriction(lastGroundHit, forceAppPointDistance, SteerAngle, motorTorque, brakeTorque, isGrounded);
         }
 
         public void Steer(float leftSteeringAngle, float rightSteeringAngle)
@@ -82,28 +107,20 @@ namespace ModularVehicleSimulator.Vehicle
             this.leftSteeringAngle = leftSteeringAngle;
         }
 
-        public void Accelerate(float torque, float brakeTorque)
+        public void Accelerate(float motorTorque)
         {
-            foreach (WheelCollider wheelCollider in wheelColliders)
-            {
-                wheelCollider.brakeTorque = brakeTorque / numberOfColliders;
-                wheelCollider.motorTorque = torque / numberOfColliders;    
-            }
+            this.motorTorque = motorTorque;    
         }
 
-        public void Brake(float brakingInput, float brakeTorque)
+        public void Brake(float brakeTorque)
         {
-            float brakeTorquePerCollider = brakeTorque / numberOfColliders;
-            foreach (WheelCollider wheelCollider in wheelColliders)
-            {
-                wheelCollider.motorTorque = 0f;
-                wheelCollider.brakeTorque = brakingInput * brakeTorquePerCollider;            
-            }
+            motorTorque = 0f;
+            this.brakeTorque = brakeTorque;            
         }
 
         public float GetSlipThreshold(float bufferMultiplier)
         {
-            WheelFrictionCurve forwardFriction = wheelColliders[0].forwardFriction;
+            WheelFrictionCurve forwardFriction = tire.ForwardFriction;
             return forwardFriction.extremumSlip * bufferMultiplier;
         }
 
@@ -120,246 +137,83 @@ namespace ModularVehicleSimulator.Vehicle
 
         public float GetAverageForwardSlip()
         {
-            float slip = 0f;
-            int colliders = 0;
-            foreach (WheelCollider wheelCollider in wheelColliders)
-            {
-                float colliderSlip = GetForwardSlipForCollider(wheelCollider);
-                if(colliderSlip < Mathf.Infinity)
-                {
-                    colliders++;
-                    slip += colliderSlip;
-                }
-            }
-            return slip / colliders;
-        }
-
-        public float GetAverageSidewaysSlip()
-        {
-            float slip = 0f;
-            int colliders = 0;
-            foreach (WheelCollider wheelCollider in wheelColliders)
-            {
-                float colliderSlip = GetSidewaysSlipForCollider(wheelCollider);
-                if(colliderSlip < Mathf.Infinity)
-                {
-                    colliders++;
-                    slip += colliderSlip;
-                }
-            }
-            return slip / colliders;
+            return tire.ForwardSlip < Mathf.Infinity ? tire.ForwardSlip : 0f;
         }
 
         public float GetTravel()
         {
             float travel = 0;
-            foreach (WheelCollider wheelCollider in wheelColliders)
+            if(isGrounded)
             {
-                if(wheelCollider.GetGroundHit(out WheelHit hit))
-                {
-                    float localY = wheelCollider.transform.InverseTransformPoint(hit.point).y;
-                    float compression = (-localY - wheelCollider.radius) / wheelCollider.suspensionDistance;
-                    travel += Mathf.Clamp01(compression);
-                }
+                float currentWheelRadius = wheelConfiguration.Radius - currentDeflection;
+                float localY = tire.transform.InverseTransformPoint(lastGroundHit.point).y;
+                float compression = (-localY - currentWheelRadius) / suspensionConfiguration.Distance;
+                travel = Mathf.Clamp01(compression);                
             }
-            return travel / wheelColliders.Count();
+            return travel;
         }
 
-        public bool IsGrounded()
+        public Vector3[] GetRayOrigins(float raycastOffset)
         {
-            foreach (WheelCollider wheelCollider in wheelColliders)
+            float halfLength = wheelConfiguration.Radius * 0.5f;
+            float halfWidth = wheelConfiguration.Width * 0.5f;
+            Vector3 origin = transform.position + (raycastOffset * transform.up);
+            Vector3[] rayOrigins = new Vector3[]
             {
-                if(wheelCollider.GetGroundHit(out WheelHit hit))
-                {
-                    return true;
-                }
-            }
-            return false;
+                origin + (transform.forward * halfLength) + (transform.right * halfWidth),   // Front-transform.right
+                origin + (transform.forward * halfLength) - (transform.right * halfWidth),   // Front-Left
+                origin - (transform.forward * halfLength) + (transform.right * halfWidth),   // Rear-transform.right
+                origin - (transform.forward * halfLength) - (transform.right * halfWidth)    // Rear-Left
+            };
+            return rayOrigins;
         }
 
         private float GetRPM(float slipThreshhold)
         {
-            float rpm = 0f;
-            int effectiveColliders = 0;
-            foreach (WheelCollider wheelCollider in wheelColliders)
+            if (Mathf.Abs(tire.ForwardSlip) < slipThreshhold)
             {
-                float vehicleForwardSlip = GetForwardSlipForCollider(wheelCollider);
-                if (Mathf.Abs(vehicleForwardSlip) < slipThreshhold)
-                {
-                    rpm += wheelCollider.rpm;
-                    effectiveColliders++;
-                }
-            }
-            if (effectiveColliders > 0)
-            {
-                return rpm / effectiveColliders;
+                return tire.RPM;
             }
             return 0f;
         }
 
-        private static float GetForwardSlipForCollider(WheelCollider wheelCollider)
+        private void UpdateSurfaceMaterial()
         {
-            float vehicleForwardSlip = Mathf.Infinity;
-            if (wheelCollider.GetGroundHit(out WheelHit hit))
+            if (isGrounded)
             {
-                // Calculate total slip magnitude accounting for steering angle
-                float steerAngleRad = wheelCollider.steerAngle * Mathf.Deg2Rad;
-                vehicleForwardSlip = hit.forwardSlip * Mathf.Cos(steerAngleRad) - hit.sidewaysSlip * Mathf.Sin(steerAngleRad);
+                surfaceMaterial = lastGroundHit.collider.sharedMaterial;
             }
-
-            return vehicleForwardSlip;
-        }
-
-        private static float GetSidewaysSlipForCollider(WheelCollider wheelCollider)
-        {
-            float vehicleSidewaysSlip = Mathf.Infinity;
-            if (wheelCollider.GetGroundHit(out WheelHit hit))
+            else
             {
-                // Calculate total slip magnitude accounting for steering angle
-                float steerAngleRad = wheelCollider.steerAngle * Mathf.Deg2Rad;
-                vehicleSidewaysSlip = hit.sidewaysSlip * Mathf.Cos(steerAngleRad) + hit.forwardSlip * Mathf.Sin(steerAngleRad);
+                surfaceMaterial = null;
             }
-
-            return vehicleSidewaysSlip;
         }
 
         private void UpdateWheelAngles()
         {
-            Vector3 position = Vector3.zero;
-            Quaternion rotation = Quaternion.identity;
-            foreach (WheelCollider wheelCollider in wheelColliders)
-            {
-                if (IsLeft)
-                {
-                    wheelCollider.steerAngle = Mathf.MoveTowards(wheelCollider.steerAngle, rightSteeringAngle, steeringConfiguration.SteeringSpeed * Time.fixedDeltaTime);
-                }
-                else
-                {
-                    wheelCollider.steerAngle = Mathf.MoveTowards(wheelCollider.steerAngle, leftSteeringAngle, steeringConfiguration.SteeringSpeed * Time.fixedDeltaTime);
-                }
-                wheelCollider.GetWorldPose(out Vector3 wheelPosition, out rotation);
-                position = position + wheelPosition;
-            }
-            wheelModel.position = position / wheelColliders.Count();
-            wheelModel.rotation = rotation;
-        }
-
-        private void ApplyWheelPhysicsParamters()
-        {
-            foreach (WheelCollider wheelCollider in wheelColliders)
-            {
-                wheelCollider.radius = wheelConfiguration.Radius;
-                wheelCollider.mass = wheelConfiguration.Weight / numberOfColliders;
-                WheelFrictionCurve forwardFriction = wheelConfiguration.GetDefaultForwardFrictionCurve();
-                wheelCollider.forwardFriction = forwardFriction;
-                WheelFrictionCurve sidewaysFriction = wheelConfiguration.GetDefaultSidewaysFrictionCurve(); 
-                wheelCollider.sidewaysFriction = sidewaysFriction;
-                wheelCollider.suspensionDistance = suspensionConfiguration.Distance;
-                wheelCollider.wheelDampingRate = driveTrain.Damping;
-                if(IsFront)
-                {
-                    wheelCollider.suspensionSpring = suspensionConfiguration.GetFrontSuspectionSpring(wheelCollider.suspensionSpring.targetPosition);
-                }
-                else
-                {
-                    wheelCollider.suspensionSpring = suspensionConfiguration.GetBackSuspectionSpring(wheelCollider.suspensionSpring.targetPosition);
-                }
-                wheelCollider.forceAppPointDistance = GetForceAppPointDistance();
-            }
-            UpdateWheelWidth(wheelConfiguration.Width);
-        }
-
-        private float GetForceAppPointDistance()
-        {
-            Vector3 wheelLocalPosition = chassisRigidBody.transform.InverseTransformPoint(transform.position);
-            float wheelOffsetFromGround = wheelConfiguration.Radius;
-            float offsetFromGroundToCenterOfMass = chassisConfiguration.CenterOfMass.y - wheelLocalPosition.y + wheelOffsetFromGround;
-            float offsetDistance = offsetFromGroundToCenterOfMass - suspensionConfiguration.ForceAppPointOffset;
-            return Mathf.Max(0f, offsetDistance);
+            float targetAngle = IsLeft ? leftSteeringAngle : rightSteeringAngle;
+            steerAngle = targetAngle;
+            // Convert RPM to degrees per second.
+            drivingAngle = (drivingAngle + RPM * (360f / 60f) * Time.fixedDeltaTime) % 360f;
+            wheelModel.position = transform.position - suspension.Offset * transform.up;
+            // Use quaternions to ensure rotations do not effect each other.
+            wheelModel.localRotation = Quaternion.Euler(0f, steerAngle, 0f) * Quaternion.Euler(drivingAngle, 0f, 0f);
         }
 
         private void ApplyDeflection()
         {
-            float verticalForce = 0f;
-            foreach (WheelCollider wheelCollider in wheelColliders)
-            {
-                wheelCollider.GetGroundHit(out WheelHit hit);
-                verticalForce += hit.force;
-            }
-            float targetDeflection = VehiclePhysics.GetTireDeflection(verticalForce, wheelConfiguration.RadialTireStiffness);
-            float bulge = VehiclePhysics.GetTireDeflection(verticalForce, wheelConfiguration.LateralTireStiffness);
+            float targetDeflection = VehiclePhysics.GetTireDeflection(suspension.GetNormalLoad(isGrounded), wheelConfiguration.RadialTireStiffness);
+            float bulge = VehiclePhysics.GetTireDeflection(suspension.GetNormalLoad(isGrounded), wheelConfiguration.LateralTireStiffness);
             currentDeflection = Mathf.MoveTowards(currentDeflection, targetDeflection, DEFLECTION_SMOOTH_STEP * Time.fixedDeltaTime);
             float currentWheelRadius = wheelConfiguration.Radius - currentDeflection;
-            foreach (WheelCollider wheelCollider in wheelColliders)
-            {
-                wheelCollider.radius = currentWheelRadius;
-            }
+            radius = currentWheelRadius;
             float currentWidth = wheelConfiguration.Width + bulge;
-            UpdateWheelWidth(currentWidth);
             UpdateTireVisuals(currentWheelRadius, currentWidth);
-        }
-
-        private void UpdateSurfaceMaterial()
-        {
-            foreach (WheelCollider wheelCollider in wheelColliders)
-            {
-                // Setup dictionary. 
-                if (!currentSurfaceMaterials.ContainsKey(wheelCollider))
-                {
-                    currentSurfaceMaterials.Add(wheelCollider, null);
-                }
-
-                WheelHit hit;
-                if (wheelCollider.GetGroundHit(out hit))
-                {
-                    if (hit.collider.material.GetType() == typeof(PhysicsMaterial))
-                    {
-                        if (hit.collider.material != currentSurfaceMaterials[wheelCollider])
-                        {
-                            currentSurfaceMaterials[wheelCollider] = hit.collider.material;
-                        }
-                    }
-                    else
-                    {
-                        if(currentSurfaceMaterials[wheelCollider] != null)
-                        {
-                            currentSurfaceMaterials[wheelCollider] = null;
-                        }
-                    }
-                }
-            }
         }
 
         private void UpdateTireVisuals(float currentRadius, float currentWidth)
         {
             tireModel.localScale = new Vector3(currentRadius * 2f, currentWidth / 2f, wheelConfiguration.Radius * 2f);
-        }
-
-        private void UpdateTireFriction(float deflection)
-        {
-            float frictionMultiplier = 1f + (deflection-nominalDeflection)/nominalDeflection * wheelConfiguration.DeflectionGrip;
-            float temperature = Weather.Instance? Weather.Instance.Temperature : 20f;
-            RoadSurfaceCondition roadSurfaceCondition = Weather.Instance? Weather.Instance.RoadSurfaceCondition : RoadSurfaceCondition.None;
-            float forwardWeatherMultiplier = wheelConfiguration.GetForwardWeatherFrictionMultiplier(temperature, roadSurfaceCondition);
-            float sidewaysWeatherMultiplier = wheelConfiguration.GetSidewaysWeatherFrictionMultiplier(temperature, roadSurfaceCondition);
-            WheelFrictionCurve defaultForwardFriction = wheelConfiguration.GetDefaultForwardFrictionCurve();
-            WheelFrictionCurve defaultSidewaysFriction = wheelConfiguration.GetDefaultSidewaysFrictionCurve();
-            foreach (WheelCollider wheelCollider in wheelColliders)
-            {
-                float surfaceFriction = currentSurfaceMaterials[wheelCollider] ? currentSurfaceMaterials[wheelCollider].dynamicFriction : 1f;
-
-                WheelFrictionCurve forwardFriction = wheelCollider.forwardFriction;
-                forwardFriction.stiffness = defaultForwardFriction.stiffness;
-                forwardFriction.extremumValue = defaultForwardFriction.extremumValue * surfaceFriction * frictionMultiplier * forwardWeatherMultiplier / numberOfColliders;
-                forwardFriction.asymptoteValue = defaultForwardFriction.asymptoteValue * surfaceFriction * frictionMultiplier * forwardWeatherMultiplier / numberOfColliders;
-                wheelCollider.forwardFriction = forwardFriction;
-
-                WheelFrictionCurve sidewaysFriction = wheelCollider.sidewaysFriction;
-                sidewaysFriction.stiffness = defaultSidewaysFriction.stiffness;
-                sidewaysFriction.extremumValue = defaultSidewaysFriction.extremumValue * surfaceFriction * frictionMultiplier * sidewaysWeatherMultiplier / numberOfColliders;
-                sidewaysFriction.asymptoteValue = defaultSidewaysFriction.asymptoteValue * surfaceFriction * frictionMultiplier * sidewaysWeatherMultiplier / numberOfColliders;
-                wheelCollider.sidewaysFriction = sidewaysFriction;
-            }
         }
 
         private void UpdateWheelPositions()
@@ -385,25 +239,14 @@ namespace ModularVehicleSimulator.Vehicle
             }
         }
 
-        private void UpdateWheelWidth(float currentWidth)
-        {
-            float offset = -currentWidth/2;
-            float increment = (numberOfColliders - 1) * currentWidth;
-            for (int i = 0; i < numberOfColliders; i++)
-            {
-                wheelColliders[i].center = new Vector3(offset + i * increment, 0f, 0f);
-            }
-        }
-
         private Vector3 GetWheelFrictionVector()
         {
             Vector3 frictionVector = Vector3.zero;
-            foreach (WheelCollider wheelCollider in wheelColliders)
+            if(isGrounded)
             {
-                wheelCollider.GetGroundHit(out WheelHit hit);
-                float forwardFriction = VehiclePhysics.GetForwardFriction(wheelCollider.forwardFriction, hit.forwardSlip, ref hit);
-                float sidewaysFriction = VehiclePhysics.GetSidewaysFriction(wheelCollider.sidewaysFriction, hit.sidewaysSlip, ref hit);
-                frictionVector += (hit.forwardDir * forwardFriction) + (hit.sidewaysDir * sidewaysFriction);
+                float forwardFriction = VehiclePhysics.GetForwardFriction(tire.ForwardFriction, tire.ForwardSlip, suspension.GetNormalLoad(isGrounded));
+                float sidewaysFriction = VehiclePhysics.GetSidewaysFriction(tire.SidewaysFriction, tire.SidewaysSlip, suspension.GetNormalLoad(isGrounded));
+                frictionVector += (lastGroundHit.transform.forward * forwardFriction) + (lastGroundHit.transform.right * sidewaysFriction);                
             }
             return frictionVector;
         }
@@ -411,12 +254,83 @@ namespace ModularVehicleSimulator.Vehicle
         private Vector3 GetWheelContactPoint()
         {
             Vector3 contactPoint = Vector3.zero;
-            foreach (WheelCollider wheelCollider in wheelColliders)
+            if(isGrounded) contactPoint = lastGroundHit.point;
+            return contactPoint;
+        }
+
+        private float GetForceAppPointDistance()
+        {
+            if (chassisConfiguration == null || chassisRigidBody == null) return 0f;
+            Vector3 wheelLocalPosition = chassisRigidBody.transform.InverseTransformPoint(transform.position);
+            float wheelOffsetFromGround = wheelConfiguration.Radius;
+            float offsetFromGroundToCenterOfMass = chassisConfiguration.CenterOfMass.y - wheelLocalPosition.y + wheelOffsetFromGround;
+            float offsetDistance = offsetFromGroundToCenterOfMass - suspensionConfiguration.ForceAppPointOffset;
+            return Mathf.Max(0f, offsetDistance);
+        }
+
+        private WheelContactData CheckIsGrounded()
+        {
+            float raycastOffset = wheelConfiguration.Radius * 2.0f;
+            Vector3[] rayOrigins = GetRayOrigins(raycastOffset);
+
+            float maxDistance = suspensionConfiguration.Distance + wheelConfiguration.Radius + raycastOffset;
+            int hitCount = 0;
+            float totalDistance = 0f;
+            Vector3 totalNormal = Vector3.zero;
+            Vector3 totalPoint = Vector3.zero;
+            Collider collider = null;
+            Transform hitTransform = null;
+            float minDistance = float.MaxValue;
+
+            // Average four raycasts;
+            for (int i = 0; i < 4; i++)
             {
-                wheelCollider.GetGroundHit(out WheelHit hit);
-                contactPoint += hit.point;
+                if (UnityEngine.Physics.Raycast(rayOrigins[i], -transform.up, out RaycastHit hit, maxDistance, groundLayerMask))
+                {
+                    hitCount++;
+                    totalDistance += Mathf.Max(-wheelConfiguration.Radius, hit.distance - raycastOffset);
+                    totalNormal += hit.normal;
+                    totalPoint += hit.point;
+                    if (hit.distance < minDistance)
+                    {
+                        minDistance = hit.distance;
+                        collider = hit.collider;
+                        hitTransform = hit.transform;
+                    }
+                }
             }
-            return contactPoint / numberOfColliders;
+
+            if (hitCount > 0)
+            {
+                Vector3 smoothedNormal = (totalNormal / hitCount).normalized;
+                if (lastGroundHit.hitCount > 0)
+                {
+                    smoothedNormal = Vector3.Slerp(lastGroundHit.normal, (totalNormal / hitCount).normalized, GROUND_SMOOTH_TIME * Time.fixedDeltaTime);
+                }
+                isGrounded = true;
+                return new WheelContactData()
+                {
+                    hitCount = hitCount,
+                    distance = totalDistance / hitCount - 0.0116f,
+                    normal = smoothedNormal,
+                    point = totalPoint / hitCount,
+                    collider = collider,
+                    transform = hitTransform,
+                };
+            }
+            else
+            {
+                isGrounded = false;
+                return new WheelContactData()
+                {
+                    hitCount = 0,
+                    distance = maxDistance - raycastOffset,
+                    normal = transform.up,
+                    point = transform.position,
+                    collider = null,
+                    transform = null,
+                };
+            }
         }
     }
 }
